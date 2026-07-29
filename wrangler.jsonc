@@ -8,6 +8,15 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "r2_buckets": [
+    {
+      "bucket_name": "vitatech-product-images",
+      "binding": "PRODUCT_IMAGES"
+    }
+  ],
+  "vars": {
+    "R2_PUBLIC_URL": "https://pub-f5e3eee06ae444ed8a574cb56350cc48.r2.dev"
+  },
   "observability": {
     "enabled": true
   }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 
@@ -14,6 +15,14 @@ export default async function AccountPage() {
         <div className="mt-4 text-[13px] text-vt-muted-2">Correo</div>
         <div className="text-[15px] font-semibold text-vt-fg">{session.user.email}</div>
       </div>
+      {session.user.role === "ADMIN" && (
+        <Link
+          href="/admin/productos"
+          className="mt-6 inline-block rounded-[10px] bg-vt-accent px-6 py-3 text-[13.5px] font-extrabold text-vt-accent-fg"
+        >
+          Panel de administración →
+        </Link>
+      )}
       <form
         action={async () => {
           "use server";

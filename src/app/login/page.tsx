@@ -34,7 +34,7 @@ export default function LoginPage() {
           body: JSON.stringify({ name, email, password: pass }),
         });
         if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
+          const data = (await res.json().catch(() => ({}))) as { error?: string };
           setFormError(data.error ?? "No se pudo crear la cuenta.");
           return;
         }
