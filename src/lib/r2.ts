@@ -3,6 +3,17 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
+// Tipo mínimo del bucket que necesitamos. Se declara aquí a propósito en vez de
+// depender de `cloudflare-env.d.ts` (generado por `wrangler types`), porque ese
+// archivo está en .gitignore y no existe durante el build de CI.
+type ProductImagesBucket = {
+  put: (
+    key: string,
+    value: ArrayBuffer,
+    options?: { httpMetadata?: { contentType?: string } }
+  ) => Promise<unknown>;
+};
+
 export async function uploadProductImage(file: File): Promise<string> {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error("Formato de imagen no permitido. Usa JPG, PNG, WEBP o GIF.");
@@ -12,7 +23,7 @@ export async function uploadProductImage(file: File): Promise<string> {
   }
 
   const { env } = await getCloudflareContext({ async: true });
-  const bucket = env.PRODUCT_IMAGES;
+  const bucket = (env as unknown as { PRODUCT_IMAGES?: ProductImagesBucket }).PRODUCT_IMAGES;
   if (!bucket) {
     throw new Error(
       "El almacenamiento de imágenes (R2) no está disponible en este entorno. La subida de fotos solo funciona en el sitio desplegado en Cloudflare."
