@@ -57,7 +57,7 @@ export default async function HomePage() {
         <div className="relative grid h-[340px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
           {heroImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={heroImage} alt="" className="h-full w-full object-cover" />
+            <img src={heroImage} alt="" className="h-full w-full object-contain p-6" />
           ) : (
             <Icon name="laptop" className="h-24 w-24" />
           )}

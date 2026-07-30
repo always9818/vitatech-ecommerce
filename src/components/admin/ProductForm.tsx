@@ -191,12 +191,14 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
         <label className={labelClass}>Foto de producto</label>
         {defaultValues?.existingImage && !removeImage && (
           <div className="mb-3 flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={defaultValues.existingImage}
-              alt="Foto actual"
-              className="h-20 w-20 rounded-lg object-cover"
-            />
+            <div className="grid h-20 w-20 flex-none place-items-center overflow-hidden rounded-lg bg-white/[.05]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={defaultValues.existingImage}
+                alt="Foto actual"
+                className="h-full w-full object-contain p-1"
+              />
+            </div>
             <button
               type="button"
               onClick={() => setRemoveImage(true)}

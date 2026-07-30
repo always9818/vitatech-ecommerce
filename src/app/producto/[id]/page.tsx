@@ -37,7 +37,7 @@ export default async function ProductDetailPage({
           <div className="grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
             {photos[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={photos[0]} alt={product.name} className="h-full w-full object-cover" />
+              <img src={photos[0]} alt={product.name} className="h-full w-full object-contain p-6" />
             ) : (
               <Icon name={fallbackIcon} className="h-28 w-28" />
             )}
@@ -45,9 +45,9 @@ export default async function ProductDetailPage({
           {photos.length > 1 && (
             <div className="mt-3 grid grid-cols-4 gap-3">
               {photos.slice(0, 4).map((src) => (
-                <div key={src} className="h-20 overflow-hidden rounded-xl bg-white/[.05]">
+                <div className="grid h-20 place-items-center overflow-hidden rounded-xl bg-white/[.05]" key={src}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={product.name} className="h-full w-full object-cover" />
+                  <img src={src} alt={product.name} className="h-full w-full object-contain p-1.5" />
                 </div>
               ))}
             </div>
