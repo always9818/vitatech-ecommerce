@@ -15,8 +15,14 @@
     }
   ],
   "vars": {
-    "R2_PUBLIC_URL": "https://pub-f5e3eee06ae444ed8a574cb56350cc48.r2.dev"
+    "R2_PUBLIC_URL": "https://pub-f5e3eee06ae444ed8a574cb56350cc48.r2.dev",
+    "NEXT_PUBLIC_APP_URL": "https://importadoravitatech.com",
+    "NEXTAUTH_URL": "https://importadoravitatech.com"
   },
+  "routes": [
+    { "pattern": "importadoravitatech.com", "custom_domain": true },
+    { "pattern": "www.importadoravitatech.com", "custom_domain": true }
+  ],
   "observability": {
     "enabled": true
   }
