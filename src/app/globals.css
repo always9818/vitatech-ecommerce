@@ -137,3 +137,76 @@ body {
   opacity: 0;
   animation: vt-stagger 0.45s ease forwards;
 }
+
+/* ── Botones: micro-interacciones compartidas ──────────────────────────
+   .vt-btn da la sensación táctil (se levanta al pasar el cursor, se hunde
+   al presionar). .vt-btn-accent añade el brillo verde de la marca. */
+
+@keyframes vt-check-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-vt-check {
+  animation: vt-check-pop 0.32s ease-out;
+}
+
+.vt-btn {
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.vt-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.vt-btn:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 0.06s;
+}
+
+.vt-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.vt-btn-accent:not(:disabled):hover {
+  background-color: var(--vt-accent-hover);
+  box-shadow: 0 8px 22px rgba(163, 230, 53, 0.28);
+}
+
+/* Botones circulares/pequeños: solo hundir, sin levantar. */
+.vt-btn-icon:not(:disabled):hover {
+  transform: none;
+}
+
+.vt-btn-icon:not(:disabled):active {
+  transform: scale(0.88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-btn,
+  .vt-btn:not(:disabled):hover,
+  .vt-btn:not(:disabled):active {
+    transform: none;
+    transition: none;
+  }
+  .animate-vt-check {
+    animation: none;
+  }
+}

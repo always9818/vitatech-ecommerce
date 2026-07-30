@@ -13,7 +13,7 @@ export default function CheckoutCancelPage() {
       </p>
       <Link
         href="/carrito"
-        className="mt-2 rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg"
+        className="vt-btn vt-btn-accent mt-2 rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg"
       >
         Volver al carrito
       </Link>

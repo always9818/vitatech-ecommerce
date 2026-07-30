@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { Icon } from "@/components/Icon";
 
 type ToastContextValue = {
   showToast: (message: string) => void;
@@ -32,8 +33,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {toast && (
         <div
           key={toast.key}
-          className="animate-vt-toast fixed bottom-8 left-1/2 z-50 rounded-full bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg shadow-[0_12px_30px_rgba(0,0,0,.4)]"
+          className="animate-vt-toast fixed bottom-8 left-1/2 z-50 flex items-center gap-2 rounded-full bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg shadow-[0_12px_30px_rgba(0,0,0,.4)]"
         >
+          <Icon name="check" className="h-[18px] w-[18px]" />
           {toast.message}
         </div>
       )}

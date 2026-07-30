@@ -99,7 +99,7 @@ export default async function CatalogPage({
               <div className="text-[16px] font-bold text-vt-fg">Sin resultados</div>
               <Link
                 href="/catalogo"
-                className="mt-2 inline-block rounded-lg bg-vt-accent/[.15] px-5 py-2.5 text-[13px] font-bold text-vt-accent"
+                className="vt-btn mt-2 inline-block rounded-lg bg-vt-accent/[.15] px-5 py-2.5 text-[13px] font-bold text-vt-accent hover:bg-vt-accent/25"
               >
                 Limpiar filtros
               </Link>

@@ -31,7 +31,7 @@ export default async function AdminProductsPage({
         <h1 className="font-heading text-2xl font-bold text-white">Productos</h1>
         <Link
           href="/admin/productos/nuevo"
-          className="rounded-[10px] bg-vt-accent px-5 py-2.5 text-sm font-bold text-vt-accent-fg"
+          className="vt-btn vt-btn-accent rounded-[10px] bg-vt-accent px-5 py-2.5 text-sm font-bold text-vt-accent-fg"
         >
           + Nuevo producto
         </Link>

@@ -35,7 +35,7 @@ export function TaxonomySection({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-[10px] bg-vt-accent px-5 py-2.5 text-sm font-bold text-vt-accent-fg disabled:opacity-60"
+          className="vt-btn vt-btn-accent rounded-[10px] bg-vt-accent px-5 py-2.5 text-sm font-bold text-vt-accent-fg"
         >
           {isPending ? "..." : "Agregar"}
         </button>

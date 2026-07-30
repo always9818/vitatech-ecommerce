@@ -54,7 +54,7 @@ export function CartLine({
           type="button"
           disabled={isPending}
           onClick={() => startTransition(() => changeCartQty(productId, -1))}
-          className="grid place-items-center px-3 py-2 text-vt-fg hover:text-vt-accent"
+          className="vt-btn vt-btn-icon grid place-items-center px-3 py-2 text-vt-fg hover:text-vt-accent"
           aria-label="Quitar una unidad"
         >
           <Icon name="minus" className="h-4 w-4" />

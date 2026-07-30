@@ -228,7 +228,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-extrabold text-vt-accent-fg disabled:opacity-60"
+          className="vt-btn vt-btn-accent rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-extrabold text-vt-accent-fg"
         >
           {isPending ? "Guardando..." : submitLabel}
         </button>

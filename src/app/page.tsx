@@ -36,13 +36,13 @@ export default async function HomePage() {
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href="/catalogo"
-              className="rounded-[10px] bg-vt-accent px-7 py-3.5 text-sm font-bold text-vt-accent-fg"
+              className="vt-btn vt-btn-accent inline-block rounded-[10px] bg-vt-accent px-7 py-3.5 text-sm font-bold text-vt-accent-fg"
             >
               Ver ofertas
             </Link>
             <Link
               href="/catalogo"
-              className="rounded-[10px] border border-white/25 px-7 py-3.5 text-sm font-bold text-white hover:border-vt-accent hover:text-vt-accent"
+              className="vt-btn inline-block rounded-[10px] border border-white/25 px-7 py-3.5 text-sm font-bold text-white hover:border-vt-accent hover:text-vt-accent"
             >
               Explorar catálogo
             </Link>

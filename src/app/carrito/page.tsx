@@ -34,7 +34,7 @@ export default async function CartPage() {
           <div className="text-[17px] font-bold text-vt-fg">Tu carrito está vacío</div>
           <Link
             href="/catalogo"
-            className="mt-2 rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg"
+            className="vt-btn vt-btn-accent mt-2 rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg"
           >
             Ir al catálogo
           </Link>
@@ -83,7 +83,7 @@ export default async function CartPage() {
               />
               <button
                 type="button"
-                className="rounded-lg bg-vt-accent/[.15] px-4 text-[13px] font-bold text-vt-accent"
+                className="vt-btn rounded-lg bg-vt-accent/[.15] px-4 text-[13px] font-bold text-vt-accent hover:bg-vt-accent/25"
               >
                 Aplicar
               </button>
