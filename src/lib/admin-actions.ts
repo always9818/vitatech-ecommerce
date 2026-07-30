@@ -128,3 +128,85 @@ export async function deleteProduct(productId: string) {
   revalidatePath("/");
   redirect("/admin/productos");
 }
+
+export type TaxonomyFormState = { error?: string };
+
+export async function createCategory(
+  _prevState: TaxonomyFormState,
+  formData: FormData
+): Promise<TaxonomyFormState> {
+  await requireAdmin();
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "El nombre de la categoría no puede estar vacío." };
+
+  try {
+    await prisma.category.create({ data: { name } });
+  } catch {
+    return { error: `Ya existe una categoría llamada "${name}".` };
+  }
+
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos/nuevo");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  return {};
+}
+
+export async function createBrand(
+  _prevState: TaxonomyFormState,
+  formData: FormData
+): Promise<TaxonomyFormState> {
+  await requireAdmin();
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "El nombre de la marca no puede estar vacío." };
+
+  try {
+    await prisma.brand.create({ data: { name } });
+  } catch {
+    return { error: `Ya existe una marca llamada "${name}".` };
+  }
+
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos/nuevo");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  return {};
+}
+
+export async function deleteCategory(categoryId: string) {
+  await requireAdmin();
+
+  try {
+    await prisma.category.delete({ where: { id: categoryId } });
+  } catch {
+    redirect(
+      "/admin/categorias?error=" +
+        encodeURIComponent("No se pudo eliminar: hay productos usando esa categoría.")
+    );
+  }
+
+  revalidatePath("/admin/categorias");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  redirect("/admin/categorias");
+}
+
+export async function deleteBrand(brandId: string) {
+  await requireAdmin();
+
+  try {
+    await prisma.brand.delete({ where: { id: brandId } });
+  } catch {
+    redirect(
+      "/admin/categorias?error=" +
+        encodeURIComponent("No se pudo eliminar: hay productos usando esa marca.")
+    );
+  }
+
+  revalidatePath("/admin/categorias");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  redirect("/admin/categorias");
+}
