@@ -21,13 +21,12 @@ function parseSpecs(raw: string): { k: string; v: string }[] {
 }
 
 async function resolveImageUrls(formData: FormData, existing: string[]): Promise<string[]> {
-  const images = [...existing];
   const file = formData.get("image");
   if (file instanceof File && file.size > 0) {
     const url = await uploadProductImage(file);
-    images.push(url);
+    return [url];
   }
-  return images;
+  return existing;
 }
 
 function readProductFields(formData: FormData) {
