@@ -19,9 +19,10 @@
     "NEXT_PUBLIC_APP_URL": "https://importadoravitatech.com",
     "NEXTAUTH_URL": "https://importadoravitatech.com"
   },
+  "workers_dev": true,
   "routes": [
-    { "pattern": "importadoravitatech.com", "custom_domain": true },
-    { "pattern": "www.importadoravitatech.com", "custom_domain": true }
+    { "pattern": "importadoravitatech.com/*", "zone_name": "importadoravitatech.com" },
+    { "pattern": "www.importadoravitatech.com/*", "zone_name": "importadoravitatech.com" }
   ],
   "observability": {
     "enabled": true
