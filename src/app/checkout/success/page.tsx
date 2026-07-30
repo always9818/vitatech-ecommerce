@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { money } from "@/lib/money";
+import { Icon } from "@/components/Icon";
 
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -16,7 +17,9 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="mx-auto flex max-w-[560px] flex-col items-center gap-4 px-6 py-24 text-center">
-      <span className="text-5xl">{order.status === "PAID" ? "✓" : "⏳"}</span>
+      <span className={order.status === "PAID" ? "text-vt-accent" : "text-vt-warning"}>
+        <Icon name={order.status === "PAID" ? "checkCircle" : "clock"} className="h-14 w-14" />
+      </span>
       <div className="font-heading text-[26px] font-bold text-white">
         {order.status === "PAID" ? "¡Pedido confirmado!" : "Procesando tu pago…"}
       </div>

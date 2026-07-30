@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getCart } from "@/lib/cart-actions";
 import { SearchBar } from "@/components/SearchBar";
 import { CartBadge } from "@/components/CartBadge";
+import { Icon } from "@/components/Icon";
 
 const HEADER_CATEGORIES = ["Laptops", "Celulares", "Monitores", "Audio"];
 
@@ -40,17 +41,17 @@ export async function Header() {
         <div className="flex flex-none items-center gap-2 min-[520px]:gap-3">
           <Link
             href={session ? "/cuenta" : "/login"}
-            className="grid h-9 w-9 flex-none place-items-center rounded-full border border-white/10 text-base min-[520px]:h-10 min-[520px]:w-10 min-[520px]:text-lg"
+            className="grid h-9 w-9 flex-none place-items-center rounded-full border border-white/10 text-vt-fg transition-colors hover:border-vt-accent/50 hover:text-vt-accent min-[520px]:h-10 min-[520px]:w-10"
             aria-label="Cuenta"
           >
-            👤
+            <Icon name="user" className="h-[18px] w-[18px]" />
           </Link>
           <Link
             href="/carrito"
-            className="relative grid h-9 w-9 flex-none place-items-center rounded-full bg-vt-accent text-base min-[520px]:h-10 min-[520px]:w-10 min-[520px]:text-lg"
+            className="relative grid h-9 w-9 flex-none place-items-center rounded-full bg-vt-accent text-vt-accent-fg min-[520px]:h-10 min-[520px]:w-10"
             aria-label="Carrito"
           >
-            🛒
+            <Icon name="cart" className="h-[18px] w-[18px]" />
             <CartBadge count={cartCount} />
           </Link>
         </div>

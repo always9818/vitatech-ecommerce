@@ -3,6 +3,7 @@ import { getCart } from "@/lib/cart-actions";
 import { money } from "@/lib/money";
 import { CartLine } from "@/components/CartLine";
 import { CheckoutButton } from "@/components/CheckoutButton";
+import { Icon } from "@/components/Icon";
 
 const FREE_SHIPPING_THRESHOLD = 299;
 const SHIPPING_COST = 70;
@@ -27,7 +28,9 @@ export default async function CartPage() {
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 py-24 text-center">
-          <span className="text-4xl">🛒</span>
+          <span className="text-vt-muted-3">
+            <Icon name="cart" className="h-12 w-12" />
+          </span>
           <div className="text-[17px] font-bold text-vt-fg">Tu carrito está vacío</div>
           <Link
             href="/catalogo"
@@ -46,6 +49,7 @@ export default async function CartPage() {
                 name={it.product.name}
                 category={it.product.category.name}
                 icon={it.product.icon}
+                photo={it.product.images[0]}
                 price={it.product.price}
                 quantity={it.quantity}
               />

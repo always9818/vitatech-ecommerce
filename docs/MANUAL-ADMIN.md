@@ -40,7 +40,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 | Precio actual (Q) | El precio que se cobra hoy |
 | Precio de lista (Q) | El precio "antes del descuento" — si no hay descuento, pon el mismo valor que el precio actual |
 | Stock disponible | Cuántas unidades hay en inventario |
-| Ícono de respaldo (emoji) | Un emoji que se muestra si el producto no tiene foto todavía (ej. 💻, 📱, 🎧) |
+| Ícono de respaldo | Se elige de una lista (Laptop, Celular, Monitor, Audífonos, Impresora…). Es el dibujo de línea que se muestra mientras el producto todavía no tiene foto |
 | Calificación (0-5) y Reseñas | Para mostrar estrellas en la tarjeta del producto |
 | Descripción | Texto que se ve en la ficha del producto |
 | Especificaciones técnicas | Una línea por especificación, formato `Nombre: Valor`. Ejemplo:<br>`Procesador: AMD Ryzen 5`<br>`Memoria RAM: 16GB`<br>`Almacenamiento: 512GB SSD` |
@@ -61,6 +61,8 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 4. Si quieres **reemplazar la foto**: sube una nueva en el campo "Foto de producto" — la anterior se reemplaza automáticamente.
 5. Si quieres **quitar la foto** sin subir una nueva: dale clic a "Quitar foto" (aparece debajo de la foto actual), y el producto volverá a mostrar solo el emoji de respaldo.
 6. Dale clic a **"Guardar cambios"**.
+
+> Las fotos que subas ahora sí se muestran en la tienda: en la tarjeta del catálogo, en la ficha del producto y en el carrito. Mientras un producto no tenga foto, se ve el ícono de línea que hayas elegido.
 
 ---
 

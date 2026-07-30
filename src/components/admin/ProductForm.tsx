@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import type { ProductFormState } from "@/lib/admin-actions";
+import { PRODUCT_ICON_OPTIONS } from "@/lib/product-icon";
 
 type Option = { id: string; name: string };
 
@@ -123,15 +124,16 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
       </div>
 
       <div>
-        <label className={labelClass}>Ícono de respaldo (emoji)</label>
-        <input
-          name="icon"
-          defaultValue={defaultValues?.icon ?? "📦"}
-          className={inputClass}
-          placeholder="📦"
-        />
+        <label className={labelClass}>Ícono de respaldo</label>
+        <select name="icon" defaultValue={defaultValues?.icon ?? "package"} className={inputClass}>
+          {PRODUCT_ICON_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
         <p className="mt-1 text-[11.5px] text-vt-muted-2">
-          Se muestra si el producto no tiene foto.
+          Se muestra si el producto todavía no tiene foto.
         </p>
       </div>
 

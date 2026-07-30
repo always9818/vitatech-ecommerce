@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { Icon } from "@/components/Icon";
 
 export function SearchBar() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export function SearchBar() {
 
   return (
     <div className="relative w-full">
-      <span className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-vt-muted-2">
-        🔍
+      <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-vt-muted-2">
+        <Icon name="search" className="h-[18px] w-[18px]" />
       </span>
       <input
         value={value}

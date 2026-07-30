@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/catalog";
 import { money, discountPct } from "@/lib/money";
 import { ProductDetailActions } from "@/components/ProductDetailActions";
+import { Icon, type IconName } from "@/components/Icon";
+import { resolveProductIcon } from "@/lib/product-icon";
 
-const BENEFITS = [
-  { icon: "🚚", label: "Envío gratis desde Q 299" },
-  { icon: "🏪", label: "Recoge en tienda" },
-  { icon: "🛡️", label: "Garantía 12 meses" },
-  { icon: "↩️", label: "Devolución 15 días" },
+const BENEFITS: { icon: IconName; label: string }[] = [
+  { icon: "truck", label: "Envío gratis desde Q 299" },
+  { icon: "store", label: "Recoge en tienda" },
+  { icon: "shield", label: "Garantía 12 meses" },
+  { icon: "returns", label: "Devolución 15 días" },
 ];
 
 export default async function ProductDetailPage({
@@ -24,24 +26,32 @@ export default async function ProductDetailPage({
     product.stock === 0 ? "Agotado" : product.stock <= 5 ? `Últimas ${product.stock} unidades` : "En stock";
   const specs = (product.specs as { k: string; v: string }[]) ?? [];
   const cuota = "o " + money(Math.round(product.price / 6)) + "/mes en 6 cuotas sin intereses";
+  const fallbackIcon = resolveProductIcon(product.icon, product.category.name);
+  const photos = product.images;
+  const rating = Math.round(product.rating);
 
   return (
     <div className="animate-vt-slide mx-auto max-w-[1180px] px-6 py-10">
       <div className="grid grid-cols-1 gap-10 min-[880px]:grid-cols-[1.05fr_.95fr]">
         <div>
-          <div className="grid h-[400px] place-items-center rounded-2xl bg-white/[.05] text-8xl">
-            {product.icon}
+          <div className="grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
+            {photos[0] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photos[0]} alt={product.name} className="h-full w-full object-cover" />
+            ) : (
+              <Icon name={fallbackIcon} className="h-28 w-28" />
+            )}
           </div>
-          <div className="mt-3 grid grid-cols-4 gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="grid h-20 place-items-center rounded-xl bg-white/[.05] text-3xl"
-              >
-                {product.icon}
-              </div>
-            ))}
-          </div>
+          {photos.length > 1 && (
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              {photos.slice(0, 4).map((src) => (
+                <div key={src} className="h-20 overflow-hidden rounded-xl bg-white/[.05]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={product.name} className="h-full w-full object-cover" />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -52,7 +62,16 @@ export default async function ProductDetailPage({
             {product.name}
           </h1>
           <div className="flex items-center gap-2 text-[13px] text-vt-muted-1">
-            <span className="text-vt-accent">{"★".repeat(Math.round(product.rating))}</span>
+            <span className="flex items-center gap-0.5 text-vt-accent">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Icon
+                  key={i}
+                  name="star"
+                  filled={i < rating}
+                  className={i < rating ? "h-3.5 w-3.5" : "h-3.5 w-3.5 text-vt-muted-3"}
+                />
+              ))}
+            </span>
             <span>{product.rating.toFixed(1)}</span>
             <span>· {product.reviews} reseñas</span>
             <span className="font-bold text-vt-accent">· {stockLabel}</span>
@@ -82,7 +101,9 @@ export default async function ProductDetailPage({
           <div className="mt-8 grid grid-cols-2 gap-3">
             {BENEFITS.map((b) => (
               <div key={b.label} className="flex items-center gap-2.5 text-[12.5px] text-vt-muted-1">
-                <span className="text-base">{b.icon}</span>
+                <span className="flex-none text-vt-accent">
+                  <Icon name={b.icon} className="h-[18px] w-[18px]" />
+                </span>
                 {b.label}
               </div>
             ))}

@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { getCategories, getBrands } from "@/lib/catalog";
 import { updateProduct } from "@/lib/admin-actions";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { resolveProductIcon } from "@/lib/product-icon";
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const [product, categories, brands] = await Promise.all([
-    prisma.product.findUnique({ where: { id } }),
+    prisma.product.findUnique({ where: { id }, include: { category: true } }),
     getCategories(),
     getBrands(),
   ]);
@@ -31,7 +32,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           name: product.name,
           sku: product.sku,
           description: product.description,
-          icon: product.icon,
+          icon: resolveProductIcon(product.icon, product.category.name),
           categoryId: product.categoryId,
           brandId: product.brandId,
           price: product.price,

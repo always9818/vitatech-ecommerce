@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { money } from "@/lib/money";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
+import { Icon } from "@/components/Icon";
+import { resolveProductIcon } from "@/lib/product-icon";
 
 export default async function AdminProductsPage({
   searchParams,
@@ -67,9 +69,21 @@ export default async function AdminProductsPage({
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-b border-white/5 last:border-none">
-                <td className="flex items-center gap-2 px-4 py-3">
-                  <span className="text-xl">{p.images[0] ? "🖼️" : p.icon}</span>
-                  <span className="font-semibold text-vt-fg">{p.name}</span>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-lg bg-white/[.05] text-vt-muted-2">
+                      {p.images[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.images[0]} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Icon
+                          name={resolveProductIcon(p.icon, p.category.name)}
+                          className="h-[18px] w-[18px]"
+                        />
+                      )}
+                    </span>
+                    <span className="font-semibold text-vt-fg">{p.name}</span>
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-vt-muted-2">{p.sku}</td>
                 <td className="px-4 py-3 text-vt-muted-1">{p.category.name}</td>

@@ -1,21 +1,14 @@
 import Link from "next/link";
 import { getCategories, getFeaturedProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
+import { Icon, type IconName } from "@/components/Icon";
+import { resolveCategoryIcon } from "@/lib/product-icon";
 
-const CATEGORY_ICONS: Record<string, string> = {
-  Laptops: "💻",
-  Celulares: "📱",
-  Monitores: "🖥️",
-  Audio: "🎧",
-  Accesorios: "⌨️",
-  Impresoras: "🖨️",
-};
-
-const BENEFITS = [
-  { icon: "🚚", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
-  { icon: "🏪", title: "Recoge en tienda", sub: "Listo en 2 horas" },
-  { icon: "🛡️", title: "Garantía real", sub: "Servicio técnico propio" },
-  { icon: "💳", title: "Pago seguro", sub: "Tarjeta o contra entrega" },
+const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
+  { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
+  { icon: "store", title: "Recoge en tienda", sub: "Listo en 2 horas" },
+  { icon: "shield", title: "Garantía real", sub: "Servicio técnico propio" },
+  { icon: "card", title: "Pago seguro", sub: "Tarjeta o contra entrega" },
 ];
 
 export default async function HomePage() {
@@ -55,8 +48,8 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-        <div className="relative grid h-[340px] place-items-center rounded-2xl bg-white/[.05] text-7xl">
-          💻
+        <div className="relative grid h-[340px] place-items-center rounded-2xl bg-white/[.05] text-vt-muted-3">
+          <Icon name="laptop" className="h-24 w-24" />
         </div>
       </section>
 
@@ -67,7 +60,9 @@ export default async function HomePage() {
             key={b.title}
             className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[.03] p-4"
           >
-            <span className="text-2xl">{b.icon}</span>
+            <span className="text-vt-accent">
+              <Icon name={b.icon} className="h-6 w-6" />
+            </span>
             <div>
               <div className="text-[13.5px] font-bold text-white">{b.title}</div>
               <div className="text-[11.5px] text-vt-muted-2">{b.sub}</div>
@@ -82,9 +77,11 @@ export default async function HomePage() {
           <Link
             key={c.id}
             href={`/catalogo?cat=${encodeURIComponent(c.name)}`}
-            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[.03] px-4 py-2.5 hover:border-vt-accent/50"
+            className="group flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[.03] px-4 py-2.5 hover:border-vt-accent/50"
           >
-            <span className="text-xl">{CATEGORY_ICONS[c.name] ?? "🔧"}</span>
+            <span className="text-vt-muted-1 group-hover:text-vt-accent">
+              <Icon name={resolveCategoryIcon(c.name)} className="h-[18px] w-[18px]" />
+            </span>
             <span className="text-[13.5px] font-bold text-vt-fg">{c.name}</span>
           </Link>
         ))}

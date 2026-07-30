@@ -34,7 +34,7 @@ function readProductFields(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const sku = String(formData.get("sku") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
-  const icon = String(formData.get("icon") ?? "📦").trim() || "📦";
+  const icon = String(formData.get("icon") ?? "package").trim() || "package";
   const categoryId = String(formData.get("categoryId") ?? "");
   const brandId = String(formData.get("brandId") ?? "");
   const price = Number(formData.get("price"));

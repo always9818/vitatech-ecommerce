@@ -11,6 +11,7 @@ export function AddToCartButton({
   className,
   children,
   stopPropagation,
+  "aria-label": ariaLabel,
 }: {
   productId: string;
   quantity?: number;
@@ -18,6 +19,7 @@ export function AddToCartButton({
   className?: string;
   children: React.ReactNode;
   stopPropagation?: boolean;
+  "aria-label"?: string;
 }) {
   const [isPending, startTransition] = useTransition();
   const { showToast } = useToast();
@@ -27,6 +29,7 @@ export function AddToCartButton({
       type="button"
       disabled={disabled || isPending}
       className={className}
+      aria-label={ariaLabel}
       onClick={(e) => {
         if (stopPropagation) e.stopPropagation();
         startTransition(async () => {

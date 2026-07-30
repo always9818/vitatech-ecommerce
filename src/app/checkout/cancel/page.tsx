@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { Icon } from "@/components/Icon";
 
 export default function CheckoutCancelPage() {
   return (
     <div className="mx-auto flex max-w-[560px] flex-col items-center gap-4 px-6 py-24 text-center">
-      <span className="text-5xl">✕</span>
+      <span className="text-vt-error">
+        <Icon name="xCircle" className="h-14 w-14" />
+      </span>
       <div className="font-heading text-[26px] font-bold text-white">Pago cancelado</div>
       <p className="text-[14px] text-vt-muted-1">
         No se completó el pago. Tu carrito sigue guardado, puedes intentar de nuevo cuando quieras.

@@ -3,6 +3,7 @@ import { getFilteredProducts, getCategoryCounts, getBrands, type SortOption } fr
 import { ProductCard } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
 import { BrandFilterList } from "@/components/BrandFilterList";
+import { Icon } from "@/components/Icon";
 
 export default async function CatalogPage({
   searchParams,
@@ -92,7 +93,9 @@ export default async function CatalogPage({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 py-20 text-center">
-              <span className="text-4xl">🔍</span>
+              <span className="text-vt-muted-3">
+                <Icon name="search" className="h-12 w-12" />
+              </span>
               <div className="text-[16px] font-bold text-vt-fg">Sin resultados</div>
               <Link
                 href="/catalogo"
