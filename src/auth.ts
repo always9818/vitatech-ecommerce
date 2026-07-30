@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { mergeGuestCartIntoUser } from "@/lib/cart-merge";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -29,6 +30,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (user?.id) {
+        await mergeGuestCartIntoUser(user.id);
+      }
+      return true;
+    },
     jwt({ token, user }) {
       if (user?.id) token.id = user.id;
       if (user && "role" in user) token.role = user.role as "CUSTOMER" | "ADMIN";

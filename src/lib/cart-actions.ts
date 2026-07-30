@@ -5,8 +5,7 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-
-const GUEST_COOKIE = "vt_guest_id";
+import { GUEST_COOKIE } from "@/lib/cart-constants";
 
 // Solo debe llamarse desde Server Actions reales (los exports mutantes de abajo):
 // escribe la cookie de invitado, lo cual Next.js prohíbe durante el render de un
