@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
-import { uploadProductImage } from "@/lib/r2";
+import { uploadProductImage, uploadSiteImage } from "@/lib/r2";
 
 export type ProductFormState = { error?: string };
 
@@ -209,4 +209,44 @@ export async function deleteBrand(brandId: string) {
   revalidatePath("/catalogo");
   revalidatePath("/");
   redirect("/admin/categorias");
+}
+
+export type SiteSettingsFormState = { error?: string };
+
+export async function updateHeroImage(
+  _prevState: SiteSettingsFormState,
+  formData: FormData
+): Promise<SiteSettingsFormState> {
+  await requireAdmin();
+
+  const file = formData.get("image");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Selecciona una imagen." };
+  }
+
+  try {
+    const url = await uploadSiteImage(file);
+    await prisma.siteSettings.upsert({
+      where: { id: "main" },
+      update: { heroImageUrl: url },
+      create: { id: "main", heroImageUrl: url },
+    });
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "No se pudo actualizar la portada." };
+  }
+
+  revalidatePath("/admin/portada");
+  revalidatePath("/");
+  return {};
+}
+
+export async function removeHeroImage() {
+  await requireAdmin();
+  await prisma.siteSettings.upsert({
+    where: { id: "main" },
+    update: { heroImageUrl: null },
+    create: { id: "main", heroImageUrl: null },
+  });
+  revalidatePath("/admin/portada");
+  revalidatePath("/");
 }

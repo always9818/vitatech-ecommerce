@@ -17,6 +17,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/categorias" className="text-vt-muted-1 hover:text-vt-accent">
             Categorías y marcas
           </Link>
+          <Link href="/admin/portada" className="text-vt-muted-1 hover:text-vt-accent">
+            Portada
+          </Link>
           <Link href="/" className="text-vt-muted-1 hover:text-vt-accent">
             ← Volver a la tienda
           </Link>

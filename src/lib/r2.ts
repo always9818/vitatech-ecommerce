@@ -14,7 +14,7 @@ type ProductImagesBucket = {
   ) => Promise<unknown>;
 };
 
-export async function uploadProductImage(file: File): Promise<string> {
+async function uploadImage(file: File, folder: string): Promise<string> {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error("Formato de imagen no permitido. Usa JPG, PNG, WEBP o GIF.");
   }
@@ -31,7 +31,7 @@ export async function uploadProductImage(file: File): Promise<string> {
   }
 
   const extension = file.type.split("/")[1] ?? "jpg";
-  const key = `productos/${crypto.randomUUID()}.${extension}`;
+  const key = `${folder}/${crypto.randomUUID()}.${extension}`;
 
   await bucket.put(key, await file.arrayBuffer(), {
     httpMetadata: { contentType: file.type },
@@ -43,4 +43,12 @@ export async function uploadProductImage(file: File): Promise<string> {
   }
 
   return `${publicUrl}/${key}`;
+}
+
+export function uploadProductImage(file: File) {
+  return uploadImage(file, "productos");
+}
+
+export function uploadSiteImage(file: File) {
+  return uploadImage(file, "sitio");
 }

@@ -8,11 +8,21 @@ export function Footer() {
           VITA<span className="text-vt-accent">TECH</span>
         </div>
         <nav className="flex flex-wrap justify-center gap-5 text-[13px] text-vt-muted-1">
-          <Link href="#">Tiendas</Link>
-          <Link href="#">Envíos</Link>
-          <Link href="#">Garantías</Link>
-          <Link href="#">Soporte</Link>
-          <Link href="#">Términos</Link>
+          <Link href="/tiendas" className="hover:text-vt-accent">
+            Tiendas
+          </Link>
+          <Link href="/envios" className="hover:text-vt-accent">
+            Envíos
+          </Link>
+          <Link href="/garantias" className="hover:text-vt-accent">
+            Garantías
+          </Link>
+          <Link href="/soporte" className="hover:text-vt-accent">
+            Soporte
+          </Link>
+          <Link href="/terminos" className="hover:text-vt-accent">
+            Términos
+          </Link>
         </nav>
         <div className="text-[12px] text-vt-muted-3">
           © {new Date().getFullYear()} Importadora Vitatech. Todos los derechos reservados.

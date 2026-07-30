@@ -3,6 +3,7 @@ import { getCategories, getFeaturedProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveCategoryIcon } from "@/lib/product-icon";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
   { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
@@ -12,7 +13,12 @@ const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
 ];
 
 export default async function HomePage() {
-  const [categories, featured] = await Promise.all([getCategories(), getFeaturedProducts(4)]);
+  const [categories, featured, settings] = await Promise.all([
+    getCategories(),
+    getFeaturedProducts(4),
+    getSiteSettings(),
+  ]);
+  const heroImage = settings?.heroImageUrl;
 
   return (
     <div className="animate-vt-fade mx-auto max-w-[1180px] px-6 py-10">
@@ -48,8 +54,13 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-        <div className="relative grid h-[340px] place-items-center rounded-2xl bg-white/[.05] text-vt-muted-3">
-          <Icon name="laptop" className="h-24 w-24" />
+        <div className="relative grid h-[340px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
+          {heroImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={heroImage} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <Icon name="laptop" className="h-24 w-24" />
+          )}
         </div>
       </section>
 

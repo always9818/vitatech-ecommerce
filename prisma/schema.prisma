@@ -122,3 +122,11 @@ model OrderItem {
   quantity   Int
   unitPrice  Int
 }
+
+// Registro único (id fijo "main") con configuración editable del sitio,
+// como la imagen de portada del hero de la home.
+model SiteSettings {
+  id            String   @id @default("main")
+  heroImageUrl  String?
+  updatedAt     DateTime @updatedAt
+}

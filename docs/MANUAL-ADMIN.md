@@ -75,13 +75,39 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 6. Preguntas frecuentes
+## 6. Categorías y marcas
+
+1. En el menú del panel, dale clic a **"Categorías y marcas"**.
+2. Vas a ver dos columnas: **Categorías** y **Marcas**, cada una con su propia lista y su propio campo para agregar una nueva.
+3. Escribe el nombre y dale clic a **"Agregar"** — aparece de inmediato en la lista, y ya queda disponible para elegirla al crear o editar un producto.
+4. Para eliminar una, dale clic a **"Eliminar"** junto a ella.
+
+**Si una categoría o marca ya tiene productos asignados**, el sistema no te va a dejar eliminarla (para no dejar productos huérfanos) — primero tendrías que cambiar esos productos a otra categoría/marca.
+
+---
+
+## 7. Imagen de portada (hero de la home)
+
+1. En el menú del panel, dale clic a **"Portada"**.
+2. Ahí ves la foto actual (si ya subiste una) y un botón para subir una nueva.
+3. Sube tu imagen (JPG, PNG, WEBP o GIF, máximo 5 MB) y dale clic a **"Subir portada"** / **"Reemplazar portada"**.
+4. Se actualiza de inmediato en la home, en el recuadro grande a la derecha del texto principal ("Potencia tu setup al mejor precio").
+5. Si quieres volver al ícono por defecto, dale clic a **"Quitar portada"**.
+
+> Igual que las fotos de producto, esto solo funciona en el sitio real desplegado, no en un entorno de desarrollo local.
+
+---
+
+## 8. Páginas del pie de página (Tiendas, Envíos, Garantías, Soporte, Términos)
+
+Estos 5 enlaces del pie de página ya llevan a páginas reales (antes no hacían nada). Por ahora tienen texto de ejemplo genérico — avísame cuándo tengas el contenido real de cada una (direcciones de tiendas, política de envíos, texto legal, etc.) y lo actualizo. No hay todavía un editor en el panel para estas páginas; el cambio lo hago yo directamente en el código.
+
+---
+
+## 9. Preguntas frecuentes
 
 **¿Puedo dar acceso de administrador a otra persona?**
 Por ahora esto no tiene un botón en el panel — hay que hacerlo manualmente en la base de datos. Si necesitas agregar otro administrador, dime el correo de esa cuenta (ya debe estar registrada en la tienda) y lo configuro.
-
-**¿Puedo agregar categorías o marcas nuevas?**
-Todavía no hay un formulario para eso en el panel — es una mejora pendiente. Mientras tanto, avísame qué categoría o marca necesitas y la agrego.
 
 **¿Qué pasa si subo una foto muy pesada?**
 El sistema rechaza archivos de más de 5 MB con un mensaje de error — no se sube nada, puedes intentar de nuevo con una imagen más liviana.
