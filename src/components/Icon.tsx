@@ -35,6 +35,8 @@ const PATHS = {
   minus: <><path d="M5 12h14" /></>,
   chat: <><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z" /></>,
   document: <><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v5h5" /><path d="M8 13h8" /><path d="M8 17h5" /></>,
+  chevronLeft: <><path d="M15 18 9 12l6-6" /></>,
+  chevronRight: <><path d="m9 18 6-6-6-6" /></>,
 } as const;
 
 export type IconName = keyof typeof PATHS;

@@ -113,15 +113,28 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 8. Imagen de portada (hero de la home)
+## 8. Portada: textos y carrusel de diseños
 
-1. En el menú del panel, dale clic a **"Portada"**.
-2. Ahí ves la foto actual (si ya subiste una) y un botón para subir una nueva.
-3. Sube tu imagen (JPG, PNG, WEBP o GIF, máximo 5 MB) y dale clic a **"Subir portada"** / **"Reemplazar portada"**.
-4. Se actualiza de inmediato en la home, en el recuadro grande a la derecha del texto principal ("Potencia tu setup al mejor precio").
-5. Si quieres volver al ícono por defecto, dale clic a **"Quitar portada"**.
+En el menú del panel, dale clic a **"Portada"**. Tiene dos partes.
 
-> Igual que las fotos de producto, esto solo funciona en el sitio real desplegado, no en un entorno de desarrollo local.
+### Textos
+El título grande, la etiqueta de temporada y el texto de abajo. Cámbialos para anunciar una promoción o un descuento.
+
+### Carrusel de diseños
+Son las imágenes grandes que se ven debajo del texto, a todo lo ancho de la página.
+
+1. En **"Agregar un diseño"**, elige la imagen (JPG, PNG, WEBP o GIF, máximo 5 MB).
+2. **Enlace** (opcional): a dónde va el cliente al hacer clic. Tiene que empezar con `/` y ser una página de tu tienda, por ejemplo `/catalogo?cat=Laptops`. Si lo dejas vacío, la imagen no es clicable.
+3. **Descripción** (opcional): se lee en voz alta para personas con discapacidad visual y aparece si la imagen no carga.
+4. Dale a **"Agregar al carrusel"**.
+
+**Sobre el orden:** las flechas ↑ ↓ mueven cada diseño. **El primero de la lista es el que ve el cliente al entrar.**
+
+**Cómo se comporta:**
+- Con **un solo diseño**, se muestra fijo, sin flechas.
+- Con **dos o más**, rotan solos cada 6 segundos. El cliente puede pasarlos con las flechas o los puntos, y la rotación se detiene mientras tiene el cursor encima.
+
+> **Consejo de tamaño:** diseña las imágenes **apaisadas**, por ejemplo **1600 × 700 px**. La imagen siempre se ve completa (nunca se recorta), así que una imagen cuadrada o vertical va a dejar franjas vacías a los lados y se verá más pequeña.
 
 ---
 
