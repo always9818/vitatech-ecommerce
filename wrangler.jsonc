@@ -8,11 +8,14 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  // El dominio personalizado (www.importadoravitatech.com) se administra desde
-  // el panel de Cloudflare, no desde aquí. Declararlo como `routes` con
-  // custom_domain hacía que cada deploy intentara reclamarlo de nuevo contra
-  // /workers/scripts/.../domains/records; cuando esa llamada falla, wrangler
-  // aborta con "No targets deployed" y la versión subida nunca se activa.
+  // El dominio se sirve con `routes` + `zone_name` (ver abajo), que es la forma
+  // que coincide con lo registrado en el panel: Workers & Pages → Domains,
+  // ambos hostnames como tipo Route.
+  //
+  // NO declararlo como `{ "custom_domain": true }`: esa forma hace que cada
+  // deploy intente reclamar el dominio contra /workers/scripts/.../domains/records
+  // y, cuando esa llamada falla, wrangler aborta con "No targets deployed" —
+  // el Worker queda subido pero la versión nueva nunca se activa y el sitio se cae.
   "r2_buckets": [
     {
       "bucket_name": "vitatech-product-images",
@@ -24,7 +27,10 @@
     "NEXT_PUBLIC_APP_URL": "https://importadoravitatech.com",
     "NEXTAUTH_URL": "https://importadoravitatech.com"
   },
-  "workers_dev": true,
+  // Apagado a propósito, igual que en el panel: la tienda se sirve solo desde el
+  // dominio propio. En `true`, cada deploy vuelve a publicar
+  // vitatech-ecommerce.<cuenta>.workers.dev como copia pública del sitio.
+  "workers_dev": false,
   "routes": [
     { "pattern": "importadoravitatech.com/*", "zone_name": "importadoravitatech.com" },
     { "pattern": "www.importadoravitatech.com/*", "zone_name": "importadoravitatech.com" }
