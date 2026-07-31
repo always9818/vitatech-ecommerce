@@ -26,7 +26,26 @@ En la pantalla de login también está el botón **"Continuar con Google"**. Sir
 
 ---
 
-## 2. Ver y buscar productos
+## 2. Pedidos (a dónde enviar cada compra)
+
+Es la primera pestaña del panel: **Pedidos**. Ahí ves todo lo que te han comprado, del más reciente al más antiguo.
+
+De cada pedido ves:
+
+- **Quién compró** (nombre y correo, por si necesitas contactarlo).
+- **Estado**: *Pendiente de pago* (todavía no paga), *Pagado* (ya puedes despachar), *Cancelado* o *Fallido*.
+- **Productos** con cantidades y precios.
+- **Entregar a**: nombre de quien recibe, teléfono, dirección completa con zona, municipio, departamento y el punto de referencia.
+
+Arriba tienes el resumen: cuántos pedidos van, cuántos están pagados y cuánto has vendido (solo cuenta los pagados).
+
+> **Despacha solo los que digan "Pagado".** Un pedido "Pendiente de pago" significa que el cliente llegó hasta la pantalla de pago pero no la completó.
+
+> Los pedidos hechos **antes** de que existiera esta función no tienen dirección guardada. En esos casos verás un aviso y tendrás que escribirle al cliente por correo para confirmar a dónde enviarlo.
+
+---
+
+## 3. Ver y buscar productos
 
 Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, marca, precio y stock disponible.
 
@@ -35,7 +54,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 3. Crear un producto nuevo
+## 4. Crear un producto nuevo
 
 1. Dale clic a **"+ Nuevo producto"**.
 2. Llena los campos:
@@ -61,7 +80,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 4. Editar un producto
+## 5. Editar un producto
 
 1. En la lista, dale clic a **"Editar"** junto al producto que quieras cambiar.
 2. El formulario aparece con todos los datos actuales ya llenos.
@@ -74,7 +93,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 5. Eliminar un producto
+## 6. Eliminar un producto
 
 1. En la lista, dale clic a **"Eliminar"**.
 2. Te pide confirmar — dale "Aceptar" si estás seguro (esta acción no se puede deshacer).
@@ -83,7 +102,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 6. Categorías y marcas
+## 7. Categorías y marcas
 
 1. En el menú del panel, dale clic a **"Categorías y marcas"**.
 2. Vas a ver dos columnas: **Categorías** y **Marcas**, cada una con su propia lista y su propio campo para agregar una nueva.
@@ -94,7 +113,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 7. Imagen de portada (hero de la home)
+## 8. Imagen de portada (hero de la home)
 
 1. En el menú del panel, dale clic a **"Portada"**.
 2. Ahí ves la foto actual (si ya subiste una) y un botón para subir una nueva.
@@ -106,13 +125,13 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 8. Páginas del pie de página (Tiendas, Envíos, Garantías, Soporte, Términos)
+## 9. Páginas del pie de página (Tiendas, Envíos, Garantías, Soporte, Términos)
 
 Estos 5 enlaces del pie de página ya llevan a páginas reales (antes no hacían nada). Por ahora tienen texto de ejemplo genérico — avísame cuándo tengas el contenido real de cada una (direcciones de tiendas, política de envíos, texto legal, etc.) y lo actualizo. No hay todavía un editor en el panel para estas páginas; el cambio lo hago yo directamente en el código.
 
 ---
 
-## 9. Preguntas frecuentes
+## 10. Preguntas frecuentes
 
 **¿Puedo dar acceso de administrador a otra persona?**
 Por ahora esto no tiene un botón en el panel — hay que hacerlo manualmente en la base de datos. Si necesitas agregar otro administrador, dime el correo de esa cuenta (ya debe estar registrada en la tienda) y lo configuro.
