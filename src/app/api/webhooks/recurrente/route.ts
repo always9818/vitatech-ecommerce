@@ -54,10 +54,13 @@ export async function POST(request: Request) {
 
   try {
     if (PAID_EVENTS.has(eventType)) {
+      // `select` explícito (sin `couponId`) para que confirmar un pago siga
+      // funcionando aunque el esquema de cupones todavía no esté aplicado en
+      // la base; el cupón se consulta aparte, tolerando el fallo.
       const order = await prisma.order.update({
         where: { id: orderId },
         data: { status: "PAID" },
-        include: { items: true },
+        select: { id: true, userId: true, items: true },
       });
 
       for (const item of order.items) {
@@ -67,9 +70,30 @@ export async function POST(request: Request) {
         });
       }
 
-      const cart = await prisma.cart.findUnique({ where: { userId: order.userId } });
+      try {
+        const withCoupon = await prisma.order.findUnique({
+          where: { id: order.id },
+          select: { couponId: true },
+        });
+        if (withCoupon?.couponId) {
+          await prisma.coupon.update({
+            where: { id: withCoupon.couponId },
+            data: { usageCount: { increment: 1 } },
+          });
+        }
+      } catch (err) {
+        console.error("[recurrente webhook] No se pudo contabilizar el cupón: %o", err);
+      }
+
+      const cart = await prisma.cart.findUnique({
+        where: { userId: order.userId },
+        select: { id: true },
+      });
       if (cart) {
         await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+        await prisma.cart
+          .update({ where: { id: cart.id }, data: { couponId: null } })
+          .catch(() => {});
       }
     } else if (FAILED_EVENTS.has(eventType)) {
       await prisma.order.update({ where: { id: orderId }, data: { status: "FAILED" } });

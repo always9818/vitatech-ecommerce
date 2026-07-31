@@ -24,6 +24,17 @@ enum UserRole {
   ADMIN
 }
 
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CouponType {
+  PERCENT
+  FIXED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -35,6 +46,7 @@ model User {
 
   cart          Cart?
   orders        Order[]
+  reviews       Review[]
 }
 
 model Category {
@@ -70,6 +82,7 @@ model Product {
 
   cartItems   CartItem[]
   orderItems  OrderItem[]
+  productReviews Review[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -78,12 +91,45 @@ model Product {
   @@index([brandId])
 }
 
+model Review {
+  id        String       @id @default(cuid())
+  productId String
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+
+  @@unique([productId, userId])
+  @@index([productId, status])
+}
+
+model Coupon {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  type        CouponType
+  value       Int
+  active      Boolean    @default(true)
+  expiresAt   DateTime?
+  usageLimit  Int?
+  usageCount  Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  carts       Cart[]
+  orders      Order[]
+}
+
 model Cart {
   id        String     @id @default(cuid())
   userId    String?    @unique
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   guestId   String?    @unique
   items     CartItem[]
+  couponId  String?
+  coupon    Coupon?    @relation(fields: [couponId], references: [id], onDelete: SetNull)
   updatedAt DateTime   @updatedAt
 }
 
@@ -106,6 +152,9 @@ model Order {
   subtotal           Int
   shipping           Int
   discount           Int
+  couponId           String?
+  coupon             Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  couponDiscount     Int         @default(0)
   total              Int
   status             OrderStatus @default(PENDING)
   recurrenteCheckoutId String?   @unique

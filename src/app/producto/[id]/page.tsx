@@ -4,6 +4,8 @@ import { money, discountPct } from "@/lib/money";
 import { ProductDetailActions } from "@/components/ProductDetailActions";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveProductIcon } from "@/lib/product-icon";
+import { getProductRatingStats } from "@/lib/review-actions";
+import { ReviewsSection } from "@/components/ReviewsSection";
 
 const BENEFITS: { icon: IconName; label: string }[] = [
   { icon: "truck", label: "Envío gratis desde Q 299" },
@@ -28,7 +30,11 @@ export default async function ProductDetailPage({
   const cuota = "o " + money(Math.round(product.price / 6)) + "/mes en 6 cuotas sin intereses";
   const fallbackIcon = resolveProductIcon(product.icon, product.category.name);
   const photos = product.images;
-  const rating = Math.round(product.rating);
+  const ratingStats = await getProductRatingStats(product.id, {
+    rating: product.rating,
+    reviews: product.reviews,
+  });
+  const rating = Math.round(ratingStats.rating);
 
   return (
     <div className="animate-vt-slide mx-auto max-w-[1180px] px-6 py-10">
@@ -72,8 +78,8 @@ export default async function ProductDetailPage({
                 />
               ))}
             </span>
-            <span>{product.rating.toFixed(1)}</span>
-            <span>· {product.reviews} reseñas</span>
+            <span>{ratingStats.rating.toFixed(1)}</span>
+            <span>· {ratingStats.reviews} reseñas</span>
             <span className="font-bold text-vt-accent">· {stockLabel}</span>
           </div>
 
@@ -119,6 +125,8 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </div>
+
+      <ReviewsSection productId={product.id} />
     </div>
   );
 }
