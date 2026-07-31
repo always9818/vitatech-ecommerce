@@ -6,7 +6,62 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 import { uploadProductImage, uploadSiteImage } from "@/lib/r2";
 
-export type ProductFormState = { error?: string };
+export type ProductFormValues = {
+  name: string;
+  sku: string;
+  description: string;
+  icon: string;
+  categoryId: string;
+  brandId: string;
+  price: number;
+  oldPrice: number;
+  stock: number;
+  rating: number;
+  reviews: number;
+  specsText: string;
+};
+
+// `values` devuelve lo que se escribió: React 19 reinicia los campos no
+// controlados al terminar una acción de formulario, así que sin esto un error
+// (por ejemplo un SKU repetido) borraba todo el producto ya tecleado.
+export type ProductFormState = { error?: string; values?: ProductFormValues };
+
+/**
+ * Traduce el error a algo que Angel entienda. Prisma devuelve cosas como
+ * "Unique constraint failed on the fields: (`sku`)", que no le dice nada a
+ * quien está administrando la tienda.
+ */
+function describeProductError(err: unknown, fallback: string): string {
+  const raw = err instanceof Error ? err.message : "";
+  if (/Unique constraint/i.test(raw) && /sku/i.test(raw)) {
+    return "Ese SKU ya lo tiene otro producto. Usa un código distinto.";
+  }
+  if (/Foreign key constraint/i.test(raw)) {
+    return "La categoría o la marca seleccionada ya no existe. Vuelve a elegirla.";
+  }
+  // Los errores que lanzamos nosotros en readProductFields ya están en español.
+  return raw && !/prisma|constraint|invalid `/i.test(raw) ? raw : fallback;
+}
+
+/** Lee los campos tal cual, sin validar, para poder devolverlos ante un error. */
+function readRawProductValues(formData: FormData): ProductFormValues {
+  const s = (k: string) => String(formData.get(k) ?? "");
+  const n = (k: string) => Number(formData.get(k) ?? 0);
+  return {
+    name: s("name").trim(),
+    sku: s("sku").trim(),
+    description: s("description").trim(),
+    icon: s("icon") || "package",
+    categoryId: s("categoryId"),
+    brandId: s("brandId"),
+    price: n("price"),
+    oldPrice: n("oldPrice"),
+    stock: n("stock"),
+    rating: n("rating"),
+    reviews: n("reviews"),
+    specsText: s("specs"),
+  };
+}
 
 function parseSpecs(raw: string): { k: string; v: string }[] {
   const specs: { k: string; v: string }[] = [];
@@ -70,7 +125,10 @@ export async function createProduct(_prevState: ProductFormState, formData: Form
       data: { ...fields, images },
     });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "No se pudo crear el producto." };
+    return {
+      error: describeProductError(err, "No se pudo crear el producto."),
+      values: readRawProductValues(formData),
+    };
   }
 
   revalidatePath("/admin/productos");
@@ -98,7 +156,10 @@ export async function updateProduct(
       data: { ...fields, images },
     });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "No se pudo actualizar el producto." };
+    return {
+      error: describeProductError(err, "No se pudo actualizar el producto."),
+      values: readRawProductValues(formData),
+    };
   }
 
   revalidatePath("/admin/productos");

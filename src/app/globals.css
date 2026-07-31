@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 :root {
+  /* La tienda es oscura. Sin esto el navegador dibuja los controles nativos
+     (la lista desplegable de un <select>, barras de scroll, selectores de
+     fecha) con el esquema claro del sistema: fondo blanco con nuestro texto
+     claro encima, ilegible. */
+  color-scheme: dark;
+
   --vt-bg: #0d1405;
   --vt-fg: #e7e5e4;
   --vt-muted-1: #a8a29e;
@@ -38,6 +44,16 @@ body {
   background: var(--vt-bg);
   color: var(--vt-fg);
   font-family: var(--font-body), sans-serif;
+}
+
+/* Respaldo para los navegadores de Windows que ignoran `color-scheme` al
+   pintar la lista desplegable. Se fija un verde oscuro opaco a propósito: las
+   superficies del sitio son blancos translúcidos y sobre el fondo blanco del
+   menú nativo se verían casi blancas. */
+select option,
+select optgroup {
+  background-color: #16200a;
+  color: var(--vt-fg);
 }
 
 @keyframes vt-fade {

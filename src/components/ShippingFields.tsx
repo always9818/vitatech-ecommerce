@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { DEPARTAMENTOS } from "@/lib/shipping";
 
 export type ShippingDefaults = {
@@ -26,11 +25,9 @@ export function ShippingFields({ defaults }: { defaults?: ShippingDefaults }) {
   // solo con `defaultValue`, pero un <select> no: al reiniciarse el formulario
   // tras una acción fallida quedaba en blanco y el cliente tenía que volver a
   // elegirlo. Controlado, React lo vuelve a pintar siempre con el valor bueno.
-  const [department, setDepartment] = useState(defaults?.department ?? "");
-  useEffect(() => {
-    setDepartment(defaults?.department ?? "");
-  }, [defaults?.department]);
-
+  // Campos no controlados a propósito: los formularios que usan estos campos
+  // manejan el envío con `onSubmit`, no con `<form action={...}>`, así que React
+  // nunca reinicia el formulario y lo que el cliente escribió se queda.
   return (
     <div className="grid grid-cols-1 gap-5 min-[620px]:grid-cols-2">
       <div>
@@ -64,8 +61,7 @@ export function ShippingFields({ defaults }: { defaults?: ShippingDefaults }) {
         <select
           name="department"
           required
-          value={department}
-          onChange={(e) => setDepartment(e.target.value)}
+          defaultValue={defaults?.department ?? ""}
           className={inputClass}
         >
           <option value="" disabled>

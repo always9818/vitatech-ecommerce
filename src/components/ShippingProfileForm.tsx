@@ -1,22 +1,31 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import { saveShippingProfile, type ShippingFormState } from "@/lib/shipping-actions";
 import { ShippingFields, type ShippingDefaults } from "@/components/ShippingFields";
 import { Icon, Spinner } from "@/components/Icon";
 
 export function ShippingProfileForm({ defaults }: { defaults?: ShippingDefaults }) {
-  const [state, formAction, isPending] = useActionState<ShippingFormState, FormData>(
-    saveShippingProfile,
-    {}
-  );
+  const [state, setState] = useState<ShippingFormState>({});
+  const [isPending, startTransition] = useTransition();
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
-      {/* Se prefiere lo último enviado sobre lo guardado: si la validación
-          falló, el cliente recupera lo que había escrito en vez de empezar
-          de cero (React reinicia los campos tras ejecutar la acción). */}
-      <ShippingFields defaults={state.values ?? defaults} />
+    <form
+      // Envío manual en vez de `<form action={...}>`: React 19 reinicia los
+      // campos no controlados al terminar una acción de formulario, y eso le
+      // borraba al cliente todo lo que había escrito cuando la validación
+      // fallaba. Peor aún en el <select>, que al reiniciarse saltaba a la
+      // primera opción válida y cambiaba el departamento en silencio.
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        startTransition(async () => {
+          setState(await saveShippingProfile({}, formData));
+        });
+      }}
+      className="flex flex-col gap-6"
+    >
+      <ShippingFields defaults={defaults} />
 
       {state.error && (
         <div className="rounded-lg border border-vt-error/30 bg-vt-error/10 px-4 py-3 text-[13px] text-vt-error">

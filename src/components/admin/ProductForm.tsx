@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState, useTransition } from "react";
 import type { ProductFormState } from "@/lib/admin-actions";
 import { PRODUCT_ICON_OPTIONS } from "@/lib/product-icon";
 
@@ -33,19 +33,36 @@ const inputClass =
 const labelClass = "mb-1.5 block text-[13px] font-semibold text-vt-fg";
 
 export function ProductForm({ action, categories, brands, submitLabel, defaultValues }: ProductFormProps) {
-  const [state, formAction, isPending] = useActionState<ProductFormState, FormData>(action, {});
+  const [state, setState] = useState<ProductFormState>({});
+  const [isPending, startTransition] = useTransition();
   const [removeImage, setRemoveImage] = useState(false);
 
+  const v = defaultValues;
+
   return (
-    <form action={formAction} className="mt-6 grid grid-cols-1 gap-6 min-[880px]:grid-cols-2">
+    <form
+      // Envío manual en vez de `<form action={...}>`: React 19 reinicia los
+      // campos no controlados al terminar una acción de formulario, y eso
+      // borraba todo el producto ya tecleado cuando algo fallaba (por ejemplo
+      // un SKU repetido). Peor aún en los <select>, que al reiniciarse saltaban
+      // a la primera opción válida y cambiaban la categoría en silencio.
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        startTransition(async () => {
+          setState(await action({}, formData));
+        });
+      }}
+      className="mt-6 grid grid-cols-1 gap-6 min-[880px]:grid-cols-2"
+    >
       <div>
         <label className={labelClass}>Nombre del producto</label>
-        <input name="name" required defaultValue={defaultValues?.name} className={inputClass} />
+        <input name="name" required defaultValue={v?.name} className={inputClass} />
       </div>
 
       <div>
         <label className={labelClass}>SKU</label>
-        <input name="sku" required defaultValue={defaultValues?.sku} className={inputClass} />
+        <input name="sku" required defaultValue={v?.sku} className={inputClass} />
       </div>
 
       <div>
@@ -53,7 +70,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
         <select
           name="categoryId"
           required
-          defaultValue={defaultValues?.categoryId}
+          defaultValue={v?.categoryId ?? ""}
           className={inputClass}
         >
           <option value="" disabled>
@@ -69,7 +86,12 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
 
       <div>
         <label className={labelClass}>Marca</label>
-        <select name="brandId" required defaultValue={defaultValues?.brandId} className={inputClass}>
+        <select
+          name="brandId"
+          required
+          defaultValue={v?.brandId ?? ""}
+          className={inputClass}
+        >
           <option value="" disabled>
             Selecciona una marca
           </option>
@@ -89,7 +111,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           min="1"
           step="1"
           required
-          defaultValue={defaultValues?.price}
+          defaultValue={v?.price}
           className={inputClass}
         />
       </div>
@@ -102,7 +124,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           min="1"
           step="1"
           required
-          defaultValue={defaultValues?.oldPrice}
+          defaultValue={v?.oldPrice}
           className={inputClass}
         />
         <p className="mt-1 text-[11.5px] text-vt-muted-2">
@@ -118,14 +140,18 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           min="0"
           step="1"
           required
-          defaultValue={defaultValues?.stock}
+          defaultValue={v?.stock}
           className={inputClass}
         />
       </div>
 
       <div>
         <label className={labelClass}>Ícono de respaldo</label>
-        <select name="icon" defaultValue={defaultValues?.icon ?? "package"} className={inputClass}>
+        <select
+          name="icon"
+          defaultValue={v?.icon ?? "package"}
+          className={inputClass}
+        >
           {PRODUCT_ICON_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -145,7 +171,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           min="0"
           max="5"
           step="0.1"
-          defaultValue={defaultValues?.rating ?? 5}
+          defaultValue={v?.rating ?? 5}
           className={inputClass}
         />
       </div>
@@ -157,7 +183,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           type="number"
           min="0"
           step="1"
-          defaultValue={defaultValues?.reviews ?? 0}
+          defaultValue={v?.reviews ?? 0}
           className={inputClass}
         />
       </div>
@@ -168,7 +194,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           name="description"
           rows={4}
           required
-          defaultValue={defaultValues?.description}
+          defaultValue={v?.description}
           className={inputClass}
         />
       </div>
@@ -178,7 +204,7 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
         <textarea
           name="specs"
           rows={5}
-          defaultValue={defaultValues?.specsText}
+          defaultValue={v?.specsText}
           placeholder={"Procesador: AMD Ryzen 5\nMemoria RAM: 16GB\nAlmacenamiento: 512GB SSD"}
           className={inputClass}
         />
