@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { GoogleMark, Spinner } from "@/components/Icon";
+import { VitatechMark } from "@/components/Logo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -88,8 +89,11 @@ export function LoginForm({
           style={{ background: "radial-gradient(circle, rgba(163,230,53,.2), transparent 65%)" }}
         />
         <div className="relative">
-          <div className="font-heading text-2xl font-bold text-white">
-            VITA<span className="text-vt-accent">TECH_</span>
+          <div className="flex items-center gap-2.5">
+            <VitatechMark className="h-10 w-10" />
+            <div className="font-heading text-2xl font-bold text-white">
+              VITA<span className="text-vt-accent">TECH_</span>
+            </div>
           </div>
           <h2 className="font-heading mt-6 text-[40px] leading-[1.12] font-bold text-white">
             Tu tecnología,

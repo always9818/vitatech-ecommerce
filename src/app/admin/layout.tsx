@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
+import { VitatechMark } from "@/components/Logo";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();
@@ -7,7 +8,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="mx-auto max-w-[1180px] px-6 py-8">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-        <Link href="/admin/productos" className="font-heading text-xl font-bold text-white">
+        <Link
+          href="/admin/productos"
+          className="flex items-center gap-2.5 font-heading text-xl font-bold text-white"
+        >
+          <VitatechMark className="h-7 w-7" />
           Panel de administración<span className="text-vt-accent">.</span>
         </Link>
         <nav className="flex items-center gap-5 text-[13px] font-semibold">

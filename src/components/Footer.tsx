@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { VitatechMark } from "@/components/Logo";
 
 export function Footer() {
   return (
     <footer className="border-t border-white/10 px-6 py-10">
       <div className="mx-auto flex max-w-[1180px] flex-col items-center gap-4 text-center">
-        <div className="font-heading text-[17px] font-bold text-white">
-          VITA<span className="text-vt-accent">TECH</span>
+        <div className="flex flex-col items-center gap-2">
+          <VitatechMark className="h-9 w-9" />
+          <div className="font-heading text-[17px] font-bold text-white">
+            VITA<span className="text-vt-accent">TECH</span>
+          </div>
         </div>
         <nav className="flex flex-wrap justify-center gap-5 text-[13px] text-vt-muted-1">
           <Link href="/tiendas" className="hover:text-vt-accent">

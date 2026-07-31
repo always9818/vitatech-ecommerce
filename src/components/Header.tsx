@@ -4,6 +4,7 @@ import { getCart } from "@/lib/cart-actions";
 import { SearchBar } from "@/components/SearchBar";
 import { CartBadge } from "@/components/CartBadge";
 import { Icon } from "@/components/Icon";
+import { VitatechMark } from "@/components/Logo";
 
 const HEADER_CATEGORIES = ["Laptops", "Celulares", "Monitores", "Audio"];
 
@@ -17,8 +18,10 @@ export async function Header() {
       <div className="mx-auto flex max-w-[1180px] items-center gap-3 px-3.5 py-3.5 min-[520px]:gap-4 min-[520px]:px-6 min-[880px]:gap-6">
         <Link
           href="/"
-          className="flex-none font-heading text-[18px] font-bold whitespace-nowrap text-white min-[520px]:text-[22px]"
+          aria-label="Importadora Vitatech, ir al inicio"
+          className="flex flex-none items-center gap-2 font-heading text-[18px] font-bold whitespace-nowrap text-white min-[520px]:text-[22px]"
         >
+          <VitatechMark className="h-6 w-6 min-[520px]:h-7 min-[520px]:w-7" />
           VITA<span className="text-vt-accent">TECH_</span>
         </Link>
 
