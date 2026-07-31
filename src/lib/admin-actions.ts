@@ -250,6 +250,74 @@ export async function removeHeroImage() {
   revalidatePath("/");
 }
 
+// Topes pensados para que el hero no se descuadre: el título es el texto
+// grande y basta con pasarse un poco para que rompa el diseño en móvil.
+const HERO_LIMITS = { badge: 60, title: 70, titleAccent: 30, subtitle: 300 };
+
+export type HeroContentFormState = { error?: string; ok?: boolean };
+
+export async function updateHeroContent(
+  _prevState: HeroContentFormState,
+  formData: FormData
+): Promise<HeroContentFormState> {
+  await requireAdmin();
+
+  const badge = String(formData.get("badge") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const titleAccent = String(formData.get("titleAccent") ?? "").trim();
+  const subtitle = String(formData.get("subtitle") ?? "").trim();
+
+  if (!title) {
+    return { error: "El título no puede quedar vacío." };
+  }
+  for (const [campo, valor, tope] of [
+    ["La insignia", badge, HERO_LIMITS.badge],
+    ["El título", title, HERO_LIMITS.title],
+    ["La palabra destacada", titleAccent, HERO_LIMITS.titleAccent],
+    ["El párrafo", subtitle, HERO_LIMITS.subtitle],
+  ] as const) {
+    if (valor.length > tope) {
+      return { error: `${campo} no puede pasar de ${tope} caracteres.` };
+    }
+  }
+
+  const data = {
+    heroBadge: badge,
+    heroTitle: title,
+    heroTitleAccent: titleAccent,
+    heroSubtitle: subtitle,
+  };
+
+  await prisma.siteSettings.upsert({
+    where: { id: "main" },
+    update: data,
+    create: { id: "main", ...data },
+  });
+
+  revalidatePath("/admin/portada");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+// Devuelve los cuatro campos a null para que la home vuelva a mostrar los
+// textos por defecto de HERO_DEFAULTS.
+export async function resetHeroContent() {
+  await requireAdmin();
+  const data = {
+    heroBadge: null,
+    heroTitle: null,
+    heroTitleAccent: null,
+    heroSubtitle: null,
+  };
+  await prisma.siteSettings.upsert({
+    where: { id: "main" },
+    update: data,
+    create: { id: "main", ...data },
+  });
+  revalidatePath("/admin/portada");
+  revalidatePath("/");
+}
+
 async function revalidateReviewPaths(productId: string) {
   revalidatePath("/admin/resenas");
   revalidatePath(`/producto/${productId}`);

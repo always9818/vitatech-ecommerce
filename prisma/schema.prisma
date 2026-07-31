@@ -172,10 +172,18 @@ model OrderItem {
   unitPrice  Int
 }
 
-// Registro único (id fijo "main") con configuración editable del sitio,
-// como la imagen de portada del hero de la home.
+// Registro único (id fijo "main") con configuración editable del sitio:
+// la imagen de portada del hero de la home y sus textos.
+//
+// Los textos son opcionales: cuando valen null se usan los valores por defecto
+// de HERO_DEFAULTS (src/lib/site-settings.ts). Una cadena vacía NO es lo mismo
+// que null — significa "ocultar ese elemento" (ver resolveHeroContent).
 model SiteSettings {
-  id            String   @id @default("main")
-  heroImageUrl  String?
-  updatedAt     DateTime @updatedAt
+  id              String   @id @default("main")
+  heroImageUrl    String?
+  heroBadge       String?
+  heroTitle       String?
+  heroTitleAccent String?
+  heroSubtitle    String?
+  updatedAt       DateTime @updatedAt
 }

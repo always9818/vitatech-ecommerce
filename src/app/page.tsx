@@ -3,7 +3,7 @@ import { getCategories, getFeaturedProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveCategoryIcon } from "@/lib/product-icon";
-import { getSiteSettings } from "@/lib/site-settings";
+import { getSiteSettings, resolveHeroContent } from "@/lib/site-settings";
 
 const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
   { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
@@ -19,6 +19,7 @@ export default async function HomePage() {
     getSiteSettings(),
   ]);
   const heroImage = settings?.heroImageUrl;
+  const hero = resolveHeroContent(settings);
 
   return (
     <div className="animate-vt-fade mx-auto max-w-[1180px] px-6 py-10">
@@ -29,16 +30,17 @@ export default async function HomePage() {
           style={{ background: "radial-gradient(circle, rgba(163,230,53,.2), transparent 65%)" }}
         />
         <div className="relative">
-          <span className="inline-flex items-center gap-2 rounded-full border border-vt-accent/30 bg-vt-accent/[.12] px-3.5 py-1.5 text-[12px] font-bold tracking-[.05em] text-vt-accent">
-            TEMPORADA TECH · HASTA -40%
-          </span>
+          {hero.badge && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-vt-accent/30 bg-vt-accent/[.12] px-3.5 py-1.5 text-[12px] font-bold tracking-[.05em] text-vt-accent">
+              {hero.badge}
+            </span>
+          )}
           <h1 className="font-heading my-4 text-[38px] leading-[1.08] font-bold text-white min-[880px]:text-[50px]">
-            Potencia tu setup al mejor <span className="text-vt-accent">precio</span>
+            {hero.title} {hero.titleAccent && <span className="text-vt-accent">{hero.titleAccent}</span>}
           </h1>
-          <p className="max-w-[440px] text-[15px] text-vt-muted-1">
-            Tecnología de las mejores marcas, con envío a todo Guatemala y garantía real. Encuentra
-            laptops, celulares, monitores y más al mejor precio.
-          </p>
+          {hero.subtitle && (
+            <p className="max-w-[440px] text-[15px] text-vt-muted-1">{hero.subtitle}</p>
+          )}
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href="/catalogo"
