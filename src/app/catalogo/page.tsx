@@ -3,7 +3,7 @@ import { getFilteredProducts, getCategoryCounts, getBrands, type SortOption } fr
 import { ProductCard } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
 import { BrandFilterList } from "@/components/BrandFilterList";
-import { Icon } from "@/components/Icon";
+import { VitoMascot } from "@/components/Logo";
 
 export default async function CatalogPage({
   searchParams,
@@ -93,10 +93,11 @@ export default async function CatalogPage({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 py-20 text-center">
-              <span className="text-vt-muted-3">
-                <Icon name="search" className="h-12 w-12" />
-              </span>
+              <VitoMascot className="h-24 w-24" />
               <div className="text-[16px] font-bold text-vt-fg">Sin resultados</div>
+              <p className="max-w-[320px] text-[13.5px] text-vt-muted-1">
+                Vito buscó por toda la bodega y no encontró nada con esos filtros.
+              </p>
               <Link
                 href="/catalogo"
                 className="vt-btn mt-2 inline-block rounded-lg bg-vt-accent/[.15] px-5 py-2.5 text-[13px] font-bold text-vt-accent hover:bg-vt-accent/25"

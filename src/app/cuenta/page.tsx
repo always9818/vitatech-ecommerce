@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getShippingProfile } from "@/lib/shipping-actions";
 import { formatOrderShipping } from "@/lib/shipping";
 import { ShippingProfileForm } from "@/components/ShippingProfileForm";
+import { VitoMascot } from "@/components/Logo";
 
 const STATUS_LABEL: Record<string, { text: string; className: string }> = {
   PENDING: { text: "Pendiente de pago", className: "text-vt-muted-1" },
@@ -53,9 +54,10 @@ export default async function AccountPage() {
         <h2 className="font-heading text-[19px] font-bold text-white">Mis pedidos</h2>
 
         {orders.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-white/10 p-6 text-[13.5px] text-vt-muted-1">
-            Todavía no tienes pedidos.{" "}
-            <Link href="/catalogo" className="font-semibold text-vt-accent hover:underline">
+          <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-white/10 p-10 text-center">
+            <VitoMascot className="h-24 w-24" />
+            <div className="text-[15px] font-bold text-vt-fg">Todavía no tienes pedidos</div>
+            <Link href="/catalogo" className="text-[13.5px] font-semibold text-vt-accent hover:underline">
               Ver el catálogo →
             </Link>
           </div>

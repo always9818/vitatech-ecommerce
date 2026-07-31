@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { formatOrderShipping } from "@/lib/shipping";
-import { Icon } from "@/components/Icon";
+import { VitoMascot } from "@/components/Logo";
 
 export const metadata = { title: "Pedidos · Panel VITATECH_" };
 
@@ -39,8 +39,8 @@ export default async function AdminOrdersPage() {
       </div>
 
       {orders.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-white/10 p-10 text-center">
-          <Icon name="package" className="mx-auto h-8 w-8 text-vt-muted-2" />
+        <div className="mt-8 flex flex-col items-center rounded-2xl border border-white/10 p-10 text-center">
+          <VitoMascot className="h-24 w-24" />
           <div className="mt-3 text-[14px] font-semibold text-vt-fg">Todavía no hay pedidos</div>
           <p className="mt-1 text-[13px] text-vt-muted-1">
             Cuando un cliente complete una compra, aparecerá aquí con su dirección de entrega.

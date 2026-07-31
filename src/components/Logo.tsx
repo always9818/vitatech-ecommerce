@@ -19,6 +19,39 @@ export function VitatechMark({ className = "h-7 w-7" }: { className?: string }) 
   );
 }
 
+/**
+ * Vito, la mascota de la marca. Vector original de la propuesta.
+ *
+ * Va dentro de un círculo claro tenue a propósito: su cuerpo es verde muy
+ * oscuro (#0C3A2D) y sobre el fondo de la tienda (#0d1405) casi desaparecía.
+ * El halo le da contraste y hace que se lea como una ilustración intencional.
+ */
+export function VitoMascot({ className = "h-28 w-28" }: { className?: string }) {
+  return (
+    <span className={`grid place-items-center rounded-full bg-white/[.06] p-4 ${className}`}>
+      <svg viewBox="0 0 260 300" className="h-full w-full" role="img" aria-label="Vito, la mascota de Vitatech">
+        <path d="M130 52 V28" stroke="#0C3A2D" strokeWidth={10} strokeLinecap="round" />
+        <path
+          d="M130 28 C128 8 148 0 166 6 C164 24 150 34 130 28 Z"
+          fill={LIMA}
+          stroke="#0C3A2D"
+          strokeWidth={7}
+          strokeLinejoin="round"
+        />
+        <rect x="55" y="52" width="150" height="112" rx="36" fill={LIMA} stroke="#0C3A2D" strokeWidth={10} />
+        <rect x="76" y="84" width="46" height="40" rx="13" fill="#FFFFFF" stroke="#0C3A2D" strokeWidth={9} />
+        <rect x="138" y="84" width="46" height="40" rx="13" fill="#FFFFFF" stroke="#0C3A2D" strokeWidth={9} />
+        <path d="M122 102 H138" stroke="#0C3A2D" strokeWidth={9} />
+        <circle cx="99" cy="104" r="7.5" fill="#0C3A2D" />
+        <circle cx="161" cy="104" r="7.5" fill="#0C3A2D" />
+        <rect x="76" y="176" width="108" height="88" rx="28" fill="#0C3A2D" />
+        <path d="M104 176 L130 204 L156 176 Z" fill="#FFFFFF" />
+        <path d="M130 204 L143 219 L134 254 L130 261 L126 254 L117 219 Z" fill={TURQUESA} />
+      </svg>
+    </span>
+  );
+}
+
 /** Marca + nombre, como se usa en la cabecera y el pie. */
 export function VitatechLogo({
   className = "",

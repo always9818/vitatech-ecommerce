@@ -4,9 +4,9 @@ import { money } from "@/lib/money";
 import { CartLine } from "@/components/CartLine";
 import { CheckoutButton } from "@/components/CheckoutButton";
 import { CouponBox } from "@/components/CouponBox";
-import { Icon } from "@/components/Icon";
 import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
+import { VitoMascot } from "@/components/Logo";
 
 const FREE_SHIPPING_THRESHOLD = 299;
 const SHIPPING_COST = 70;
@@ -32,11 +32,12 @@ export default async function CartPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 py-24 text-center">
-          <span className="text-vt-muted-3">
-            <Icon name="cart" className="h-12 w-12" />
-          </span>
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 py-20 text-center">
+          <VitoMascot className="h-28 w-28" />
           <div className="text-[17px] font-bold text-vt-fg">Tu carrito está vacío</div>
+          <p className="max-w-[320px] text-[13.5px] text-vt-muted-1">
+            Vito no encontró nada aquí todavía. Date una vuelta por el catálogo.
+          </p>
           <Link
             href="/catalogo"
             className="vt-btn vt-btn-accent mt-2 rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-bold text-vt-accent-fg"
