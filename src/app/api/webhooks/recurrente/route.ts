@@ -67,9 +67,17 @@ export async function POST(request: Request) {
         });
       }
 
+      if (order.couponId) {
+        await prisma.coupon.update({
+          where: { id: order.couponId },
+          data: { usageCount: { increment: 1 } },
+        });
+      }
+
       const cart = await prisma.cart.findUnique({ where: { userId: order.userId } });
       if (cart) {
         await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+        await prisma.cart.update({ where: { id: cart.id }, data: { couponId: null } });
       }
     } else if (FAILED_EVENTS.has(eventType)) {
       await prisma.order.update({ where: { id: orderId }, data: { status: "FAILED" } });

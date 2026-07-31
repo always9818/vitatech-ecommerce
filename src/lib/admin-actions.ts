@@ -250,3 +250,86 @@ export async function removeHeroImage() {
   revalidatePath("/admin/portada");
   revalidatePath("/");
 }
+
+async function revalidateReviewPaths(productId: string) {
+  revalidatePath("/admin/resenas");
+  revalidatePath(`/producto/${productId}`);
+}
+
+export async function approveReview(reviewId: string) {
+  await requireAdmin();
+  const review = await prisma.review.update({
+    where: { id: reviewId },
+    data: { status: "APPROVED" },
+  });
+  await revalidateReviewPaths(review.productId);
+}
+
+export async function rejectReview(reviewId: string) {
+  await requireAdmin();
+  const review = await prisma.review.update({
+    where: { id: reviewId },
+    data: { status: "REJECTED" },
+  });
+  await revalidateReviewPaths(review.productId);
+}
+
+export async function deleteReview(reviewId: string) {
+  await requireAdmin();
+  const review = await prisma.review.delete({ where: { id: reviewId } });
+  await revalidateReviewPaths(review.productId);
+}
+
+export type CouponFormState = { error?: string };
+
+export async function createCoupon(
+  _prevState: CouponFormState,
+  formData: FormData
+): Promise<CouponFormState> {
+  await requireAdmin();
+
+  const code = String(formData.get("code") ?? "").trim().toUpperCase();
+  const type = String(formData.get("type") ?? "PERCENT");
+  const value = Number(formData.get("value"));
+  const expiresAtRaw = String(formData.get("expiresAt") ?? "").trim();
+  const usageLimitRaw = String(formData.get("usageLimit") ?? "").trim();
+
+  if (!code) return { error: "El código no puede estar vacío." };
+  if (type !== "PERCENT" && type !== "FIXED") return { error: "Tipo de cupón inválido." };
+  if (!Number.isFinite(value) || value <= 0) {
+    return { error: "El valor debe ser un número mayor a 0." };
+  }
+  if (type === "PERCENT" && value > 100) {
+    return { error: "Un cupón de porcentaje no puede ser mayor a 100." };
+  }
+
+  const expiresAt = expiresAtRaw ? new Date(expiresAtRaw) : null;
+  if (expiresAt && Number.isNaN(expiresAt.getTime())) {
+    return { error: "Fecha de expiración inválida." };
+  }
+
+  let usageLimit: number | null = null;
+  if (usageLimitRaw) {
+    usageLimit = Number(usageLimitRaw);
+    if (!Number.isInteger(usageLimit) || usageLimit <= 0) {
+      return { error: "El límite de usos debe ser un número entero mayor a 0." };
+    }
+  }
+
+  try {
+    await prisma.coupon.create({
+      data: { code, type, value: Math.round(value), expiresAt, usageLimit },
+    });
+  } catch {
+    return { error: `Ya existe un cupón con el código "${code}".` };
+  }
+
+  revalidatePath("/admin/cupones");
+  return {};
+}
+
+export async function toggleCoupon(couponId: string, active: boolean) {
+  await requireAdmin();
+  await prisma.coupon.update({ where: { id: couponId }, data: { active } });
+  revalidatePath("/admin/cupones");
+}

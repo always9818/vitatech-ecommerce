@@ -3,7 +3,10 @@ import { getCart } from "@/lib/cart-actions";
 import { money } from "@/lib/money";
 import { CartLine } from "@/components/CartLine";
 import { CheckoutButton } from "@/components/CheckoutButton";
+import { CouponBox } from "@/components/CouponBox";
 import { Icon } from "@/components/Icon";
+import { getCartCoupon } from "@/lib/coupon-actions";
+import { computeCouponDiscount } from "@/lib/coupon-utils";
 
 const FREE_SHIPPING_THRESHOLD = 299;
 const SHIPPING_COST = 70;
@@ -15,7 +18,9 @@ export default async function CartPage() {
   const listTotal = items.reduce((a, it) => a + it.product.oldPrice * it.quantity, 0);
   const discount = listTotal - subtotal;
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
-  const total = subtotal + shipping;
+  const coupon = await getCartCoupon();
+  const couponDiscount = coupon ? computeCouponDiscount(coupon, subtotal) : 0;
+  const total = Math.max(0, subtotal + shipping - couponDiscount);
 
   return (
     <div className="animate-vt-pop mx-auto max-w-[1180px] px-6 py-10">
@@ -75,19 +80,14 @@ export default async function CartPage() {
               <span>Envío</span>
               <span className="text-vt-accent">{shipping === 0 ? "Gratis" : money(shipping)}</span>
             </div>
+            {couponDiscount > 0 && (
+              <div className="mt-2.5 flex justify-between text-[13.5px] text-vt-muted-1">
+                <span>Cupón {coupon?.code}</span>
+                <span className="font-bold text-vt-accent">− {money(couponDiscount)}</span>
+              </div>
+            )}
 
-            <div className="mt-4 flex gap-2">
-              <input
-                placeholder="Código de descuento"
-                className="flex-1 rounded-lg border border-white/10 bg-white/[.05] px-3 py-2 text-[13px] text-vt-fg placeholder:text-vt-muted-2"
-              />
-              <button
-                type="button"
-                className="vt-btn rounded-lg bg-vt-accent/[.15] px-4 text-[13px] font-bold text-vt-accent hover:bg-vt-accent/25"
-              >
-                Aplicar
-              </button>
-            </div>
+            <CouponBox appliedCode={coupon?.code ?? null} />
 
             <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-5">
               <span className="text-[15px] font-semibold text-vt-fg">Total</span>
