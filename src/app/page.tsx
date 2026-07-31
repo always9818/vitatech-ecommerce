@@ -27,58 +27,59 @@ export default async function HomePage() {
 
   return (
     <div className="animate-vt-fade mx-auto max-w-[1180px] px-6 py-10">
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 p-8 min-[880px]:p-10">
-        <div
-          className="pointer-events-none absolute -top-24 -right-24 h-[420px] w-[420px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(163,230,53,.2), transparent 65%)" }}
-        />
-        <div className="relative">
-          {hero.badge && (
-            <span className="inline-flex items-center gap-2 rounded-full border border-vt-accent/30 bg-vt-accent/[.12] px-3.5 py-1.5 text-[12px] font-bold tracking-[.05em] text-vt-accent">
-              {hero.badge}
-            </span>
-          )}
-          <h1 className="font-heading my-4 text-[38px] leading-[1.08] font-bold text-white min-[880px]:text-[50px]">
-            {hero.title} {hero.titleAccent && <span className="text-vt-accent">{hero.titleAccent}</span>}
-          </h1>
-          {hero.subtitle && (
-            <p className="max-w-[440px] text-[15px] text-vt-muted-1">{hero.subtitle}</p>
-          )}
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/catalogo"
-              className="vt-btn vt-btn-accent inline-block rounded-[10px] bg-vt-accent px-7 py-3.5 text-sm font-bold text-vt-accent-fg"
-            >
-              Ver ofertas
-            </Link>
-            <Link
-              href="/catalogo"
-              className="vt-btn inline-block rounded-[10px] border border-white/25 px-7 py-3.5 text-sm font-bold text-white hover:border-vt-accent hover:text-vt-accent"
-            >
-              Explorar catálogo
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Carrusel de diseños. Va a todo el ancho y con alto por proporción para
-          que los banners con texto se puedan leer; en el recuadro lateral que
-          tenía antes quedaban demasiado pequeños. */}
-      {slides.length > 0 ? (
-        <div className="mt-8">
+      {/* Mosaico de portada: el carrusel y el bloque de temporada viven en la
+          misma retícula, como piezas de un solo conjunto, en vez de ser dos
+          secciones sueltas una debajo de la otra. */}
+      <div className="grid grid-cols-1 gap-5 min-[980px]:grid-cols-[1.9fr_1fr]">
+        {slides.length > 0 ? (
           <HeroCarousel slides={slides} />
-        </div>
-      ) : (
-        heroImage && (
-          <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/[.04]">
-            <div className="relative aspect-[4/3] w-full min-[640px]:aspect-[16/9] min-[880px]:aspect-[21/9]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-contain" />
+        ) : (
+          <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[.04]">
+            <div className="relative aspect-[4/3] w-full min-[560px]:aspect-[16/9]">
+              {heroImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-contain" />
+              ) : (
+                <div className="absolute inset-0 grid place-items-center text-vt-muted-3">
+                  <Icon name="image" className="h-16 w-16" />
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        <section className="relative flex flex-col justify-center overflow-hidden rounded-3xl border border-white/10 p-7 min-[980px]:p-8">
+          <div
+            className="pointer-events-none absolute -top-24 -right-24 h-[380px] w-[380px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(163,230,53,.2), transparent 65%)" }}
+          />
+          <div className="relative">
+            {hero.badge && (
+              <span className="inline-flex items-center gap-2 rounded-full border border-vt-accent/30 bg-vt-accent/[.12] px-3.5 py-1.5 text-[12px] font-bold tracking-[.05em] text-vt-accent">
+                {hero.badge}
+              </span>
+            )}
+            <h1 className="font-heading my-4 text-[30px] leading-[1.1] font-bold text-white min-[980px]:text-[34px]">
+              {hero.title} {hero.titleAccent && <span className="text-vt-accent">{hero.titleAccent}</span>}
+            </h1>
+            {hero.subtitle && <p className="text-[14.5px] text-vt-muted-1">{hero.subtitle}</p>}
+            <div className="mt-6 flex flex-col gap-3">
+              <Link
+                href="/catalogo"
+                className="vt-btn vt-btn-accent rounded-[10px] bg-vt-accent px-6 py-3.5 text-center text-sm font-bold text-vt-accent-fg"
+              >
+                Ver ofertas
+              </Link>
+              <Link
+                href="/catalogo"
+                className="vt-btn rounded-[10px] border border-white/25 px-6 py-3.5 text-center text-sm font-bold text-white hover:border-vt-accent hover:text-vt-accent"
+              >
+                Explorar catálogo
+              </Link>
             </div>
           </div>
-        )
-      )}
+        </section>
+      </div>
 
       {/* Benefits */}
       <section className="mt-14 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-4">

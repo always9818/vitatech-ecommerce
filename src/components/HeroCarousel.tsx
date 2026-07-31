@@ -39,10 +39,10 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      {/* Alto por proporción: el banner crece con el ancho de la pantalla en vez
-          de quedarse en una caja fija pequeña. Más alto en móvil, donde el
-          espacio horizontal es el que falta. */}
-      <div className="relative aspect-[4/3] w-full min-[640px]:aspect-[16/9] min-[880px]:aspect-[21/9]">
+      {/* Alto por proporción: el banner crece con el ancho disponible en vez de
+          quedarse en una caja fija. Más alto en móvil, donde lo que falta es
+          ancho; 16/9 de escritorio para que case con el panel de al lado. */}
+      <div className="relative aspect-[4/3] w-full min-[560px]:aspect-[16/9]">
         {slides.map((slide, i) => {
           const image = (
             /* eslint-disable-next-line @next/next/no-img-element */
