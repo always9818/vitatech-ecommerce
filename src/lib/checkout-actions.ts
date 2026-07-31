@@ -6,9 +6,9 @@ import { getCart } from "@/lib/cart-actions";
 import { createRecurrenteCheckout } from "@/lib/recurrente";
 import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
+import { readShippingInput, validateShipping, shippingCostFor } from "@/lib/shipping";
+import { persistShippingProfile } from "@/lib/shipping-actions";
 
-const FREE_SHIPPING_THRESHOLD = 299;
-const SHIPPING_COST = 70;
 
 // Recurrente factura por línea de producto (amount_in_cents, sin soporte de
 // descuentos negativos), así que el cupón se reparte proporcionalmente entre
@@ -39,10 +39,23 @@ function applyDiscountToLineItems(
   return scaled;
 }
 
-export async function startCheckout(): Promise<{ url?: string; error?: string }> {
+export async function startCheckout(formData: FormData): Promise<{ url?: string; error?: string }> {
   const session = await auth();
   if (!session?.user) {
     return { error: "Debes iniciar sesión para finalizar tu compra." };
+  }
+
+  const shipping_ = readShippingInput(formData);
+  const shippingError = validateShipping(shipping_);
+  if (shippingError) return { error: shippingError };
+
+  // Guardar la dirección es secundario: si falla, la compra debe continuar.
+  if (formData.get("saveProfile") === "on") {
+    try {
+      await persistShippingProfile(session.user.id, shipping_);
+    } catch {
+      /* no bloquea el checkout */
+    }
   }
 
   const items = await getCart();
@@ -59,7 +72,7 @@ export async function startCheckout(): Promise<{ url?: string; error?: string }>
   const subtotal = items.reduce((a, it) => a + it.product.price * it.quantity, 0);
   const listTotal = items.reduce((a, it) => a + it.product.oldPrice * it.quantity, 0);
   const discount = listTotal - subtotal;
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const shipping = shippingCostFor(subtotal);
   const coupon = await getCartCoupon();
   const couponDiscount = coupon ? computeCouponDiscount(coupon, subtotal) : 0;
   const total = Math.max(0, subtotal + shipping - couponDiscount);
@@ -75,6 +88,13 @@ export async function startCheckout(): Promise<{ url?: string; error?: string }>
       // `prisma db push` (esas columnas no existirían aún).
       ...(coupon ? { couponId: coupon.id, couponDiscount } : {}),
       total,
+      shipRecipientName: shipping_.recipientName,
+      shipPhone: shipping_.phone,
+      shipDepartment: shipping_.department,
+      shipMunicipality: shipping_.municipality,
+      shipAddressLine: shipping_.addressLine,
+      shipZone: shipping_.zone || null,
+      shipReference: shipping_.reference || null,
       items: {
         create: items.map((it) => ({
           productId: it.productId,

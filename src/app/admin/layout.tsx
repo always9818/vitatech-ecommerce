@@ -11,6 +11,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           Panel de administración<span className="text-vt-accent">.</span>
         </Link>
         <nav className="flex items-center gap-5 text-[13px] font-semibold">
+          <Link href="/admin/pedidos" className="text-vt-muted-1 hover:text-vt-accent">
+            Pedidos
+          </Link>
           <Link href="/admin/productos" className="text-vt-muted-1 hover:text-vt-accent">
             Productos
           </Link>

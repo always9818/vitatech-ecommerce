@@ -47,9 +47,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  cart          Cart?
-  orders        Order[]
-  reviews       Review[]
+  cart            Cart?
+  orders          Order[]
+  reviews         Review[]
+  shippingProfile ShippingProfile?
 }
 
 model Category {
@@ -161,8 +162,37 @@ model Order {
   total              Int
   status             OrderStatus @default(PENDING)
   recurrenteCheckoutId String?   @unique
+
+  // Copia congelada de la dirección al momento de comprar. Se guarda aquí y no
+  // solo como referencia al perfil porque si el cliente luego se muda, este
+  // pedido debe seguir mostrando a dónde se envió realmente.
+  // Opcionales porque los pedidos anteriores a esta función no la tienen.
+  shipRecipientName  String?
+  shipPhone          String?
+  shipDepartment     String?
+  shipMunicipality   String?
+  shipAddressLine    String?
+  shipZone           String?
+  shipReference      String?
+
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
+}
+
+/// Dirección guardada del cliente, para no volver a escribirla en cada compra.
+model ShippingProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipientName String
+  phone         String
+  department    String
+  municipality  String
+  addressLine   String
+  zone          String?
+  reference     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model OrderItem {
