@@ -20,6 +20,29 @@ export function VitatechMark({ className = "h-7 w-7" }: { className?: string }) 
 }
 
 /**
+ * El símbolo usado COMO la letra "V" de VITATECH, para no repetir la V dos
+ * veces seguidas en el logotipo.
+ *
+ * Lleva un viewBox recortado a la forma real (el original tiene aire alrededor,
+ * que como letra dejaría un hueco). El alto va en `em` para que crezca junto al
+ * texto, y `-mr-[.06em]` compensa el espacio óptico del trazo diagonal.
+ */
+export function VitatechLetterV({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="34 20 142 158"
+      className={`inline-block h-[0.92em] w-auto -mr-[.06em] align-[-.06em] ${className}`}
+      role="img"
+      aria-label="V"
+    >
+      <path d="M52 38 L100 162" stroke={LIMA} strokeWidth={22} strokeLinecap="round" fill="none" />
+      <circle cx="52" cy="38" r="14" fill={TURQUESA} />
+      <path d="M150 36 C170 92 146 144 100 164 C96 114 112 66 150 36 Z" fill={LIMA} />
+    </svg>
+  );
+}
+
+/**
  * Vito, la mascota de la marca. Vector original de la propuesta.
  *
  * Va dentro de un círculo claro tenue a propósito: su cuerpo es verde muy

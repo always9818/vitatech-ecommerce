@@ -4,6 +4,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveCategoryIcon } from "@/lib/product-icon";
 import { getSiteSettings, resolveHeroContent } from "@/lib/site-settings";
+import { VitoMascot } from "@/components/Logo";
 
 const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
   { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
@@ -82,6 +83,20 @@ export default async function HomePage() {
             </div>
           </div>
         ))}
+      </section>
+
+      {/* Presentación de la marca, con Vito */}
+      <section className="mt-10 flex flex-col items-center gap-6 overflow-hidden rounded-3xl border border-white/10 bg-white/[.03] p-8 text-center min-[720px]:flex-row min-[720px]:gap-8 min-[720px]:p-10 min-[720px]:text-left">
+        <VitoMascot className="h-28 w-28 flex-none min-[720px]:h-32 min-[720px]:w-32" />
+        <div>
+          <h2 className="font-heading text-[22px] font-bold text-white min-[720px]:text-[26px]">
+            Hola, soy <span className="text-vt-accent">Vito</span>
+          </h2>
+          <p className="mt-2 max-w-[560px] text-[14.5px] leading-relaxed text-vt-muted-1">
+            Te acompaño en Importadora Vitatech. Traemos tecnología original de las mejores marcas,
+            con garantía real, servicio técnico propio y envío a todo Guatemala.
+          </p>
+        </div>
       </section>
 
       {/* Category chips */}
