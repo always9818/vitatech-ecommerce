@@ -57,7 +57,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 3. Dale clic a **"Crear producto"**.
 4. Te regresa automáticamente a la lista, con el producto ya creado arriba de todo.
 
-**Importante sobre las fotos:** la subida de imágenes **solo funciona en el sitio real** (`vitatech-ecommerce.angelvasquez201010.workers.dev`). Si en algún momento se prueba en un entorno de desarrollo local, la subida de fotos no va a funcionar — es una limitación técnica del almacenamiento de imágenes (Cloudflare R2), no un error.
+**Importante sobre las fotos:** la subida de imágenes **solo funciona en el sitio real** (`importadoravitatech.com`). Si en algún momento se prueba en un entorno de desarrollo local, la subida de fotos no va a funcionar — es una limitación técnica del almacenamiento de imágenes (Cloudflare R2), no un error.
 
 ---
 
@@ -67,7 +67,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 2. El formulario aparece con todos los datos actuales ya llenos.
 3. Cambia lo que necesites (precio, stock, descripción, etc.).
 4. Si quieres **reemplazar la foto**: sube una nueva en el campo "Foto de producto" — la anterior se reemplaza automáticamente.
-5. Si quieres **quitar la foto** sin subir una nueva: dale clic a "Quitar foto" (aparece debajo de la foto actual), y el producto volverá a mostrar solo el emoji de respaldo.
+5. Si quieres **quitar la foto** sin subir una nueva: dale clic a "Quitar foto" (aparece debajo de la foto actual), y el producto volverá a mostrar solo el ícono de respaldo.
 6. Dale clic a **"Guardar cambios"**.
 
 > Las fotos que subas ahora sí se muestran en la tienda: en la tarjeta del catálogo, en la ficha del producto y en el carrito. Mientras un producto no tenga foto, se ve el ícono de línea que hayas elegido.
