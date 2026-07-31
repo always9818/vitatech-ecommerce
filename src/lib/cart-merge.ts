@@ -11,9 +11,12 @@ export async function mergeGuestCartIntoUser(userId: string) {
   const guestId = cookieStore.get(GUEST_COOKIE)?.value;
   if (!guestId) return;
 
+  // `select` explícito en vez de `include`: sin él Prisma pide también
+  // `couponId`, que no existe hasta correr `prisma db push`, y el inicio de
+  // sesión fallaría entero.
   const guestCart = await prisma.cart.findUnique({
     where: { guestId },
-    include: { items: true },
+    select: { id: true, items: true },
   });
 
   if (guestCart) {
@@ -22,6 +25,7 @@ export async function mergeGuestCartIntoUser(userId: string) {
         where: { userId },
         update: {},
         create: { userId },
+        select: { id: true },
       });
 
       for (const item of guestCart.items) {

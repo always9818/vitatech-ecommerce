@@ -70,8 +70,10 @@ export async function startCheckout(): Promise<{ url?: string; error?: string }>
       subtotal,
       shipping,
       discount,
-      couponId: coupon?.id,
-      couponDiscount,
+      // Solo se mencionan las columnas del cupón cuando de verdad hay uno: así
+      // el checkout normal sigue funcionando aunque todavía no se haya corrido
+      // `prisma db push` (esas columnas no existirían aún).
+      ...(coupon ? { couponId: coupon.id, couponDiscount } : {}),
       total,
       items: {
         create: items.map((it) => ({
@@ -81,6 +83,7 @@ export async function startCheckout(): Promise<{ url?: string; error?: string }>
         })),
       },
     },
+    select: { id: true },
   });
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

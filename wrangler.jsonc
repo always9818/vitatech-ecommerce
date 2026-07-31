@@ -8,10 +8,11 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  "routes": [
-    { "pattern": "www.importadoravitatech.com", "custom_domain": true },
-    { "pattern": "importadoravitatech.com", "custom_domain": true }
-  ],
+  // El dominio personalizado (www.importadoravitatech.com) se administra desde
+  // el panel de Cloudflare, no desde aquí. Declararlo como `routes` con
+  // custom_domain hacía que cada deploy intentara reclamarlo de nuevo contra
+  // /workers/scripts/.../domains/records; cuando esa llamada falla, wrangler
+  // aborta con "No targets deployed" y la versión subida nunca se activa.
   "r2_buckets": [
     {
       "bucket_name": "vitatech-product-images",

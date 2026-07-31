@@ -6,6 +6,17 @@ import { prisma } from "@/lib/prisma";
 
 export type ReviewFormState = { error?: string; success?: boolean };
 
+// La tabla `Review` solo existe después de correr `prisma db push`. Mientras no
+// se haya aplicado el esquema, estas consultas revientan y se llevarían consigo
+// la ficha de producto entera. Se degrada a "sin reseñas" y se registra el
+// error en los logs (wrangler tail) en vez de tumbar la página.
+function onReviewQueryError<T>(context: string, fallback: T) {
+  return (err: unknown): T => {
+    console.error("[reviews] %s falló (¿falta `prisma db push`?): %o", context, err);
+    return fallback;
+  };
+}
+
 export async function createReview(
   productId: string,
   _prevState: ReviewFormState,
@@ -34,32 +45,41 @@ export async function createReview(
     return { error: "El producto ya no existe." };
   }
 
-  await prisma.review.upsert({
-    where: { productId_userId: { productId, userId: session.user.id } },
-    update: { rating, comment, status: "PENDING" },
-    create: { productId, userId: session.user.id, rating, comment, status: "PENDING" },
-  });
+  try {
+    await prisma.review.upsert({
+      where: { productId_userId: { productId, userId: session.user.id } },
+      update: { rating, comment, status: "PENDING" },
+      create: { productId, userId: session.user.id, rating, comment, status: "PENDING" },
+    });
+  } catch (err) {
+    console.error("[reviews] createReview falló (¿falta `prisma db push`?): %o", err);
+    return { error: "No se pudo guardar tu reseña en este momento. Intenta más tarde." };
+  }
 
   revalidatePath(`/producto/${productId}`);
   return { success: true };
 }
 
 export async function getApprovedReviews(productId: string) {
-  return prisma.review.findMany({
-    where: { productId, status: "APPROVED" },
-    include: { user: { select: { name: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  return prisma.review
+    .findMany({
+      where: { productId, status: "APPROVED" },
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+    })
+    .catch(onReviewQueryError("getApprovedReviews", [] as never[]));
 }
 
 export async function getProductRatingStats(productId: string, fallback: { rating: number; reviews: number }) {
-  const approved = await prisma.review.aggregate({
-    where: { productId, status: "APPROVED" },
-    _avg: { rating: true },
-    _count: { _all: true },
-  });
+  const approved = await prisma.review
+    .aggregate({
+      where: { productId, status: "APPROVED" },
+      _avg: { rating: true },
+      _count: { _all: true },
+    })
+    .catch(onReviewQueryError("getProductRatingStats", null));
 
-  if (approved._count._all === 0) {
+  if (!approved || approved._count._all === 0) {
     return fallback;
   }
 
@@ -69,7 +89,9 @@ export async function getProductRatingStats(productId: string, fallback: { ratin
 export async function getMyReviewForProduct(productId: string) {
   const session = await auth();
   if (!session?.user) return null;
-  return prisma.review.findUnique({
-    where: { productId_userId: { productId, userId: session.user.id } },
-  });
+  return prisma.review
+    .findUnique({
+      where: { productId_userId: { productId, userId: session.user.id } },
+    })
+    .catch(onReviewQueryError("getMyReviewForProduct", null));
 }

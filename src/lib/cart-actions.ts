@@ -10,6 +10,12 @@ import { GUEST_COOKIE } from "@/lib/cart-constants";
 // Solo debe llamarse desde Server Actions reales (los exports mutantes de abajo):
 // escribe la cookie de invitado, lo cual Next.js prohíbe durante el render de un
 // Server Component (p. ej. cuando el Header solo quiere leer el carrito).
+// Todas las lecturas del carrito piden explícitamente solo `id`: sin un
+// `select`, Prisma trae también `couponId`, columna que únicamente existe
+// después de `prisma db push`. Como el Header llama a cartCount() en cada
+// página, esa consulta fallando tumbaría el sitio entero.
+const CART_ID_ONLY = { id: true } as const;
+
 async function getOrCreateCart() {
   const session = await auth();
   const userId = session?.user?.id;
@@ -19,6 +25,7 @@ async function getOrCreateCart() {
       where: { userId },
       update: {},
       create: { userId },
+      select: CART_ID_ONLY,
     });
     return cart;
   }
@@ -39,6 +46,7 @@ async function getOrCreateCart() {
     where: { guestId },
     update: {},
     create: { guestId },
+    select: CART_ID_ONLY,
   });
   return cart;
 }
@@ -50,14 +58,14 @@ async function findExistingCart() {
   const userId = session?.user?.id;
 
   if (userId) {
-    return prisma.cart.findUnique({ where: { userId } });
+    return prisma.cart.findUnique({ where: { userId }, select: CART_ID_ONLY });
   }
 
   const cookieStore = await cookies();
   const guestId = cookieStore.get(GUEST_COOKIE)?.value;
   if (!guestId) return null;
 
-  return prisma.cart.findUnique({ where: { guestId } });
+  return prisma.cart.findUnique({ where: { guestId }, select: CART_ID_ONLY });
 }
 
 export async function getCart() {
