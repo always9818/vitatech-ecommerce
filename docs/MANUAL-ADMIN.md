@@ -2,19 +2,27 @@
 
 Guía para gestionar el catálogo de productos de la tienda desde el Panel de Administración.
 
-**Sitio:** https://vitatech-ecommerce.angelvasquez201010.workers.dev
+**Sitio:** https://importadoravitatech.com
 
 ---
 
 ## 1. Cómo entrar al panel
 
-1. Ve a `https://vitatech-ecommerce.angelvasquez201010.workers.dev/login`.
+1. Ve a `https://importadoravitatech.com/login`.
 2. Inicia sesión con tu correo y contraseña (la cuenta que ya tienes marcada como administrador).
 3. Dale clic al ícono de perfil (👤) arriba a la derecha, o entra directo a **Mi cuenta**.
 4. Vas a ver un botón verde **"Panel de administración →"** — solo aparece si tu cuenta tiene permisos de administrador.
-5. También puedes ir directo a: `https://vitatech-ecommerce.angelvasquez201010.workers.dev/admin/productos`
+5. También puedes ir directo a: `https://importadoravitatech.com/admin/productos`
 
 > Si intentas entrar a `/admin/productos` sin haber iniciado sesión, te manda a la pantalla de login. Si tu cuenta no es administrador, te regresa a la tienda.
+
+### Entrar con Google
+
+En la pantalla de login también está el botón **"Continuar con Google"**. Sirve para que tus clientes se registren en un clic, sin inventar contraseña.
+
+- Si entras con Google usando **el mismo correo** de tu cuenta de administrador, se enlaza con la cuenta que ya tenías y **conservas tus permisos**.
+- Una cuenta creada con Google no tiene contraseña. Si después intentas entrar con correo y contraseña, no va a funcionar: usa el botón de Google.
+- Por seguridad solo aceptamos cuentas de Google con el **correo verificado**.
 
 ---
 
