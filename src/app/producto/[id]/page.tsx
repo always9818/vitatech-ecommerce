@@ -40,10 +40,14 @@ export default async function ProductDetailPage({
     <div className="animate-vt-slide mx-auto max-w-[1180px] px-6 py-10">
       <div className="grid grid-cols-1 gap-10 min-[880px]:grid-cols-[1.05fr_.95fr]">
         <div>
-          <div className="grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
+          <div className="relative grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
             {photos[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={photos[0]} alt={product.name} className="h-full w-full object-contain p-6" />
+              <img
+                src={photos[0]}
+                alt={product.name}
+                className="absolute inset-0 h-full w-full object-contain p-6"
+              />
             ) : (
               <Icon name={fallbackIcon} className="h-28 w-28" />
             )}
@@ -51,9 +55,13 @@ export default async function ProductDetailPage({
           {photos.length > 1 && (
             <div className="mt-3 grid grid-cols-4 gap-3">
               {photos.slice(0, 4).map((src) => (
-                <div className="grid h-20 place-items-center overflow-hidden rounded-xl bg-white/[.05]" key={src}>
+                <div className="relative grid h-20 place-items-center overflow-hidden rounded-xl bg-white/[.05]" key={src}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={product.name} className="h-full w-full object-contain p-1.5" />
+                  <img
+                    src={src}
+                    alt={product.name}
+                    className="absolute inset-0 h-full w-full object-contain p-1.5"
+                  />
                 </div>
               ))}
             </div>

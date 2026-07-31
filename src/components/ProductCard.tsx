@@ -30,7 +30,11 @@ export function ProductCard({ product, index = 0 }: { product: CardProduct; inde
         <div className="relative grid h-[170px] place-items-center overflow-hidden rounded-t-2xl bg-white/[.05] text-vt-muted-3">
           {photo ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photo} alt={product.name} className="h-full w-full object-contain p-3" />
+            <img
+              src={photo}
+              alt={product.name}
+              className="absolute inset-0 h-full w-full object-contain p-3"
+            />
           ) : (
             <Icon name={resolveProductIcon(product.icon, product.category.name)} className="h-14 w-14" />
           )}

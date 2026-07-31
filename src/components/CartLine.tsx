@@ -27,10 +27,10 @@ export function CartLine({
 
   return (
     <div className="flex flex-wrap items-center gap-4 border-b border-white/10 py-5 last:border-none">
-      <div className="grid h-[88px] w-[88px] flex-none place-items-center overflow-hidden rounded-xl bg-white/[.05] text-vt-muted-3">
+      <div className="relative grid h-[88px] w-[88px] flex-none place-items-center overflow-hidden rounded-xl bg-white/[.05] text-vt-muted-3">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt={name} className="h-full w-full object-contain p-2" />
+          <img src={photo} alt={name} className="absolute inset-0 h-full w-full object-contain p-2" />
         ) : (
           <Icon name={resolveProductIcon(icon, category)} className="h-9 w-9" />
         )}

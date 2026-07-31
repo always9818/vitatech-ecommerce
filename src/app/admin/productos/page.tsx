@@ -71,10 +71,14 @@ export default async function AdminProductsPage({
               <tr key={p.id} className="border-b border-white/5 last:border-none">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5">
-                    <span className="grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-lg bg-white/[.05] text-vt-muted-2">
+                    <span className="relative grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-lg bg-white/[.05] text-vt-muted-2">
                       {p.images[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.images[0]} alt="" className="h-full w-full object-contain p-1" />
+                        <img
+                          src={p.images[0]}
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-contain p-1"
+                        />
                       ) : (
                         <Icon
                           name={resolveProductIcon(p.icon, p.category.name)}

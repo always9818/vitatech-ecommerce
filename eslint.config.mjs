@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Artefactos generados por `npm run deploy` (opennextjs-cloudflare + wrangler).
+    // Sin esto, cualquier build local deja el bundle en disco y el lint lo escanea.
+    ".open-next/**",
+    ".wrangler/**",
   ]),
 ]);
 

@@ -13,12 +13,12 @@ export function HeroImageForm({ currentImage }: { currentImage?: string }) {
       {currentImage && (
         <div className="mb-4">
           <div className="mb-2 text-[13px] font-semibold text-vt-muted-1">Portada actual</div>
-          <div className="grid h-[220px] place-items-center overflow-hidden rounded-2xl border border-white/10 bg-white/[.05]">
+          <div className="relative grid h-[220px] place-items-center overflow-hidden rounded-2xl border border-white/10 bg-white/[.05]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={currentImage}
               alt="Portada actual"
-              className="h-full w-full object-contain p-4"
+              className="absolute inset-0 h-full w-full object-contain p-4"
             />
           </div>
           <button
