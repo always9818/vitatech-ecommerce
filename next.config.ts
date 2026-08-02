@@ -17,11 +17,24 @@ const nextConfig: NextConfig = {
   // Redirigir en el borde garantiza que el flujo empiece y termine en el mismo
   // host. 308 (permanent) para que buscadores y navegadores lo memoricen y de
   // paso se acabe el contenido duplicado en los dos dominios.
+  // La raíz va en su propia regla, antes del comodín. Con `/:path*` sola, el
+  // build de producción no sustituye el comodín cuando no hay ruta que capturar
+  // y responde un Location literal `https://importadoravitatech.com/:path*`,
+  // que es un 404. En desarrollo no pasa: solo se ve en el sitio desplegado.
+  // Las reglas se evalúan en orden, así que esta atiende "/" y la siguiente
+  // el resto.
   async redirects() {
+    const desdeWww = [{ type: "host" as const, value: "www.importadoravitatech.com" }];
     return [
       {
+        source: "/",
+        has: desdeWww,
+        destination: "https://importadoravitatech.com/",
+        permanent: true,
+      },
+      {
         source: "/:path*",
-        has: [{ type: "host", value: "www.importadoravitatech.com" }],
+        has: desdeWww,
         destination: "https://importadoravitatech.com/:path*",
         permanent: true,
       },
