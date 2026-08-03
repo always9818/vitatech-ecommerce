@@ -21,9 +21,12 @@ async function sendEmail(params: { to: string; subject: string; html: string }) 
   }
 
   // Mientras no se verifique importadoravitatech.com en Resend, se envía desde
-  // su dominio compartido (onboarding@resend.dev) — funciona sin configurar
-  // nada más, a cualquier destinatario. RESEND_FROM_EMAIL permite pasar a un
-  // remitente propio en cuanto el dominio quede verificado.
+  // su dominio compartido (onboarding@resend.dev). OJO: ese remitente NO envía
+  // a cualquier destinatario — Resend lo restringe únicamente al correo dueño
+  // de la cuenta (confirmado: falla con 403 "You can only send testing emails
+  // to your own email address" contra cualquier otro correo). Hasta que se
+  // verifique un dominio propio, el envío a clientes reales no funciona.
+  // RESEND_FROM_EMAIL permite pasar a un remitente propio en cuanto se verifique.
   const from = process.env.RESEND_FROM_EMAIL || "Vitatech <onboarding@resend.dev>";
 
   const res = await fetch(`${RESEND_API_BASE}/emails`, {
