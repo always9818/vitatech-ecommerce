@@ -24,6 +24,16 @@ En la pantalla de login también está el botón **"Continuar con Google"**. Sir
 - Una cuenta creada con Google no tiene contraseña. Si después intentas entrar con correo y contraseña, no va a funcionar: usa el botón de Google.
 - Por seguridad solo aceptamos cuentas de Google con el **correo verificado**.
 
+### Recuperar contraseña olvidada
+
+En la pantalla de login, el enlace **"¿Olvidaste tu contraseña?"** manda un correo con un botón para crear una contraseña nueva.
+
+- El enlace vence en **1 hora** y solo funciona **una vez**.
+- Si un cliente pide el enlace varias veces, solo el más reciente funciona — los anteriores quedan inválidos.
+- Por seguridad, la pantalla dice lo mismo exista o no esa cuenta ("si ese correo está registrado, te enviamos un enlace"), así nadie puede usarla para averiguar qué correos tienen cuenta en la tienda.
+
+> **Pendiente:** el envío de correo necesita una llave de [Resend](https://resend.com) (servicio de correo transaccional, tiene plan gratuito). Sin ella configurada, el enlace no sale del servidor — avísame cuando quieras activarlo y te guío para crear la cuenta.
+
 ---
 
 ## 2. Pedidos (a dónde enviar cada compra)
