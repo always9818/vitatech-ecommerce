@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getShippingProfile } from "@/lib/shipping-actions";
 import { formatOrderShipping } from "@/lib/shipping";
 import { ShippingProfileForm } from "@/components/ShippingProfileForm";
 import { VitoMascot } from "@/components/Logo";
+import { SignOutButton } from "@/components/SignOutButton";
 
 const STATUS_LABEL: Record<string, { text: string; className: string }> = {
   PENDING: { text: "Pendiente de pago", className: "text-vt-muted-1" },
@@ -119,20 +120,9 @@ export default async function AccountPage() {
         </Link>
       )}
 
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/" });
-        }}
-        className="mt-6"
-      >
-        <button
-          type="submit"
-          className="rounded-[10px] border border-white/[.14] px-6 py-3 text-[13.5px] font-semibold text-vt-fg hover:border-vt-accent hover:text-vt-accent"
-        >
-          Cerrar sesión
-        </button>
-      </form>
+      <div className="mt-6">
+        <SignOutButton />
+      </div>
     </div>
   );
 }
