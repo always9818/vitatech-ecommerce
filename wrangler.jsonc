@@ -25,7 +25,10 @@
   "vars": {
     "R2_PUBLIC_URL": "https://pub-f5e3eee06ae444ed8a574cb56350cc48.r2.dev",
     "NEXT_PUBLIC_APP_URL": "https://importadoravitatech.com",
-    "NEXTAUTH_URL": "https://importadoravitatech.com"
+    "NEXTAUTH_URL": "https://importadoravitatech.com",
+    // Dominio verificado en Resend (subdominio, no la raíz, para no tocar el
+    // SPF/MX que usa Zoho para el correo normal de importadoravitatech.com).
+    "RESEND_FROM_EMAIL": "VITATECH <noreply@notificaciones.importadoravitatech.com>"
   },
   // Apagado a propósito, igual que en el panel: la tienda se sirve solo desde el
   // dominio propio. En `true`, cada deploy vuelve a publicar
