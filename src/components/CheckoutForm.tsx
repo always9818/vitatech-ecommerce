@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { startCheckout } from "@/lib/checkout-actions";
 import { Icon, Spinner } from "@/components/Icon";
 import { ShippingFields, type ShippingDefaults } from "@/components/ShippingFields";
@@ -15,7 +14,6 @@ export function CheckoutForm({
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   return (
     <form
@@ -29,7 +27,12 @@ export function CheckoutForm({
             setError(result.error);
             return;
           }
-          if (result.url) router.push(result.url);
+          // Navegación real del navegador, NO `router.push`: la pasarela de
+          // Recurrente está en otro dominio y el router de Next solo sabe
+          // moverse dentro de la app. Con `router.push` el cliente se quedaba
+          // en esta página, sin error visible y con el pedido ya creado — sin
+          // forma de llegar a pagar.
+          if (result.url) window.location.href = result.url;
         });
       }}
       className="flex flex-col gap-6"
