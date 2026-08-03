@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { GoogleMark, Spinner } from "@/components/Icon";
 import { VitatechMark } from "@/components/Logo";
@@ -178,9 +179,9 @@ export function LoginForm({
           <div>
             <div className="mb-2 flex items-center justify-between">
               <span className="text-[13px] font-bold text-vt-fg">Contraseña</span>
-              <button type="button" className="text-[12px] text-vt-accent">
+              <Link href="/olvide-contrasena" className="text-[12px] text-vt-accent hover:underline">
                 ¿Olvidaste tu contraseña?
-              </button>
+              </Link>
             </div>
             <input
               type="password"

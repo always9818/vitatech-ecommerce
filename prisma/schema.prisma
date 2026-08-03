@@ -47,10 +47,26 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  cart            Cart?
-  orders          Order[]
-  reviews         Review[]
-  shippingProfile ShippingProfile?
+  cart                Cart?
+  orders              Order[]
+  reviews             Review[]
+  shippingProfile     ShippingProfile?
+  passwordResetTokens PasswordResetToken[]
+}
+
+/// Enlace de un solo uso para restablecer la contraseña. Se guarda el hash del
+/// token, no el token en sí: si alguien llegara a leer la base de datos, no
+/// podría fabricar un enlace válido con esos datos.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }
 
 model Category {
