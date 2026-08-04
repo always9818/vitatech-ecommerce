@@ -10,6 +10,23 @@ export type SortOption = "relevancia" | "menor" | "mayor" | "descuento";
  */
 const SOLO_VISIBLES = { visible: true } as const;
 
+/**
+ * Un producto agotado NO se oculta: conserva su ficha, su enlace y su lugar en
+ * buscadores, porque volverá a haber existencias. Lo que no hace es competir
+ * con lo que sí se puede comprar hoy, así que se va al final de cualquier orden
+ * que elija el visitante. Ocultarlo de verdad sigue siendo decisión manual
+ * (botón Ocultar del panel).
+ */
+function agotadosAlFinal<T extends { stock: number }>(
+  productos: T[],
+  desempate: (a: T, b: T) => number = () => 0,
+): T[] {
+  const sinExistencias = (p: T) => (p.stock > 0 ? 0 : 1);
+  // `sort` es estable en JS, así que cuando el desempate devuelve 0 se conserva
+  // el orden con el que vinieron de la base.
+  return [...productos].sort((a, b) => sinExistencias(a) - sinExistencias(b) || desempate(a, b));
+}
+
 export async function getCategories() {
   return prisma.category.findMany({ orderBy: { name: "asc" } });
 }
@@ -19,12 +36,23 @@ export async function getBrands() {
 }
 
 export async function getFeaturedProducts(take = 4) {
-  return prisma.product.findMany({
+  const disponibles = await prisma.product.findMany({
     take,
-    where: SOLO_VISIBLES,
+    where: { ...SOLO_VISIBLES, stock: { gt: 0 } },
     orderBy: { createdAt: "asc" },
     include: { category: true, brand: true },
   });
+  if (disponibles.length >= take) return disponibles;
+
+  // Solo cuando no alcanzan los que sí se pueden comprar se completa con
+  // agotados: la portada nunca debe quedar con huecos.
+  const agotados = await prisma.product.findMany({
+    take: take - disponibles.length,
+    where: { ...SOLO_VISIBLES, stock: { lte: 0 } },
+    orderBy: { createdAt: "asc" },
+    include: { category: true, brand: true },
+  });
+  return [...disponibles, ...agotados];
 }
 
 export async function getProductById(id: string) {
@@ -69,11 +97,17 @@ export async function getFilteredProducts(opts: {
     off: p.oldPrice > p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0,
   }));
 
-  if (sort === "menor") withOff.sort((a, b) => a.price - b.price);
-  else if (sort === "mayor") withOff.sort((a, b) => b.price - a.price);
-  else if (sort === "descuento") withOff.sort((a, b) => b.off - a.off);
+  type Item = (typeof withOff)[number];
+  const desempate: (a: Item, b: Item) => number =
+    sort === "menor"
+      ? (a, b) => a.price - b.price
+      : sort === "mayor"
+        ? (a, b) => b.price - a.price
+        : sort === "descuento"
+          ? (a, b) => b.off - a.off
+          : () => 0;
 
-  return withOff;
+  return agotadosAlFinal(withOff, desempate);
 }
 
 export async function getCategoryCounts() {

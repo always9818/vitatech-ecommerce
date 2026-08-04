@@ -60,7 +60,7 @@ Arriba tienes el resumen: cuántos pedidos van, cuántos están pagados y cuánt
 Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, marca, precio y stock disponible.
 
 - Usa el buscador de arriba para filtrar por **nombre o SKU**.
-- El stock en **rojo** significa que el producto está agotado (0 unidades). **Sigue apareciendo en la tienda** marcado como "Agotado", solo que sin poder agregarse al carrito. Si no quieres que se vea, usa **Ocultar** (sección 6).
+- El stock en **rojo** significa que el producto está agotado (0 unidades). Sigue apareciendo en la tienda marcado como "Agotado" y sin poder agregarse al carrito, pero **se va solo hasta el final del catálogo** y **sale de los Destacados de la portada**, para que nunca le quite el lugar a algo que sí puedes vender. En cuanto le cargues stock, vuelve a su sitio solo. Si prefieres que no se vea del todo, usa **Ocultar** (sección 6).
 - Los productos marcados **"Oculto"** no los ve ningún cliente, pero siguen aquí para que puedas volver a mostrarlos.
 
 ---
@@ -116,7 +116,7 @@ Dale clic a **"Ocultar"** en la fila del producto. Desaparece por completo de la
 
 Úsalo cuando el producto se agotó, lo diste de baja temporalmente, o simplemente ya no quieres ofrecerlo.
 
-> **Ojo:** poner el stock en 0 **no** lo oculta — el cliente lo sigue viendo, solo que marcado "Agotado". Si no quieres que aparezca, usa **Ocultar**.
+> **Ojo:** poner el stock en 0 **no** lo oculta. El cliente lo sigue viendo marcado "Agotado", solo que hasta el final del catálogo y ya no en los Destacados. Eso es a propósito: el enlace del producto se conserva (junto con lo que Google ya tenga indexado) y vuelve a su lugar solo cuando le cargas existencias. Si de plano no quieres que aparezca, usa **Ocultar**.
 
 ### Eliminar (definitivo)
 
