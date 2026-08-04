@@ -76,21 +76,31 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
 
       {total > 1 && (
         <>
+          {/* Solo el trazo de la flecha: el círculo con fondo que había antes
+              tapaba parte del banner. El área de clic sigue siendo de 44px
+              (transparente) para que se pueda tocar bien en móvil, y la sombra
+              del icono es lo que lo mantiene legible sobre imágenes claras. */}
           <button
             type="button"
             onClick={() => go(index - 1)}
             aria-label="Diseño anterior"
-            className="vt-btn absolute top-1/2 left-3 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur hover:border-vt-accent hover:text-vt-accent min-[640px]:left-5"
+            className="vt-btn absolute top-1/2 left-1 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-white hover:text-vt-accent min-[640px]:left-3"
           >
-            <Icon name="chevronLeft" className="h-5 w-5" />
+            <Icon
+              name="chevronLeft"
+              className="h-7 w-7 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,.85))_drop-shadow(0_0_6px_rgba(0,0,0,.5))]"
+            />
           </button>
           <button
             type="button"
             onClick={() => go(index + 1)}
             aria-label="Diseño siguiente"
-            className="vt-btn absolute top-1/2 right-3 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur hover:border-vt-accent hover:text-vt-accent min-[640px]:right-5"
+            className="vt-btn absolute top-1/2 right-1 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-white hover:text-vt-accent min-[640px]:right-3"
           >
-            <Icon name="chevronRight" className="h-5 w-5" />
+            <Icon
+              name="chevronRight"
+              className="h-7 w-7 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,.85))_drop-shadow(0_0_6px_rgba(0,0,0,.5))]"
+            />
           </button>
 
           <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/45 px-3 py-2 backdrop-blur">
