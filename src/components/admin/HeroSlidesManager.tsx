@@ -4,13 +4,20 @@ import { useState, useTransition } from "react";
 import { addHeroSlide, deleteHeroSlide, moveHeroSlide } from "@/lib/hero-slide-actions";
 import type { HeroSlideFormState } from "@/lib/hero-slide-actions";
 import type { HeroSlideView } from "@/lib/hero-slides";
+import { SlideLinkPicker, type DestinosDisponibles } from "@/components/admin/SlideLinkPicker";
 import { Icon, Spinner } from "@/components/Icon";
 
 const inputClass =
   "w-full rounded-[10px] border border-white/10 bg-white/[.05] px-4 py-2.5 text-sm text-vt-fg placeholder:text-vt-muted-2 focus:border-vt-accent/50 focus:outline-none";
 const labelClass = "mb-1.5 block text-[13px] font-semibold text-vt-fg";
 
-export function HeroSlidesManager({ slides }: { slides: HeroSlideView[] }) {
+export function HeroSlidesManager({
+  slides,
+  destinos,
+}: {
+  slides: HeroSlideView[];
+  destinos: DestinosDisponibles;
+}) {
   const [state, setState] = useState<HeroSlideFormState>({});
   const [isAdding, startAdd] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -33,10 +40,10 @@ export function HeroSlidesManager({ slides }: { slides: HeroSlideView[] }) {
               />
             </div>
 
-            <div className="min-w-[160px] flex-1">
+            <div className="min-w-[220px] flex-1">
               <div className="text-[13.5px] font-bold text-vt-fg">Diseño {i + 1}</div>
-              <div className="mt-0.5 text-[12.5px] text-vt-muted-2">
-                {slide.linkUrl ? `Lleva a ${slide.linkUrl}` : "Sin enlace"}
+              <div className="mt-1.5">
+                <SlideLinkPicker slideId={slide.id} linkUrl={slide.linkUrl} destinos={destinos} />
               </div>
             </div>
 
@@ -131,11 +138,33 @@ export function HeroSlidesManager({ slides }: { slides: HeroSlideView[] }) {
 
         <div>
           <label className={labelClass}>
-            Enlace <span className="font-normal text-vt-muted-2">(opcional)</span>
+            A dónde lleva <span className="font-normal text-vt-muted-2">(opcional)</span>
           </label>
-          <input name="linkUrl" placeholder="/catalogo?cat=Laptops" className={inputClass} />
+          <select name="linkUrl" defaultValue="" className={inputClass}>
+            <option value="">Sin enlace (no se puede hacer clic)</option>
+            <option value="/catalogo">Todo el catálogo</option>
+            {destinos.productos.length > 0 && (
+              <optgroup label="Ir a un producto">
+                {destinos.productos.map((p) => (
+                  <option key={p.valor} value={p.valor}>
+                    {p.etiqueta}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {destinos.categorias.length > 0 && (
+              <optgroup label="Ir a una categoría">
+                {destinos.categorias.map((c) => (
+                  <option key={c.valor} value={c.valor}>
+                    {c.etiqueta}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+          </select>
           <p className="mt-1 text-[11.5px] text-vt-muted-2">
-            A dónde va el cliente al hacer clic. Debe empezar con / y ser una página de tu tienda.
+            Si eliges un destino, la imagen se vuelve clicable y lleva ahí. También puedes cambiarlo
+            después desde la lista de arriba.
           </p>
         </div>
 

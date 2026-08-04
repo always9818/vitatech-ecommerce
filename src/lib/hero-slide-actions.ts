@@ -52,6 +52,25 @@ export async function addHeroSlide(
   return { ok: true };
 }
 
+/**
+ * Cambia a dónde lleva un diseño ya subido. Antes el enlace solo se podía poner
+ * al crearlo: para agregárselo a uno existente había que borrarlo y volver a
+ * subir la imagen.
+ */
+export async function updateHeroSlideLink(slideId: string, linkUrl: string) {
+  await requireAdmin();
+
+  const limpio = linkUrl.trim();
+  if (limpio && !limpio.startsWith("/")) return;
+
+  await prisma.heroSlide.update({
+    where: { id: slideId },
+    data: { linkUrl: limpio || null },
+  });
+
+  refresh();
+}
+
 export async function deleteHeroSlide(slideId: string) {
   await requireAdmin();
   await prisma.heroSlide.delete({ where: { id: slideId } });

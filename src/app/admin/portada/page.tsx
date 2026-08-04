@@ -1,11 +1,31 @@
+import { prisma } from "@/lib/prisma";
 import { getSiteSettings, resolveHeroContent } from "@/lib/site-settings";
 import { getHeroSlides } from "@/lib/hero-slides";
 import { HeroContentForm } from "@/components/admin/HeroContentForm";
 import { HeroSlidesManager } from "@/components/admin/HeroSlidesManager";
 
 export default async function AdminHeroPage() {
-  const [settings, slides] = await Promise.all([getSiteSettings(), getHeroSlides()]);
+  const [settings, slides, productos, categorias] = await Promise.all([
+    getSiteSettings(),
+    getHeroSlides(),
+    // Solo los visibles: no tiene sentido ofrecer como destino un producto que
+    // el cliente no puede ver — el enlace lo llevaría a una página 404.
+    prisma.product.findMany({
+      where: { visible: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+  ]);
   const content = resolveHeroContent(settings);
+
+  const destinos = {
+    productos: productos.map((p) => ({ valor: `/producto/${p.id}`, etiqueta: p.name })),
+    categorias: categorias.map((c) => ({
+      valor: `/catalogo?cat=${encodeURIComponent(c.name)}`,
+      etiqueta: c.name,
+    })),
+  };
 
   return (
     <div>
@@ -28,9 +48,10 @@ export default async function AdminHeroPage() {
         <p className="mt-1 mb-4 text-[13px] text-vt-muted-1">
           Las imágenes grandes debajo del texto. Si subes varias, van rotando solas cada 6 segundos
           y el cliente puede pasarlas con las flechas. Usa ↑ ↓ para cambiar el orden: la primera es
-          la que se ve al entrar.
+          la que se ve al entrar. En &quot;A dónde lleva&quot; eliges si la imagen es clicable y a
+          qué producto o categoría manda al cliente.
         </p>
-        <HeroSlidesManager slides={slides} />
+        <HeroSlidesManager slides={slides} destinos={destinos} />
       </div>
     </div>
   );
