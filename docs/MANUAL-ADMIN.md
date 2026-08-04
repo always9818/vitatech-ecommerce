@@ -32,7 +32,7 @@ En la pantalla de login, el enlace **"¿Olvidaste tu contraseña?"** manda un co
 - Si un cliente pide el enlace varias veces, solo el más reciente funciona — los anteriores quedan inválidos.
 - Por seguridad, la pantalla dice lo mismo exista o no esa cuenta ("si ese correo está registrado, te enviamos un enlace"), así nadie puede usarla para averiguar qué correos tienen cuenta en la tienda.
 
-> **Pendiente:** el envío de correo necesita una llave de [Resend](https://resend.com) (servicio de correo transaccional, tiene plan gratuito). Sin ella configurada, el enlace no sale del servidor — avísame cuando quieras activarlo y te guío para crear la cuenta.
+> El correo sale desde `noreply@notificaciones.importadoravitatech.com`, un subdominio verificado aparte para no interferir con tu correo normal de Zoho.
 
 ---
 
@@ -60,7 +60,8 @@ Arriba tienes el resumen: cuántos pedidos van, cuántos están pagados y cuánt
 Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, marca, precio y stock disponible.
 
 - Usa el buscador de arriba para filtrar por **nombre o SKU**.
-- El stock en **rojo** significa que el producto está agotado (0 unidades) — sigue apareciendo en la tienda pero marcado como "Agotado" y sin poder agregarse al carrito.
+- El stock en **rojo** significa que el producto está agotado (0 unidades). **Sigue apareciendo en la tienda** marcado como "Agotado", solo que sin poder agregarse al carrito. Si no quieres que se vea, usa **Ocultar** (sección 6).
+- Los productos marcados **"Oculto"** no los ve ningún cliente, pero siguen aquí para que puedas volver a mostrarlos.
 
 ---
 
@@ -103,12 +104,26 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 
 ---
 
-## 6. Eliminar un producto
+## 6. Ocultar o eliminar un producto
 
-1. En la lista, dale clic a **"Eliminar"**.
-2. Te pide confirmar — dale "Aceptar" si estás seguro (esta acción no se puede deshacer).
+Tienes dos opciones, y sirven para cosas distintas.
 
-**Si un producto ya fue comprado alguna vez o está en el carrito de algún cliente**, el sistema no lo va a dejar eliminar (para no romper el historial de pedidos) y te va a mostrar un mensaje de aviso. En ese caso, la alternativa es **editar el producto y poner el Stock en 0** — así desaparece la posibilidad de comprarlo mientras se mantiene el historial intacto.
+### Ocultar (lo más común)
+
+Dale clic a **"Ocultar"** en la fila del producto. Desaparece por completo de la tienda: catálogo, buscador, destacados, los contadores de categoría y hasta su enlace directo (si alguien lo tenía guardado, ahora ve "página no encontrada").
+
+**No se borra nada.** El producto sigue en tu panel marcado como **"Oculto"**, y los pedidos donde ya aparece se conservan intactos. Para volver a venderlo, dale a **"Mostrar"**.
+
+Úsalo cuando el producto se agotó, lo diste de baja temporalmente, o simplemente ya no quieres ofrecerlo.
+
+> **Ojo:** poner el stock en 0 **no** lo oculta — el cliente lo sigue viendo, solo que marcado "Agotado". Si no quieres que aparezca, usa **Ocultar**.
+
+### Eliminar (definitivo)
+
+Dale clic a **"Eliminar"** y confirma. Esto sí borra el producto para siempre.
+
+- Si el producto estaba **en el carrito de alguien**, no hay problema: se quita de ese carrito y se elimina. Un carrito es algo pasajero.
+- Si el producto **ya aparece en algún pedido**, el sistema **no te va a dejar borrarlo**, y te lo dirá. No es un error: si se borrara, ese pedido pasaría a decir "producto desconocido" y perderías el registro de qué vendiste. **Para esos casos usa Ocultar.**
 
 ---
 
