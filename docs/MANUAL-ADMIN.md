@@ -149,11 +149,15 @@ El título grande, la etiqueta de temporada y el texto de abajo. Cámbialos para
 Son las imágenes grandes que se ven debajo del texto, a todo lo ancho de la página.
 
 1. En **"Agregar un diseño"**, elige la imagen (JPG, PNG, WEBP o GIF, máximo 5 MB).
-2. **Enlace** (opcional): a dónde va el cliente al hacer clic. Tiene que empezar con `/` y ser una página de tu tienda, por ejemplo `/catalogo?cat=Laptops`. Si lo dejas vacío, la imagen no es clicable.
+2. **A dónde lleva** (opcional): elige de la lista a qué **producto** o **categoría** quieres mandar al cliente cuando haga clic en la imagen. También puedes elegir "Todo el catálogo". Si lo dejas en "Sin enlace", la imagen no es clicable.
 3. **Descripción** (opcional): se lee en voz alta para personas con discapacidad visual y aparece si la imagen no carga.
 4. Dale a **"Agregar al carrusel"**.
 
 **Sobre el orden:** las flechas ↑ ↓ mueven cada diseño. **El primero de la lista es el que ve el cliente al entrar.**
+
+**Cambiar el destino después:** cada diseño de la lista tiene su propio desplegable "A dónde lleva". Cámbialo cuando quieras — se guarda solo y aparece una palomita verde al confirmarse. No necesitas volver a subir la imagen.
+
+> Solo aparecen en la lista los productos **visibles**. Si ocultas un producto que era el destino de un diseño, el desplegable te lo va a marcar como no disponible para que elijas otro.
 
 **Cómo se comporta:**
 - Con **un solo diseño**, se muestra fijo, sin flechas.
