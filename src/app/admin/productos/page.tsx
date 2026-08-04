@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { money } from "@/lib/money";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
+import { ProductVisibilityButton } from "@/components/admin/ProductVisibilityButton";
 import { Icon } from "@/components/Icon";
 import { resolveProductIcon } from "@/lib/product-icon";
 
@@ -87,6 +88,11 @@ export default async function AdminProductsPage({
                       )}
                     </span>
                     <span className="font-semibold text-vt-fg">{p.name}</span>
+                    {!p.visible && (
+                      <span className="flex-none rounded-full border border-white/20 px-2 py-0.5 text-[11px] font-bold text-vt-muted-2">
+                        Oculto
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-vt-muted-2">{p.sku}</td>
@@ -103,6 +109,7 @@ export default async function AdminProductsPage({
                     <Link href={`/admin/productos/${p.id}/editar`} className="font-bold text-vt-accent">
                       Editar
                     </Link>
+                    <ProductVisibilityButton productId={p.id} visible={p.visible} />
                     <DeleteProductButton productId={p.id} productName={p.name} />
                   </div>
                 </td>

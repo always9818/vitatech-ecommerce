@@ -172,13 +172,31 @@ export async function updateProduct(
 export async function deleteProduct(productId: string) {
   await requireAdmin();
 
+  // Un pedido es historial de ventas: si se borrara el producto, ese pedido
+  // pasaría a decir "producto desconocido" y se perdería qué se vendió.
+  const enPedidos = await prisma.orderItem.count({ where: { productId } });
+  if (enPedidos > 0) {
+    redirect(
+      "/admin/productos?error=" +
+        encodeURIComponent(
+          "No se puede eliminar: este producto ya aparece en pedidos y borrarlo dejaría ese historial incompleto. Usa el botón Ocultar para que deje de verse en la tienda."
+        )
+    );
+  }
+
   try {
-    await prisma.product.delete({ where: { id: productId } });
+    // Un carrito NO es historial: es algo pasajero que alguien dejó a medias.
+    // Se limpia solo para no bloquear el borrado por un carrito abandonado.
+    await prisma.$transaction([
+      prisma.cartItem.deleteMany({ where: { productId } }),
+      prisma.review.deleteMany({ where: { productId } }),
+      prisma.product.delete({ where: { id: productId } }),
+    ]);
   } catch {
     redirect(
       "/admin/productos?error=" +
         encodeURIComponent(
-          "No se pudo eliminar: el producto ya tiene carritos u órdenes asociadas. Pon el stock en 0 para ocultarlo del catálogo en su lugar."
+          "No se pudo eliminar el producto. Usa el botón Ocultar para quitarlo de la tienda."
         )
     );
   }
@@ -187,6 +205,18 @@ export async function deleteProduct(productId: string) {
   revalidatePath("/catalogo");
   revalidatePath("/");
   redirect("/admin/productos");
+}
+
+/** Saca (o devuelve) el producto de la tienda sin tocar el historial de ventas. */
+export async function toggleProductVisibility(productId: string, visible: boolean) {
+  await requireAdmin();
+
+  await prisma.product.update({ where: { id: productId }, data: { visible } });
+
+  revalidatePath("/admin/productos");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  revalidatePath(`/producto/${productId}`);
 }
 
 export type TaxonomyFormState = { error?: string };

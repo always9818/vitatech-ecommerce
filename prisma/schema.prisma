@@ -95,6 +95,12 @@ model Product {
   description String
   specs       Json
 
+  /// Si es false, el producto desaparece de la tienda (catálogo, búsqueda,
+  /// destacados y su propia ficha) pero se conserva en la base. Es la salida
+  /// para los productos que no se pueden eliminar porque ya tienen pedidos:
+  /// borrarlos rompería el historial de ventas.
+  visible     Boolean  @default(true)
+
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
   brandId     String
