@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { GoogleMark, Spinner } from "@/components/Icon";
@@ -41,7 +40,6 @@ export function LoginForm({
   const [loginOk, setLoginOk] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [googlePending, setGooglePending] = useState(false);
-  const router = useRouter();
 
   const submit = () => {
     setFormError(null);
@@ -78,7 +76,15 @@ export function LoginForm({
       }
 
       setLoginOk(true);
-      setTimeout(() => router.push("/"), 900);
+
+      // Navegación dura del navegador, NO `router.push`. La cabecera es un
+      // componente de servidor que Next ya había renderizado y cacheado como
+      // "visitante anónimo" mientras el cliente estaba en /login; con
+      // `router.push` reutilizaba esa versión, así que tras entrar el ícono de
+      // cuenta seguía apuntando a /login y parecía que la sesión no había
+      // funcionado. Recargar de verdad hace que el servidor vuelva a renderizar
+      // todo con la sesión ya puesta.
+      window.location.href = "/";
     });
   };
 
@@ -195,12 +201,23 @@ export function LoginForm({
 
           {formError && <div className="text-[13px] text-vt-error">{formError}</div>}
 
+          {/* Verificar la contraseña toma unos segundos (bcrypt es lento a
+              propósito, es lo que la hace difícil de romper). Sin spinner el
+              botón solo se atenuaba y parecía trabado, así que el cliente
+              volvía a intentar o creía que no había entrado. */}
           <button
             type="submit"
             disabled={isPending}
-            className="rounded-[10px] bg-vt-accent py-3 text-[15px] font-extrabold text-vt-accent-fg disabled:opacity-60"
+            className="flex items-center justify-center gap-2 rounded-[10px] bg-vt-accent py-3 text-[15px] font-extrabold text-vt-accent-fg disabled:opacity-60"
           >
-            {tab === "register" ? "Crear cuenta" : "Entrar"}
+            {isPending && <Spinner className="h-[18px] w-[18px]" />}
+            {isPending
+              ? tab === "register"
+                ? "Creando cuenta..."
+                : "Entrando..."
+              : tab === "register"
+                ? "Crear cuenta"
+                : "Entrar"}
           </button>
 
           {loginOk && (
