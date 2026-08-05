@@ -2,11 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyRecurrenteWebhookSignature } from "@/lib/recurrente";
 
-// Ajustar el nombre exacto del header de firma contra el payload real que
-// llegue del primer webhook (Recurrente no publica el header exacto en su
-// documentación pública). Ver logs de Cloudflare (wrangler tail) si falla.
-const SIGNATURE_HEADER = "x-recurrente-signature";
-
 const PAID_EVENTS = new Set(["payment_intent.succeeded"]);
 const FAILED_EVENTS = new Set(["payment_intent.failed"]);
 
@@ -33,9 +28,15 @@ function extractOrderId(event: UnknownRecord): string | null {
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
-  const signature = request.headers.get(SIGNATURE_HEADER);
+  // Confirmado con el primer webhook real: Recurrente despacha via Svix, no
+  // con un header propio — ver la nota en verifyRecurrenteWebhookSignature.
+  const svixHeaders = {
+    svixId: request.headers.get("svix-id"),
+    svixTimestamp: request.headers.get("svix-timestamp"),
+    svixSignature: request.headers.get("svix-signature"),
+  };
 
-  if (!verifyRecurrenteWebhookSignature(rawBody, signature)) {
+  if (!verifyRecurrenteWebhookSignature(rawBody, svixHeaders)) {
     return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
   }
 
@@ -54,6 +55,14 @@ export async function POST(request: Request) {
 
   try {
     if (PAID_EVENTS.has(eventType)) {
+      // Svix reintenta entregas fallidas solo, y también se puede reenviar a
+      // mano desde su panel — sin este seguro, un mismo pago ya confirmado
+      // volvería a descontar stock y a vaciar el carrito una segunda vez.
+      const existing = await prisma.order.findUnique({ where: { id: orderId }, select: { status: true } });
+      if (existing?.status === "PAID") {
+        return NextResponse.json({ received: true, alreadyProcessed: true });
+      }
+
       // `select` explícito (sin `couponId`) para que confirmar un pago siga
       // funcionando aunque el esquema de cupones todavía no esté aplicado en
       // la base; el cupón se consulta aparte, tolerando el fallo.

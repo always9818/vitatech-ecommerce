@@ -68,15 +68,45 @@ export async function createRecurrenteCheckout(params: CreateCheckoutParams) {
   return { id: data.id, checkoutUrl: data.checkout_url };
 }
 
-export function verifyRecurrenteWebhookSignature(rawBody: string, signatureHeader: string | null) {
+/**
+ * Confirmado con el primer webhook real (2026-08-05): Recurrente NO firma
+ * sus webhooks con un HMAC simple del body — los despacha a través de Svix
+ * (los headers vienen como `svix-id` / `svix-timestamp` / `svix-signature`,
+ * y RECURRENTE_WEBHOOK_SECRET empieza con "whsec_", el prefijo propio de
+ * Svix). El esquema real: HMAC-SHA256 de "{id}.{timestamp}.{body}" con la
+ * llave decodificada de base64 (quitando el prefijo "whsec_"), codificado a
+ * base64. El header puede traer varias firmas separadas por espacio
+ * ("v1,firma1 v1,firma2") por rotación de llaves — basta con que una calce.
+ * Ver https://docs.svix.com/receiving/verifying-payloads/how-manual.
+ */
+export function verifyRecurrenteWebhookSignature(
+  rawBody: string,
+  headers: { svixId: string | null; svixTimestamp: string | null; svixSignature: string | null }
+): boolean {
   const webhookSecret = process.env.RECURRENTE_WEBHOOK_SECRET;
-  if (!webhookSecret || !signatureHeader) return false;
+  const { svixId, svixTimestamp, svixSignature } = headers;
+  if (!webhookSecret || !svixId || !svixTimestamp || !svixSignature) return false;
 
-  const expected = crypto.createHmac("sha256", webhookSecret).update(rawBody).digest("hex");
-
-  try {
-    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signatureHeader));
-  } catch {
+  // Tolerancia de 5 minutos contra ataques de repetición con una firma vieja
+  // capturada — recomendado por la propia documentación de Svix.
+  const timestampSeconds = Number(svixTimestamp);
+  if (!Number.isFinite(timestampSeconds) || Math.abs(Date.now() / 1000 - timestampSeconds) > 300) {
     return false;
   }
+
+  const secretBytes = Buffer.from(webhookSecret.replace(/^whsec_/, ""), "base64");
+  const signedContent = `${svixId}.${svixTimestamp}.${rawBody}`;
+  const expected = crypto.createHmac("sha256", secretBytes).update(signedContent).digest("base64");
+  const expectedBuffer = Buffer.from(expected);
+
+  return svixSignature
+    .split(" ")
+    .map((part) => part.split(",")[1])
+    .filter((candidate): candidate is string => Boolean(candidate))
+    .some((candidate) => {
+      const candidateBuffer = Buffer.from(candidate, "base64");
+      return (
+        candidateBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(expectedBuffer, candidateBuffer)
+      );
+    });
 }
