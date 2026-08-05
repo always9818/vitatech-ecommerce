@@ -2,18 +2,35 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyRecurrenteWebhookSignature } from "@/lib/recurrente";
 
-const PAID_EVENTS = new Set(["payment_intent.succeeded"]);
-const FAILED_EVENTS = new Set(["payment_intent.failed"]);
-
 type UnknownRecord = Record<string, unknown>;
 
-// El esquema de Recurrente sigue el patrón de Stripe (payment_intent.*), pero
-// no hay documentación pública de dónde queda anidado nuestro `metadata`.
-// Se prueban varias rutas plausibles: objeto plano, envuelto en `data`,
-// o envuelto en `data.object` (estilo Stripe).
+// El primer webhook real (2026-08-05) mostró las claves de verdad del
+// payload — nada de "payment_intent.*" estilo Stripe, sino un evento con
+// `event_type`, `checkout`, `payment`, `product(s)`, `installments`, etc.
+// Mientras no se confirme el valor exacto de `event_type`, se hace match
+// flexible por si trae mayúsculas o un nombre ligeramente distinto.
+function extractEventType(event: UnknownRecord): string {
+  const raw = event.event_type ?? event.type ?? (event.payment as UnknownRecord | undefined)?.status;
+  return typeof raw === "string" ? raw : "";
+}
+
+function isPaidEvent(eventType: string) {
+  return /succe|complet|\bpaid\b/i.test(eventType);
+}
+
+function isFailedEvent(eventType: string) {
+  return /fail|declin|reject|cancel/i.test(eventType);
+}
+
+// Se prueban varias rutas plausibles para nuestro `metadata.orderId`: objeto
+// plano, dentro de `checkout` (el objeto que nosotros mandamos al crear el
+// checkout, que Recurrente parece devolver eco), dentro de `payment`, o
+// envuelto en `data`/`data.object` (estilo Stripe, por si acaso).
 function extractOrderId(event: UnknownRecord): string | null {
   const candidates: unknown[] = [
     event.metadata,
+    (event.checkout as UnknownRecord | undefined)?.metadata,
+    (event.payment as UnknownRecord | undefined)?.metadata,
     (event.data as UnknownRecord | undefined)?.metadata,
     ((event.data as UnknownRecord | undefined)?.object as UnknownRecord | undefined)?.metadata,
     (event.object as UnknownRecord | undefined)?.metadata,
@@ -40,21 +57,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
   }
 
-  const event = JSON.parse(rawBody) as UnknownRecord & { type?: string };
-  const eventType = event.type ?? "";
+  const event = JSON.parse(rawBody) as UnknownRecord;
+  const eventType = extractEventType(event);
   const orderId = extractOrderId(event);
 
   if (!orderId) {
-    console.error(
-      "[recurrente webhook] No se encontró orderId en el payload. type=%s keys=%s",
-      eventType,
-      Object.keys(event).join(",")
-    );
+    // Dump completo mientras no se conozca la forma exacta del payload real:
+    // en cuanto se confirme dónde vive `metadata.orderId`, se puede volver a
+    // recortar este log (queda en wrangler tail, no en un lugar público).
+    console.error("[recurrente webhook] No se encontró orderId. event_type=%s payload=%s", eventType, rawBody);
     return NextResponse.json({ received: true });
   }
 
   try {
-    if (PAID_EVENTS.has(eventType)) {
+    if (isPaidEvent(eventType)) {
       // Svix reintenta entregas fallidas solo, y también se puede reenviar a
       // mano desde su panel — sin este seguro, un mismo pago ya confirmado
       // volvería a descontar stock y a vaciar el carrito una segunda vez.
@@ -104,10 +120,10 @@ export async function POST(request: Request) {
           .update({ where: { id: cart.id }, data: { couponId: null } })
           .catch(() => {});
       }
-    } else if (FAILED_EVENTS.has(eventType)) {
+    } else if (isFailedEvent(eventType)) {
       await prisma.order.update({ where: { id: orderId }, data: { status: "FAILED" } });
     } else {
-      console.error("[recurrente webhook] Evento no manejado: %s", eventType);
+      console.error("[recurrente webhook] Evento no reconocido como pagado ni fallido: %s", eventType);
     }
   } catch (err) {
     console.error("[recurrente webhook] Error procesando orderId=%s: %o", orderId, err);
