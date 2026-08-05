@@ -31,7 +31,11 @@
     "RESEND_FROM_EMAIL": "VITATECH <noreply@notificaciones.importadoravitatech.com>",
     // ID de medición público de Google Analytics 4 (no es secreto). El script
     // en layout.tsx solo se activa si esta variable existe.
-    "NEXT_PUBLIC_GA_ID": "G-ZHKSV94ZFY"
+    "NEXT_PUBLIC_GA_ID": "G-ZHKSV94ZFY",
+    // ID público del Meta Pixel (no es secreto, es el mismo que va en el
+    // código de instalación "manual" de Meta). Mismo patrón: el script en
+    // layout.tsx solo se activa si esta variable existe.
+    "NEXT_PUBLIC_META_PIXEL_ID": "1042501291850371"
   },
   // Apagado a propósito, igual que en el panel: la tienda se sirve solo desde el
   // dominio propio. En `true`, cada deploy vuelve a publicar
