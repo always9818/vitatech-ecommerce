@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { money } from "@/lib/money";
 import { Icon } from "@/components/Icon";
+import { PurchaseTracker } from "@/components/tracking/PurchaseTracker";
 
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -12,11 +13,29 @@ export default async function CheckoutSuccessPage({
   const { order: orderId } = await searchParams;
   if (!orderId) notFound();
 
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { items: { include: { product: { include: { category: true } } } } },
+  });
   if (!order) notFound();
 
   return (
     <div className="mx-auto flex max-w-[560px] flex-col items-center gap-4 px-6 py-24 text-center">
+      {/* Nunca antes de que Recurrente confirme el pago: si se disparara en
+          PENDING, un pedido que termina fallando igual contaría como venta. */}
+      {order.status === "PAID" && (
+        <PurchaseTracker
+          orderId={order.id}
+          value={order.total}
+          items={order.items.map((it) => ({
+            id: it.productId,
+            name: it.product.name,
+            price: it.unitPrice,
+            quantity: it.quantity,
+            category: it.product.category.name,
+          }))}
+        />
+      )}
       <span className={order.status === "PAID" ? "text-vt-accent" : "text-vt-warning"}>
         <Icon name={order.status === "PAID" ? "checkCircle" : "clock"} className="h-14 w-14" />
       </span>

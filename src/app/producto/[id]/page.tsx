@@ -9,6 +9,7 @@ import { getProductRatingStats } from "@/lib/review-actions";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { pageMetadata, SITE_URL } from "@/lib/site";
 import { AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
+import { ViewContentTracker } from "@/components/tracking/ViewContentTracker";
 
 const MAX_INSTALLMENTS = Math.max(...AVAILABLE_INSTALLMENTS);
 
@@ -88,6 +89,9 @@ export default async function ProductDetailPage({
   return (
     <div className="animate-vt-slide mx-auto max-w-[1180px] px-6 py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ViewContentTracker
+        item={{ id: product.id, name: product.name, price: product.price, category: product.category.name }}
+      />
       <div className="grid grid-cols-1 gap-10 min-[880px]:grid-cols-[1.05fr_.95fr]">
         <div>
           <div className="relative grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
@@ -166,7 +170,11 @@ export default async function ProductDetailPage({
           <p className="mt-6 text-[14px] leading-relaxed text-vt-muted-1">{product.description}</p>
 
           <div className="mt-6">
-            <ProductDetailActions productId={product.id} stock={product.stock} />
+            <ProductDetailActions
+              productId={product.id}
+              stock={product.stock}
+              trackingItem={{ id: product.id, name: product.name, price: product.price, category: product.category.name }}
+            />
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-3">

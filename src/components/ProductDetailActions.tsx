@@ -4,8 +4,17 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { addToCart } from "@/lib/cart-actions";
 import { useToast } from "@/components/ToastProvider";
 import { Icon, Spinner } from "@/components/Icon";
+import { trackAddToCart, type TrackedItem } from "@/lib/tracking";
 
-export function ProductDetailActions({ productId, stock }: { productId: string; stock: number }) {
+export function ProductDetailActions({
+  productId,
+  stock,
+  trackingItem,
+}: {
+  productId: string;
+  stock: number;
+  trackingItem: Omit<TrackedItem, "quantity">;
+}) {
   const [qty, setQty] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [justAdded, setJustAdded] = useState(false);
@@ -46,6 +55,7 @@ export function ProductDetailActions({ productId, stock }: { productId: string; 
         onClick={() =>
           startTransition(async () => {
             await addToCart(productId, qty);
+            trackAddToCart({ ...trackingItem, quantity: qty });
             showToast("Agregado al carrito");
             setJustAdded(true);
             if (timer.current) clearTimeout(timer.current);

@@ -7,6 +7,7 @@ import { computeCouponDiscount } from "@/lib/coupon-utils";
 import { getShippingProfile } from "@/lib/shipping-actions";
 import { shippingCostFor } from "@/lib/shipping";
 import { CheckoutForm } from "@/components/CheckoutForm";
+import { InitiateCheckoutTracker } from "@/components/tracking/InitiateCheckoutTracker";
 
 export const metadata = { title: "Datos de envío · VITATECH_" };
 
@@ -28,6 +29,16 @@ export default async function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-[1180px] px-6 py-10">
+      <InitiateCheckoutTracker
+        items={items.map((it) => ({
+          id: it.productId,
+          name: it.product.name,
+          price: it.product.price,
+          quantity: it.quantity,
+          category: it.product.category.name,
+        }))}
+        value={total}
+      />
       <div className="text-[13px] text-vt-muted-2">
         <Link href="/carrito" className="hover:text-vt-accent">
           Carrito

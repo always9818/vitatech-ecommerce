@@ -70,6 +70,7 @@ export function ProductCard({ product, index = 0 }: { product: CardProduct; inde
             productId={product.id}
             disabled={!inStock}
             stopPropagation
+            trackingItem={{ id: product.id, name: product.name, price: product.price, category: product.category.name }}
             aria-label="Agregar al carrito"
             className={
               inStock

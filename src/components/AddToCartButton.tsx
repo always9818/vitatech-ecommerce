@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { addToCart } from "@/lib/cart-actions";
 import { useToast } from "@/components/ToastProvider";
 import { Icon, Spinner } from "@/components/Icon";
+import { trackAddToCart, type TrackedItem } from "@/lib/tracking";
 
 export function AddToCartButton({
   productId,
@@ -12,6 +13,7 @@ export function AddToCartButton({
   className,
   children,
   stopPropagation,
+  trackingItem,
   "aria-label": ariaLabel,
 }: {
   productId: string;
@@ -20,6 +22,7 @@ export function AddToCartButton({
   className?: string;
   children: React.ReactNode;
   stopPropagation?: boolean;
+  trackingItem: Omit<TrackedItem, "quantity">;
   "aria-label"?: string;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -41,6 +44,7 @@ export function AddToCartButton({
         if (stopPropagation) e.stopPropagation();
         startTransition(async () => {
           await addToCart(productId, quantity);
+          trackAddToCart({ ...trackingItem, quantity });
           showToast("Agregado al carrito");
           setJustAdded(true);
           if (timer.current) clearTimeout(timer.current);
