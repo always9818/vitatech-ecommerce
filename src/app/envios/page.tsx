@@ -8,8 +8,7 @@ export default function EnviosPage() {
       subtitle="Cómo y cuándo llega tu pedido."
       paragraphs={[
         "El envío tiene un costo fijo de Q 25. En compras desde Q 299 el envío es gratis.",
-        "Aquí puedes detallar tiempos de entrega por zona, empresas de paquetería y cómo rastrear un pedido.",
-        "Contenido de ejemplo — reemplázalo con tu política real de envíos.",
+        "Todos nuestros envíos se realizan a nivel nacional a través de GUATEX.",
       ]}
     />
   );

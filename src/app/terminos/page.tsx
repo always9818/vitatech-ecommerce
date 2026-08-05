@@ -112,11 +112,6 @@ export default function TerminosPage() {
           </section>
         ))}
       </div>
-
-      <p className="mt-6 text-[12px] text-vt-muted-3">
-        Este documento es una referencia general preparada para VITATECH y no sustituye asesoría legal. Se recomienda
-        su revisión por un profesional del derecho antes de considerarlo definitivo.
-      </p>
     </div>
   );
 }
