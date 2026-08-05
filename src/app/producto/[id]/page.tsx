@@ -49,11 +49,9 @@ export default async function ProductDetailPage({
   const cuota = "o " + money(Math.round(product.price / 6)) + "/mes en 6 cuotas sin intereses";
   const fallbackIcon = resolveProductIcon(product.icon, product.category.name);
   const photos = product.images;
-  const ratingStats = await getProductRatingStats(product.id, {
-    rating: product.rating,
-    reviews: product.reviews,
-  });
+  const ratingStats = await getProductRatingStats(product.id);
   const rating = Math.round(ratingStats.rating);
+  const hasReviews = ratingStats.reviews > 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -122,19 +120,26 @@ export default async function ProductDetailPage({
             {product.name}
           </h1>
           <div className="flex items-center gap-2 text-[13px] text-vt-muted-1">
-            <span className="flex items-center gap-0.5 text-vt-accent">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Icon
-                  key={i}
-                  name="star"
-                  filled={i < rating}
-                  className={i < rating ? "h-3.5 w-3.5" : "h-3.5 w-3.5 text-vt-muted-3"}
-                />
-              ))}
+            {hasReviews && (
+              <>
+                <span className="flex items-center gap-0.5 text-vt-accent">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Icon
+                      key={i}
+                      name="star"
+                      filled={i < rating}
+                      className={i < rating ? "h-3.5 w-3.5" : "h-3.5 w-3.5 text-vt-muted-3"}
+                    />
+                  ))}
+                </span>
+                <span>{ratingStats.rating.toFixed(1)}</span>
+                <span>· {ratingStats.reviews} reseñas</span>
+              </>
+            )}
+            <span className="font-bold text-vt-accent">
+              {hasReviews ? "· " : ""}
+              {stockLabel}
             </span>
-            <span>{ratingStats.rating.toFixed(1)}</span>
-            <span>· {ratingStats.reviews} reseñas</span>
-            <span className="font-bold text-vt-accent">· {stockLabel}</span>
           </div>
 
           <div className="mt-5 flex items-end gap-3">

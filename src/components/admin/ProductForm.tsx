@@ -21,8 +21,6 @@ type ProductFormProps = {
     price: number;
     oldPrice: number;
     stock: number;
-    rating: number;
-    reviews: number;
     specsText: string;
     existingImage?: string;
   };
@@ -161,31 +159,6 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
         <p className="mt-1 text-[11.5px] text-vt-muted-2">
           Se muestra si el producto todavía no tiene foto.
         </p>
-      </div>
-
-      <div>
-        <label className={labelClass}>Calificación (0-5)</label>
-        <input
-          name="rating"
-          type="number"
-          min="0"
-          max="5"
-          step="0.1"
-          defaultValue={v?.rating ?? 5}
-          className={inputClass}
-        />
-      </div>
-
-      <div>
-        <label className={labelClass}>Número de reseñas</label>
-        <input
-          name="reviews"
-          type="number"
-          min="0"
-          step="1"
-          defaultValue={v?.reviews ?? 0}
-          className={inputClass}
-        />
       </div>
 
       <div className="min-[880px]:col-span-2">

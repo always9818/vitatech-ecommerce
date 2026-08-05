@@ -16,8 +16,6 @@ export type ProductFormValues = {
   price: number;
   oldPrice: number;
   stock: number;
-  rating: number;
-  reviews: number;
   specsText: string;
 };
 
@@ -57,8 +55,6 @@ function readRawProductValues(formData: FormData): ProductFormValues {
     price: n("price"),
     oldPrice: n("oldPrice"),
     stock: n("stock"),
-    rating: n("rating"),
-    reviews: n("reviews"),
     specsText: s("specs"),
   };
 }
@@ -94,8 +90,6 @@ function readProductFields(formData: FormData) {
   const price = Number(formData.get("price"));
   const oldPrice = Number(formData.get("oldPrice"));
   const stock = Number(formData.get("stock"));
-  const rating = Number(formData.get("rating") ?? 5);
-  const reviews = Number(formData.get("reviews") ?? 0);
   const specs = parseSpecs(String(formData.get("specs") ?? ""));
 
   if (!name || !sku || !categoryId || !brandId) {
@@ -111,7 +105,13 @@ function readProductFields(formData: FormData) {
     throw new Error("El stock debe ser un número mayor o igual a 0.");
   }
 
-  return { name, sku, description, icon, categoryId, brandId, price, oldPrice, stock, rating, reviews, specs };
+  // El formulario ya no pide calificación ni número de reseñas: eran datos de
+  // ejemplo que un producto nuevo nunca tiene de verdad (rating fijo en 5,
+  // 0 reseñas), y publicarlos como si fueran reales — sobre todo en los datos
+  // estructurados que Google indexa — es justo el tipo de reseña falsa que
+  // Google penaliza. La calificación real vive en el modelo `Review`
+  // (src/lib/review-actions.ts), no en el producto.
+  return { name, sku, description, icon, categoryId, brandId, price, oldPrice, stock, rating: 0, reviews: 0, specs };
 }
 
 export async function createProduct(_prevState: ProductFormState, formData: FormData): Promise<ProductFormState> {

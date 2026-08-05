@@ -70,7 +70,15 @@ export async function getApprovedReviews(productId: string) {
     .catch(onReviewQueryError("getApprovedReviews", [] as never[]));
 }
 
-export async function getProductRatingStats(productId: string, fallback: { rating: number; reviews: number }) {
+/**
+ * Antes caía en `product.rating`/`product.reviews` cuando no había reseñas
+ * aprobadas reales — esos campos eran datos de ejemplo (ej. "5.0 · 4
+ * reseñas" en un producto que nunca recibió una reseña real), y se publicaban
+ * tal cual en los datos estructurados que lee Google. Ahora, sin reseñas
+ * reales, es 0 sin relleno: es lo honesto, y evita el riesgo de que Google
+ * marque el sitio por reseñas falsas.
+ */
+export async function getProductRatingStats(productId: string) {
   const approved = await prisma.review
     .aggregate({
       where: { productId, status: "APPROVED" },
@@ -80,7 +88,7 @@ export async function getProductRatingStats(productId: string, fallback: { ratin
     .catch(onReviewQueryError("getProductRatingStats", null));
 
   if (!approved || approved._count._all === 0) {
-    return fallback;
+    return { rating: 0, reviews: 0 };
   }
 
   return { rating: approved._avg.rating ?? 0, reviews: approved._count._all };

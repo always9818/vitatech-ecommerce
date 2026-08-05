@@ -38,8 +38,6 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           price: product.price,
           oldPrice: product.oldPrice,
           stock: product.stock,
-          rating: product.rating,
-          reviews: product.reviews,
           specsText,
           existingImage: product.images[0],
         }}
