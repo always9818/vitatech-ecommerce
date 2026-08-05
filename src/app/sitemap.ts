@@ -20,7 +20,12 @@ const STATIC_ROUTES: { path: string; changeFrequency: "daily" | "weekly" | "mont
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const products = await getSitemapProducts();
+  // Next ejecuta esta función una vez durante el build para el manifiesto de
+  // rutas, momento en el que DATABASE_URL no existe (el paso de build en
+  // Cloudflare no la expone, solo el runtime del Worker). En producción real
+  // sí corre por request con el entorno completo; esto solo evita que ese
+  // paso de build truene con un error sin capturar.
+  const products = await getSitemapProducts().catch(() => []);
   const now = new Date();
 
   const staticEntries = STATIC_ROUTES.map(({ path, changeFrequency, priority }) => ({
