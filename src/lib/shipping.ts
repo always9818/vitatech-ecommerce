@@ -1,6 +1,6 @@
 /** Reglas de costo de envío, compartidas por el checkout y su resumen. */
 export const FREE_SHIPPING_THRESHOLD = 299;
-export const SHIPPING_COST = 70;
+export const SHIPPING_COST = 25;
 
 export function shippingCostFor(subtotal: number) {
   return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;

@@ -9,9 +9,9 @@ import { ReviewsSection } from "@/components/ReviewsSection";
 
 const BENEFITS: { icon: IconName; label: string }[] = [
   { icon: "truck", label: "Envío gratis desde Q 299" },
-  { icon: "store", label: "Recoge en tienda" },
-  { icon: "shield", label: "Garantía 12 meses" },
-  { icon: "returns", label: "Devolución 15 días" },
+  { icon: "chat", label: "Soporte por WhatsApp" },
+  { icon: "shield", label: "Garantía real" },
+  { icon: "returns", label: "Cambios por desperfecto de fábrica" },
 ];
 
 export default async function ProductDetailPage({

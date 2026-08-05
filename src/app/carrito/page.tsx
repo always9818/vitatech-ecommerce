@@ -7,9 +7,7 @@ import { CouponBox } from "@/components/CouponBox";
 import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
 import { VitoMascot } from "@/components/Logo";
-
-const FREE_SHIPPING_THRESHOLD = 299;
-const SHIPPING_COST = 70;
+import { shippingCostFor } from "@/lib/shipping";
 
 export default async function CartPage() {
   const items = await getCart();
@@ -17,7 +15,7 @@ export default async function CartPage() {
   const subtotal = items.reduce((a, it) => a + it.product.price * it.quantity, 0);
   const listTotal = items.reduce((a, it) => a + it.product.oldPrice * it.quantity, 0);
   const discount = listTotal - subtotal;
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
+  const shipping = subtotal === 0 ? 0 : shippingCostFor(subtotal);
   const coupon = await getCartCoupon();
   const couponDiscount = coupon ? computeCouponDiscount(coupon, subtotal) : 0;
   const total = Math.max(0, subtotal + shipping - couponDiscount);

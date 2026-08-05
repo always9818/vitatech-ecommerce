@@ -7,9 +7,11 @@ export default function GarantiasPage() {
       title="Garantías"
       subtitle="Cobertura y proceso de garantía de tus productos."
       paragraphs={[
-        "Todos los productos incluyen garantía de fábrica; consulta los meses específicos en la ficha de cada producto.",
-        "Aquí puedes detallar el proceso para hacer válida una garantía, qué cubre y qué no, y los tiempos de reparación.",
-        "Contenido de ejemplo — reemplázalo con tu política real de garantías.",
+        "En VITATECH respaldamos cada producto que vendemos contra desperfectos de fábrica.",
+        "Cables y accesorios de conexión: garantía de 48 horas a partir de la entrega.",
+        "Productos electrónicos (laptops, celulares, monitores, audio y demás equipos): garantía de 30 días a partir de la entrega.",
+        "Cambios por desperfecto de fábrica: si tu producto presenta una falla de fábrica dentro del plazo de garantía, lo cambiamos por uno nuevo.",
+        "La garantía cubre desperfectos de fábrica; no cubre daños por mal uso, golpes, humedad ni modificaciones al producto. Para hacerla válida, contáctanos dentro del plazo correspondiente con tu comprobante de compra.",
       ]}
     />
   );

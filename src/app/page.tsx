@@ -10,7 +10,7 @@ import { VitoMascot } from "@/components/Logo";
 
 const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
   { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
-  { icon: "store", title: "Recoge en tienda", sub: "Listo en 2 horas" },
+  { icon: "chat", title: "Soporte por WhatsApp", sub: "Lun a sáb, 9am–6pm" },
   { icon: "shield", title: "Garantía real", sub: "Servicio técnico propio" },
   { icon: "card", title: "Pago seguro", sub: "Tarjeta o contra entrega" },
 ];

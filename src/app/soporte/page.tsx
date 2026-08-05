@@ -7,9 +7,10 @@ export default function SoportePage() {
       title="Soporte"
       subtitle="¿Necesitas ayuda? Estamos para servirte."
       paragraphs={[
-        "Aquí puedes agregar tus canales de contacto: WhatsApp, correo, teléfono, y horario de atención.",
-        "También puedes incluir preguntas frecuentes sobre pedidos, pagos y devoluciones.",
-        "Contenido de ejemplo — reemplázalo con tu información real de soporte.",
+        "WhatsApp: +502 5335-3561.",
+        "Correo electrónico: info@importacionesvitatech.com.",
+        "Horario de atención: lunes a sábado, de 9:00 a. m. a 6:00 p. m.",
+        "Todos nuestros envíos se realizan a través de GUATEX.",
       ]}
     />
   );
