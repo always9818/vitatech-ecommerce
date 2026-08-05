@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCategories, getFeaturedProducts } from "@/lib/catalog";
+import { getCategoriesWithStock, getFeaturedProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveCategoryIcon } from "@/lib/product-icon";
@@ -17,7 +17,7 @@ const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
 
 export default async function HomePage() {
   const [categories, featured, settings, slides] = await Promise.all([
-    getCategories(),
+    getCategoriesWithStock(),
     getFeaturedProducts(4),
     getSiteSettings(),
     getHeroSlides(),

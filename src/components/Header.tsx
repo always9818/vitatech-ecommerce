@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getCart } from "@/lib/cart-actions";
+import { getCategoriesWithStock } from "@/lib/catalog";
 import { SearchBar } from "@/components/SearchBar";
 import { CartBadge } from "@/components/CartBadge";
 import { Icon } from "@/components/Icon";
 import { VitatechLetterV } from "@/components/Logo";
 
-const HEADER_CATEGORIES = ["Accesorios", "Celulares", "Monitores", "Audio"];
+// Máximo de categorías en el menú, no una lista fija: antes "Monitores"
+// quedó ahí con 0 productos (el cliente hacía clic y caía en "Sin
+// resultados") porque nadie se acuerda de tocar este archivo cuando cambia
+// el inventario. Ahora se arma solo con lo que hay stock, de mayor a menor.
+const HEADER_CATEGORY_LIMIT = 4;
 
 export async function Header() {
-  const session = await auth();
-  const items = await getCart();
+  const [session, items, categories] = await Promise.all([auth(), getCart(), getCategoriesWithStock()]);
+  const headerCategories = categories.slice(0, HEADER_CATEGORY_LIMIT);
   const cartCount = items.reduce((a, it) => a + it.quantity, 0);
 
   return (
@@ -30,13 +35,13 @@ export async function Header() {
         </div>
 
         <nav className="hidden min-[881px]:flex items-center gap-1 text-[13.5px] font-semibold text-vt-fg">
-          {HEADER_CATEGORIES.map((c) => (
+          {headerCategories.map((c) => (
             <Link
-              key={c}
-              href={`/catalogo?cat=${encodeURIComponent(c)}`}
+              key={c.id}
+              href={`/catalogo?cat=${encodeURIComponent(c.name)}`}
               className="rounded-lg px-3 py-2 hover:text-vt-accent"
             >
-              {c}
+              {c.name}
             </Link>
           ))}
         </nav>

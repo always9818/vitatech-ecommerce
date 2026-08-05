@@ -127,3 +127,17 @@ export async function getCategoryCounts() {
   });
   return categories;
 }
+
+/**
+ * Solo categorías con al menos un producto. Se usa en la navegación
+ * (encabezado, chips de la portada, filtro del catálogo) para no mandar al
+ * cliente a una categoría vacía — a diferencia de `getCategories()`, que sí
+ * debe listarlas todas en el panel de administración (ahí hace falta ver una
+ * categoría sin productos para poder agregarle el primero).
+ */
+export async function getCategoriesWithStock() {
+  const categories = await getCategoryCounts();
+  return categories
+    .filter((c) => c._count.products > 0)
+    .sort((a, b) => b._count.products - a._count.products || a.name.localeCompare(b.name));
+}

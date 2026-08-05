@@ -47,6 +47,10 @@ export default async function CatalogPage({
 
   const totalCount = categoryCounts.reduce((a, c) => a + c._count.products, 0);
   const resultLabel = `${products.length} ${products.length === 1 ? "resultado" : "resultados"}`;
+  // El total de arriba sí cuenta todo; la lista de abajo solo muestra
+  // categorías con al menos un producto, para no ofrecer un filtro que lleve
+  // a "Sin resultados" (ej. Monitores o Impresoras cuando están sin stock).
+  const categoriesWithStock = categoryCounts.filter((c) => c._count.products > 0);
 
   return (
     <div className="animate-vt-fade mx-auto max-w-[1180px] px-6 py-10">
@@ -81,7 +85,7 @@ export default async function CatalogPage({
                 <span>Todas las categorías</span>
                 <span>{totalCount}</span>
               </Link>
-              {categoryCounts.map((c) => (
+              {categoriesWithStock.map((c) => (
                 <Link
                   key={c.id}
                   href={`/catalogo?cat=${encodeURIComponent(c.name)}`}
