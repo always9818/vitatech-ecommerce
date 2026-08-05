@@ -28,7 +28,10 @@
     "NEXTAUTH_URL": "https://importadoravitatech.com",
     // Dominio verificado en Resend (subdominio, no la raíz, para no tocar el
     // SPF/MX que usa Zoho para el correo normal de importadoravitatech.com).
-    "RESEND_FROM_EMAIL": "VITATECH <noreply@notificaciones.importadoravitatech.com>"
+    "RESEND_FROM_EMAIL": "VITATECH <noreply@notificaciones.importadoravitatech.com>",
+    // ID de medición público de Google Analytics 4 (no es secreto). El script
+    // en layout.tsx solo se activa si esta variable existe.
+    "NEXT_PUBLIC_GA_ID": "G-ZHKSV94ZFY"
   },
   // Apagado a propósito, igual que en el panel: la tienda se sirve solo desde el
   // dominio propio. En `true`, cada deploy vuelve a publicar
