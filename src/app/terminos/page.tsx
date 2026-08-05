@@ -1,4 +1,11 @@
 import { Icon } from "@/components/Icon";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Términos y condiciones",
+  description: "Las reglas de uso de la tienda VITATECH: compra, pago, envíos, garantías y protección de datos.",
+  path: "/terminos",
+});
 
 /**
  * A diferencia de las otras páginas del footer (Tiendas, Envíos, Garantías,

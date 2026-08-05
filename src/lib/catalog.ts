@@ -110,6 +110,15 @@ export async function getFilteredProducts(opts: {
   return agotadosAlFinal(withOff, desempate);
 }
 
+/** Solo lo que necesita el sitemap: id y fecha de actualización. */
+export async function getSitemapProducts() {
+  return prisma.product.findMany({
+    where: SOLO_VISIBLES,
+    select: { id: true, updatedAt: true },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
 export async function getCategoryCounts() {
   const categories = await prisma.category.findMany({
     // El conteo también excluye los ocultos: si no, una categoría anunciaría

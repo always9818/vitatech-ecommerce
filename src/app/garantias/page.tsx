@@ -1,4 +1,11 @@
 import { StaticInfoPage } from "@/components/StaticInfoPage";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Garantías",
+  description: "Garantía real contra desperfectos de fábrica: 48 horas en cables y accesorios, 30 días en productos electrónicos.",
+  path: "/garantias",
+});
 
 export default function GarantiasPage() {
   return (

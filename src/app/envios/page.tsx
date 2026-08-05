@@ -1,4 +1,11 @@
 import { StaticInfoPage } from "@/components/StaticInfoPage";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Envíos",
+  description: "Envío con costo fijo de Q25, gratis desde Q299. Entregas a nivel nacional en Guatemala a través de GUATEX.",
+  path: "/envios",
+});
 
 export default function EnviosPage() {
   return (

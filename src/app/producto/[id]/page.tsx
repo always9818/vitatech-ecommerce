@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/catalog";
 import { money, discountPct } from "@/lib/money";
@@ -6,6 +7,7 @@ import { Icon, type IconName } from "@/components/Icon";
 import { resolveProductIcon } from "@/lib/product-icon";
 import { getProductRatingStats } from "@/lib/review-actions";
 import { ReviewsSection } from "@/components/ReviewsSection";
+import { pageMetadata, SITE_URL } from "@/lib/site";
 
 const BENEFITS: { icon: IconName; label: string }[] = [
   { icon: "truck", label: "Envío gratis desde Q 299" },
@@ -13,6 +15,23 @@ const BENEFITS: { icon: IconName; label: string }[] = [
   { icon: "shield", label: "Garantía real" },
   { icon: "returns", label: "Cambios por desperfecto de fábrica" },
 ];
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductById(id);
+  if (!product) return {};
+
+  return pageMetadata({
+    title: product.name,
+    description: product.description.slice(0, 155),
+    path: `/producto/${id}`,
+    image: product.images[0],
+  });
+}
 
 export default async function ProductDetailPage({
   params,
@@ -36,8 +55,35 @@ export default async function ProductDetailPage({
   });
   const rating = Math.round(ratingStats.rating);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    sku: product.sku,
+    image: photos,
+    brand: { "@type": "Brand", name: product.brand.name },
+    offers: {
+      "@type": "Offer",
+      url: `${SITE_URL}/producto/${product.id}`,
+      priceCurrency: "GTQ",
+      price: product.price,
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    },
+    ...(ratingStats.reviews > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: ratingStats.rating,
+            reviewCount: ratingStats.reviews,
+          },
+        }
+      : {}),
+  };
+
   return (
     <div className="animate-vt-slide mx-auto max-w-[1180px] px-6 py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="grid grid-cols-1 gap-10 min-[880px]:grid-cols-[1.05fr_.95fr]">
         <div>
           <div className="relative grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">

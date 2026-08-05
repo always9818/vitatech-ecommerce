@@ -1,4 +1,11 @@
 import { StaticInfoPage } from "@/components/StaticInfoPage";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Soporte",
+  description: "Escríbenos por WhatsApp o correo. Atendemos de lunes a sábado, de 9:00 a. m. a 6:00 p. m.",
+  path: "/soporte",
+});
 
 export default function SoportePage() {
   return (

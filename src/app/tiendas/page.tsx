@@ -1,4 +1,11 @@
 import { StaticInfoPage } from "@/components/StaticInfoPage";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Tiendas",
+  description: "Nuestros kioscos VITATECH están en camino. Por ahora seguimos siendo 100% en línea, con envío a todo Guatemala.",
+  path: "/tiendas",
+});
 
 export default function TiendasPage() {
   return (

@@ -1,14 +1,37 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getFilteredProducts, getCategoryCounts, getBrands, type SortOption } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
 import { BrandFilterList } from "@/components/BrandFilterList";
 import { VitoMascot } from "@/components/Logo";
+import { pageMetadata } from "@/lib/site";
+
+type CatalogSearchParams = { cat?: string; brand?: string; search?: string; sort?: string };
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<CatalogSearchParams>;
+}): Promise<Metadata> {
+  const { cat } = await searchParams;
+  const category = cat && cat !== "Todas" ? cat : null;
+
+  return pageMetadata({
+    title: category ?? "Catálogo",
+    description: category
+      ? `Compra ${category.toLowerCase()} originales en Guatemala, con envío a todo el país y garantía real.`
+      : "Explora accesorios, celulares, monitores, audio y más, originales, con envío a todo Guatemala.",
+    // Solo la categoría define una página distinta; marca, búsqueda y orden son
+    // filtros del mismo listado, no contenido nuevo para indexar por separado.
+    path: category ? `/catalogo?cat=${encodeURIComponent(category)}` : "/catalogo",
+  });
+}
 
 export default async function CatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ cat?: string; brand?: string; search?: string; sort?: string }>;
+  searchParams: Promise<CatalogSearchParams>;
 }) {
   const params = await searchParams;
   const category = params.cat ?? "Todas";
