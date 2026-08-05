@@ -6,7 +6,7 @@ import { CartBadge } from "@/components/CartBadge";
 import { Icon } from "@/components/Icon";
 import { VitatechLetterV } from "@/components/Logo";
 
-const HEADER_CATEGORIES = ["Laptops", "Celulares", "Monitores", "Audio"];
+const HEADER_CATEGORIES = ["Accesorios", "Celulares", "Monitores", "Audio"];
 
 export async function Header() {
   const session = await auth();
