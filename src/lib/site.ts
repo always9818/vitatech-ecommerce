@@ -18,7 +18,11 @@ export const SUPPORT_EMAIL = "info@importacionesvitatech.com";
 export function pageMetadata(opts: { title: string; description: string; path: string; image?: string }): Metadata {
   const { title, description, path, image } = opts;
   const fullTitle = `${title} · ${SITE_NAME}`;
-  const images = image ? [image] : undefined;
+  // Next solo aplica el respaldo automático de opengraph-image.png cuando la
+  // página NO define su propio `openGraph`. En cuanto una página trae el suyo
+  // (como aquí, para tener título/descripción propios), ese respaldo deja de
+  // aplicarse aunque no se incluya `images` — hay que poner la imagen a mano.
+  const images = [image ?? `${SITE_URL}/opengraph-image.png`];
   return {
     title,
     description,
