@@ -10,10 +10,20 @@ import crypto from "crypto";
 
 const RECURRENTE_API_BASE = "https://app.recurrente.com/api";
 
+/**
+ * Plazos de cuotas habilitados en el panel de Recurrente para VITATECH
+ * (Configuración → Métodos de Pago → Cuotas). El cliente paga el mismo total
+ * elija o no cuotas — Recurrente le descuenta la comisión (8% a 3 meses, 9% a
+ * 6, 10% a 12) al saldo del comercio, no al cliente, así que "sin intereses"
+ * es literal para quien compra.
+ */
+export const AVAILABLE_INSTALLMENTS = [3, 6, 12];
+
 type CheckoutItem = {
   name: string;
   quantity: number;
   amountInCents: number;
+  availableInstallments?: number[];
 };
 
 type CreateCheckoutParams = {
@@ -41,6 +51,7 @@ export async function createRecurrenteCheckout(params: CreateCheckoutParams) {
         quantity: item.quantity,
         currency: "GTQ",
         amount_in_cents: item.amountInCents,
+        ...(item.availableInstallments?.length ? { available_installments: item.availableInstallments } : {}),
       })),
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,

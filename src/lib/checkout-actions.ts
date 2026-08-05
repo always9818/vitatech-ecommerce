@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getCart } from "@/lib/cart-actions";
-import { createRecurrenteCheckout } from "@/lib/recurrente";
+import { createRecurrenteCheckout, AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
 import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
 import { readShippingInput, validateShipping, shippingCostFor } from "@/lib/shipping";
@@ -15,7 +15,7 @@ import { persistShippingProfile } from "@/lib/shipping-actions";
 // los precios unitarios que se le envían. El remanente de redondeo se ajusta
 // en la última línea para que la suma cobrada cuadre exacto con `total`.
 function applyDiscountToLineItems(
-  items: { name: string; quantity: number; amountInCents: number }[],
+  items: { name: string; quantity: number; amountInCents: number; availableInstallments?: number[] }[],
   discountInCents: number
 ) {
   if (discountInCents <= 0) return items;
@@ -114,6 +114,9 @@ export async function startCheckout(formData: FormData): Promise<{ url?: string;
         name: it.product.name,
         quantity: it.quantity,
         amountInCents: it.product.price * 100,
+        // Cuotas solo en los productos, no en el envío: no tiene sentido
+        // financiar un cargo de Q25-70 a 12 meses.
+        availableInstallments: AVAILABLE_INSTALLMENTS,
       })),
       couponDiscount * 100
     );

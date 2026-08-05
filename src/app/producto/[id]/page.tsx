@@ -8,6 +8,9 @@ import { resolveProductIcon } from "@/lib/product-icon";
 import { getProductRatingStats } from "@/lib/review-actions";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { pageMetadata, SITE_URL } from "@/lib/site";
+import { AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
+
+const MAX_INSTALLMENTS = Math.max(...AVAILABLE_INSTALLMENTS);
 
 const BENEFITS: { icon: IconName; label: string }[] = [
   { icon: "truck", label: "Envío gratis desde Q 299" },
@@ -46,7 +49,10 @@ export default async function ProductDetailPage({
   const stockLabel =
     product.stock === 0 ? "Agotado" : product.stock <= 5 ? `Últimas ${product.stock} unidades` : "En stock";
   const specs = (product.specs as { k: string; v: string }[]) ?? [];
-  const cuota = "o " + money(Math.round(product.price / 6)) + "/mes en 6 cuotas sin intereses";
+  // El monto es el de la cuota más baja (a MAX_INSTALLMENTS meses, el plazo
+  // más largo); el checkout de Recurrente ofrece los demás plazos disponibles.
+  const cuota =
+    "Desde " + money(Math.round(product.price / MAX_INSTALLMENTS)) + `/mes en hasta ${MAX_INSTALLMENTS} cuotas sin intereses`;
   const fallbackIcon = resolveProductIcon(product.icon, product.category.name);
   const photos = product.images;
   const ratingStats = await getProductRatingStats(product.id);
