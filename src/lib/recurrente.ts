@@ -97,7 +97,12 @@ export function verifyRecurrenteWebhookSignature(
   const secretBytes = Buffer.from(webhookSecret.replace(/^whsec_/, ""), "base64");
   const signedContent = `${svixId}.${svixTimestamp}.${rawBody}`;
   const expected = crypto.createHmac("sha256", secretBytes).update(signedContent).digest("base64");
-  const expectedBuffer = Buffer.from(expected);
+  // `Buffer.from(expected)` sin decir "base64" trata el string como texto
+  // plano (44 bytes) en vez de decodificarlo a los 32 bytes reales del hash
+  // — así nunca iba a coincidir contra la firma del header, sin importar que
+  // el resto del cálculo estuviera bien. Confirmado con el vector de prueba
+  // oficial de Svix antes de este fix.
+  const expectedBuffer = Buffer.from(expected, "base64");
 
   return svixSignature
     .split(" ")
