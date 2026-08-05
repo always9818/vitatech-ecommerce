@@ -157,6 +157,12 @@ model Cart {
   couponId  String?
   coupon    Coupon?    @relation(fields: [couponId], references: [id], onDelete: SetNull)
   updatedAt DateTime   @updatedAt
+
+  /// Cuándo se mandó el último correo de "dejaste algo en tu carrito". Si el
+  /// carrito se vuelve a tocar (agregar/quitar/cambiar cantidad), `updatedAt`
+  /// avanza y queda por delante de este valor otra vez — así el cron sabe que
+  /// puede volver a avisar sin necesidad de limpiar el campo a mano.
+  abandonedEmailSentAt DateTime?
 }
 
 model CartItem {

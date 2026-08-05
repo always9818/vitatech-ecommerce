@@ -4,6 +4,9 @@
  * sumar una dependencia solo por un par de llamadas.
  */
 
+import { SITE_URL } from "@/lib/site";
+import { money } from "@/lib/money";
+
 const RESEND_API_BASE = "https://api.resend.com";
 
 function isEmailEnabled() {
@@ -64,6 +67,57 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
         </p>
         <p style="font-size: 13px; color: #57534e;">
           Este enlace vence en 1 hora y solo funciona una vez. Si tú no pediste este cambio, puedes ignorar este correo.
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendAbandonedCartEmail(
+  to: string,
+  cart: { name: string | null; items: { name: string; quantity: number; price: number }[]; total: number }
+) {
+  if (!isEmailEnabled()) {
+    console.error("[email] Envío de correo deshabilitado (falta RESEND_API_KEY); recordatorio no enviado a", to);
+    return;
+  }
+
+  const saludo = cart.name ? `Hola, ${cart.name.split(" ")[0]}` : "Hola";
+  const filas = cart.items
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e7e5e4;">
+            ${it.name}${it.quantity > 1 ? ` <span style="color: #78716c;">× ${it.quantity}</span>` : ""}
+          </td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e7e5e4; text-align: right; white-space: nowrap;">
+            ${money(it.price * it.quantity)}
+          </td>
+        </tr>`
+    )
+    .join("");
+
+  await sendEmail({
+    to,
+    subject: "Dejaste algo en tu carrito de VITATECH",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #1a2e05;">
+        <h1 style="font-size: 20px;">${saludo}, todavía tienes esto en tu carrito</h1>
+        <p>No completaste tu compra en Importadora Vitatech. Tus productos siguen guardados, por si quieres terminarla.</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          ${filas}
+          <tr>
+            <td style="padding: 10px 0; font-weight: bold;">Total</td>
+            <td style="padding: 10px 0; font-weight: bold; text-align: right;">${money(cart.total)}</td>
+          </tr>
+        </table>
+        <p>
+          <a href="${SITE_URL}/carrito" style="display: inline-block; background: #a3e635; color: #1a2e05; font-weight: bold; padding: 12px 24px; border-radius: 10px; text-decoration: none;">
+            Terminar mi compra
+          </a>
+        </p>
+        <p style="font-size: 13px; color: #57534e;">
+          Si ya no te interesa, puedes ignorar este correo — tu carrito no vence.
         </p>
       </div>
     `,

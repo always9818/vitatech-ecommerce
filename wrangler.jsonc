@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "vitatech-ecommerce",
-  "main": ".open-next/worker.js",
+  // Envoltorio sobre el worker que genera OpenNext (custom-worker.ts, en la
+  // raíz del proyecto): reexporta el mismo `fetch` tal cual y le suma el
+  // handler `scheduled` para el cron de carritos abandonados.
+  "main": "custom-worker.ts",
   "compatibility_date": "2026-07-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
@@ -45,6 +48,12 @@
     { "pattern": "importadoravitatech.com/*", "zone_name": "importadoravitatech.com" },
     { "pattern": "www.importadoravitatech.com/*", "zone_name": "importadoravitatech.com" }
   ],
+  // Cada hora, en punto: revisa carritos abandonados y manda el recordatorio
+  // a los que ya llevan quietos el tiempo suficiente (ver custom-worker.ts y
+  // src/lib/abandoned-cart.ts).
+  "triggers": {
+    "crons": ["0 * * * *"]
+  },
   "observability": {
     "enabled": true
   }
