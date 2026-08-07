@@ -23,15 +23,19 @@ export const getSiteSettings = unstable_cache(
   { tags: [TAG_PORTADA], revalidate: CACHE_SEGUNDOS },
 );
 
-// Textos del hero de la home tal como estaban escritos en el código antes de
-// hacerlos editables. Se usan cuando el campo correspondiente vale null, es
-// decir mientras nadie los haya personalizado desde /admin/portada.
+// Textos del hero de la home. Se usan cuando el campo correspondiente vale
+// null, es decir mientras nadie lo haya personalizado desde /admin/portada —
+// incluido el caso de darle "Restablecer": ahí es a donde vuelve.
+//
+// Hablan de los DOS departamentos (Tecnología y Salud y Bienestar) a
+// propósito: antes solo mencionaban tecnología, cuando VITATECH siempre fue
+// literal — VITA por vitaminas y suplementos, TECH por tecnología.
 export const HERO_DEFAULTS = {
-  badge: "TEMPORADA TECH · HASTA -40%",
-  title: "Potencia tu setup al mejor",
-  titleAccent: "precio",
+  badge: "TECNOLOGÍA Y BIENESTAR",
+  title: "Todo lo que tu día",
+  titleAccent: "necesita",
   subtitle:
-    "Tecnología de las mejores marcas, con envío a todo Guatemala y garantía real. Encuentra laptops, celulares, monitores y más al mejor precio.",
+    "Tecnología original y suplementos de marcas confiables, con envío a todo Guatemala y garantía real.",
 } as const;
 
 export type HeroContent = {
