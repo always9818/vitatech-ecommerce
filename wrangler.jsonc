@@ -23,6 +23,24 @@
     {
       "bucket_name": "vitatech-product-images",
       "binding": "PRODUCT_IMAGES"
+    },
+    // Caché de datos de OpenNext (lo que guardan los `unstable_cache` de
+    // catalog.ts). Bucket PRIVADO y distinto al de las fotos: no debe quedar
+    // expuesto en el dominio público r2.dev. El nombre del binding lo exige
+    // OpenNext, no es libre.
+    {
+      "bucket_name": "vitatech-next-cache",
+      "binding": "NEXT_INC_CACHE_R2_BUCKET"
+    }
+  ],
+  // Registro de invalidaciones por etiqueta: es lo que hace que un cambio hecho
+  // en el panel se vea de inmediato en la tienda en vez de esperar a que expire
+  // la caché. El nombre del binding también lo exige OpenNext.
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "vitatech-next-tags",
+      "database_id": "9628aaf7-0b8c-44a1-9ea4-c011614939c6"
     }
   ],
   "vars": {

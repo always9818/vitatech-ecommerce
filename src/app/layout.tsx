@@ -4,6 +4,8 @@ import { Space_Grotesk, Public_Sans } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/ToastProvider";
+import { WhatsAppFab } from "@/components/WhatsAppButton";
+import { MENSAJE_GENERAL, whatsappUrl } from "@/lib/whatsapp";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, SUPPORT_PHONE_E164 } from "@/lib/site";
 import "./globals.css";
 
@@ -118,6 +120,9 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          {/* La tienda promete "Soporte por WhatsApp" en la portada y en la
+              ficha de producto, pero hasta ahora no había dónde hacer clic. */}
+          <WhatsAppFab href={whatsappUrl(MENSAJE_GENERAL)} />
         </ToastProvider>
       </body>
     </html>

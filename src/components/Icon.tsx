@@ -34,6 +34,11 @@ const PATHS = {
   plus: <><path d="M5 12h14" /><path d="M12 5v14" /></>,
   minus: <><path d="M5 12h14" /></>,
   chat: <><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z" /></>,
+  // Misma burbuja que `chat`, con el auricular dentro. Va de línea y con
+  // `currentColor` como todos: pintarlo del verde de WhatsApp sería una tercera
+  // excepción de color, y las únicas permitidas son el logo de VITATECH y el
+  // de Google.
+  whatsapp: <><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z" /><path d="M9.5 8.5h1l1 2-.9 1a5.5 5.5 0 0 0 2.9 2.9l1-.9 2 1v1c0 .6-.5 1-1.1 1A7.4 7.4 0 0 1 8.5 9.6c0-.6.4-1.1 1-1.1Z" /></>,
   document: <><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v5h5" /><path d="M8 13h8" /><path d="M8 17h5" /></>,
   chevronLeft: <><path d="M15 18 9 12l6-6" /></>,
   chevronRight: <><path d="m9 18 6-6-6-6" /></>,

@@ -92,6 +92,17 @@ export function trackInitiateCheckout(items: TrackedItem[], value: number) {
   });
 }
 
+/**
+ * Clic en un botón de WhatsApp. En Guatemala buena parte de las ventas se
+ * cierran por chat y no por el carrito, así que sin medir esto la tienda
+ * parecería vender mucho menos de lo que realmente genera. `origen` distingue
+ * el botón flotante del de la ficha de producto, para saber cuál trae gente.
+ */
+export function trackWhatsAppContact(origen: "flotante" | "ficha-producto") {
+  fbq("track", "Contact", { content_name: origen });
+  gtag("event", "generate_lead", { method: "whatsapp", origen });
+}
+
 /** Pedido confirmado como pagado (nunca antes de que Recurrente lo confirme). */
 export function trackPurchase(orderId: string, items: TrackedItem[], value: number) {
   fbq("track", "Purchase", {

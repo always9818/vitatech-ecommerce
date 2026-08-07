@@ -1,10 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 import { uploadProductImage } from "@/lib/r2";
+import { TAG_CATALOGO, TAG_PORTADA } from "@/lib/cache-tags";
 
 export type ProductFormValues = {
   name: string;
@@ -131,6 +132,7 @@ export async function createProduct(_prevState: ProductFormState, formData: Form
     };
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
   revalidatePath("/");
@@ -162,6 +164,7 @@ export async function updateProduct(
     };
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
   revalidatePath(`/producto/${productId}`);
@@ -201,6 +204,7 @@ export async function deleteProduct(productId: string) {
     );
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
   revalidatePath("/");
@@ -213,6 +217,7 @@ export async function toggleProductVisibility(productId: string, visible: boolea
 
   await prisma.product.update({ where: { id: productId }, data: { visible } });
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
   revalidatePath("/");
@@ -236,6 +241,7 @@ export async function createCategory(
     return { error: `Ya existe una categoría llamada "${name}".` };
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/categorias");
   revalidatePath("/admin/productos/nuevo");
   revalidatePath("/catalogo");
@@ -258,6 +264,7 @@ export async function createBrand(
     return { error: `Ya existe una marca llamada "${name}".` };
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/categorias");
   revalidatePath("/admin/productos/nuevo");
   revalidatePath("/catalogo");
@@ -277,6 +284,7 @@ export async function deleteCategory(categoryId: string) {
     );
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/categorias");
   revalidatePath("/catalogo");
   revalidatePath("/");
@@ -295,6 +303,7 @@ export async function deleteBrand(brandId: string) {
     );
   }
 
+  updateTag(TAG_CATALOGO);
   revalidatePath("/admin/categorias");
   revalidatePath("/catalogo");
   revalidatePath("/");
@@ -347,6 +356,7 @@ export async function updateHeroContent(
     create: { id: "main", ...data },
   });
 
+  updateTag(TAG_PORTADA);
   revalidatePath("/admin/portada");
   revalidatePath("/");
   return { ok: true };
@@ -367,6 +377,7 @@ export async function resetHeroContent() {
     update: data,
     create: { id: "main", ...data },
   });
+  updateTag(TAG_PORTADA);
   revalidatePath("/admin/portada");
   revalidatePath("/");
 }

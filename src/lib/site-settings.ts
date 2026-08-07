@@ -1,8 +1,27 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { CACHE_SEGUNDOS, TAG_PORTADA } from "@/lib/cache-tags";
 
-export async function getSiteSettings() {
-  return prisma.siteSettings.findUnique({ where: { id: "main" } });
-}
+// Se seleccionan los campos a mano en vez de traer la fila entera: `updatedAt`
+// es un `DateTime` y la caché guarda JSON, así que volvería convertido en texto
+// aunque TypeScript siguiera diciendo `Date`. Nadie lo usa, así que la forma
+// más segura es no traerlo.
+export const getSiteSettings = unstable_cache(
+  async () =>
+    prisma.siteSettings.findUnique({
+      where: { id: "main" },
+      select: {
+        id: true,
+        heroImageUrl: true,
+        heroBadge: true,
+        heroTitle: true,
+        heroTitleAccent: true,
+        heroSubtitle: true,
+      },
+    }),
+  ["ajustes-sitio"],
+  { tags: [TAG_PORTADA], revalidate: CACHE_SEGUNDOS },
+);
 
 // Textos del hero de la home tal como estaban escritos en el código antes de
 // hacerlos editables. Se usan cuando el campo correspondiente vale null, es

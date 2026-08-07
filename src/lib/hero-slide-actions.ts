@@ -1,13 +1,17 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 import { uploadSiteImage } from "@/lib/r2";
+import { TAG_PORTADA } from "@/lib/cache-tags";
 
 export type HeroSlideFormState = { error?: string; ok?: boolean };
 
 function refresh() {
+  // La etiqueta es lo que de verdad tira la caché del carrusel; los
+  // `revalidatePath` solo refrescan la navegación del cliente.
+  updateTag(TAG_PORTADA);
   revalidatePath("/admin/portada");
   revalidatePath("/");
 }

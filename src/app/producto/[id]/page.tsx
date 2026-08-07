@@ -8,6 +8,8 @@ import { resolveProductIcon } from "@/lib/product-icon";
 import { getProductRatingStats } from "@/lib/review-actions";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { pageMetadata, SITE_URL } from "@/lib/site";
+import { WhatsAppProducto } from "@/components/WhatsAppButton";
+import { mensajeProducto, whatsappUrl } from "@/lib/whatsapp";
 import { AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
 import { ViewContentTracker } from "@/components/tracking/ViewContentTracker";
 
@@ -174,6 +176,22 @@ export default async function ProductDetailPage({
               productId={product.id}
               stock={product.stock}
               trackingItem={{ id: product.id, name: product.name, price: product.price, category: product.category.name }}
+            />
+          </div>
+
+          {/* Salida para quien no quiere comprar por el carrito: en Guatemala
+              muchas ventas se cierran por chat. El mensaje ya lleva producto,
+              precio y enlace, así que del lado de Angel no hay que adivinar
+              de qué está hablando el cliente. */}
+          <div className="mt-3">
+            <WhatsAppProducto
+              href={whatsappUrl(
+                mensajeProducto({
+                  nombre: product.name,
+                  precio: money(product.price),
+                  url: `${SITE_URL}/producto/${product.id}`,
+                })
+              )}
             />
           </div>
 

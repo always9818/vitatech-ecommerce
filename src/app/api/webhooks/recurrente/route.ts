@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { verifyRecurrenteWebhookSignature } from "@/lib/recurrente";
+import { TAG_CATALOGO } from "@/lib/cache-tags";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -93,6 +95,28 @@ export async function POST(request: Request) {
           where: { id: item.productId },
           data: { stock: { decrement: item.quantity } },
         });
+      }
+
+      // El stock que se acaba de descontar es el que la tienda muestra como
+      // "Últimas 3" o "Agotado", y viene de la caché del catálogo. Sin esto,
+      // una venta que deja algo en cero seguiría anunciándolo como disponible
+      // hasta que la caché expirara sola. Vender de más no era posible (el
+      // carrito y el checkout releen el stock real de la base), pero sí que un
+      // cliente llegara ilusionado hasta el carrito para toparse ahí con el
+      // "ya no tiene stock suficiente".
+      //
+      // Aquí no sirve `updateTag`: solo funciona dentro de un Server Action y
+      // esto es un route handler. `{ expire: 0 }` pide el mismo efecto —
+      // caducar ya, sin ventana de datos viejos — en vez del perfil "max", que
+      // permitiría seguir sirviendo el stock anterior 5 minutos más y dejaría
+      // esta llamada sin efecto práctico.
+      //
+      // Va en su propio try/catch por la misma razón que el conteo del cupón:
+      // refrescar una caché nunca debe tumbar la confirmación de un pago.
+      try {
+        revalidateTag(TAG_CATALOGO, { expire: 0 });
+      } catch (err) {
+        console.error("[recurrente webhook] No se pudo refrescar la caché del catálogo: %o", err);
       }
 
       try {
