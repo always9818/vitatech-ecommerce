@@ -76,20 +76,27 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 |---|---|
 | Nombre del producto | El nombre que verán tus clientes |
 | SKU | Código interno único (no puede repetirse) |
-| Categoría / Marca | Elige de la lista — si necesitas una categoría o marca nueva, avísame para agregarla |
+| Categoría / Marca | Elige de la lista. Las categorías salen **agrupadas por departamento** (Tecnología / Salud y Bienestar): la que elijas decide en qué mitad de la tienda aparece el producto. Si necesitas una categoría nueva, la creas tú desde "Categorías y marcas" |
 | Precio actual (Q) | El precio que se cobra hoy |
 | Precio de lista (Q) | El precio "antes del descuento" — si no hay descuento, pon el mismo valor que el precio actual |
 | Stock disponible | Cuántas unidades hay en inventario |
-| Ícono de respaldo | Se elige de una lista (Laptop, Celular, Monitor, Audífonos, Impresora…). Es el dibujo de línea que se muestra mientras el producto todavía no tiene foto |
-| Calificación (0-5) y Reseñas | Para mostrar estrellas en la tarjeta del producto |
+| Ícono de respaldo | Se elige de una lista. Para tecnología: Laptop, Celular, Monitor, Audífonos, Impresora… Para suplementos: **Bote de suplemento, Cápsulas o tabletas, Deportivo, Natural, Bienestar**. Es el dibujo de línea que se muestra mientras el producto todavía no tiene foto |
 | Descripción | Texto que se ve en la ficha del producto |
-| Especificaciones técnicas | Una línea por especificación, formato `Nombre: Valor`. Ejemplo:<br>`Procesador: AMD Ryzen 5`<br>`Memoria RAM: 16GB`<br>`Almacenamiento: 512GB SSD` |
+| Especificaciones | Una línea por especificación, formato `Nombre: Valor`. Debajo del cuadro hay **botones de plantilla** (Tecnología, Suplemento, Proteína en polvo) que te lo dejan casi listo — solo llenas los valores |
 | Foto de producto | Sube una imagen (JPG, PNG, WEBP o GIF, máximo 5 MB) |
 
 3. Dale clic a **"Crear producto"**.
 4. Te regresa automáticamente a la lista, con el producto ya creado arriba de todo.
 
 **Importante sobre las fotos:** la subida de imágenes **solo funciona en el sitio real** (`importadoravitatech.com`). Si en algún momento se prueba en un entorno de desarrollo local, la subida de fotos no va a funcionar — es una limitación técnica del almacenamiento de imágenes (Cloudflare R2), no un error.
+
+### Al subir un suplemento o vitamina
+
+Es igual que cualquier producto, con tres cosas propias:
+
+- **Elige una categoría del departamento "Salud y Bienestar"** — eso es lo único que hace que aparezca en esa sección de la tienda.
+- **Usa la plantilla "Suplemento" o "Proteína en polvo"** en Especificaciones. Trae los campos que el cliente de verdad pregunta: presentación, contenido neto, porción, porciones por envase, sabor y registro sanitario.
+- **En la descripción, copia lo que dice la etiqueta del fabricante.** No escribas que sirve para curar, tratar o prevenir enfermedades: un suplemento no es un medicamento, y prometerlo es lo que puede meterte en un problema legal o en un reclamo. La ficha ya muestra sola, en todos los productos de este departamento, el aviso de que es un suplemento alimenticio y que hay que consultar al médico.
 
 ---
 
@@ -133,10 +140,25 @@ Dale clic a **"Eliminar"** y confirma. Esto sí borra el producto para siempre.
 
 1. En el menú del panel, dale clic a **"Categorías y marcas"**.
 2. Vas a ver dos columnas: **Categorías** y **Marcas**, cada una con su propia lista y su propio campo para agregar una nueva.
-3. Escribe el nombre y dale clic a **"Agregar"** — aparece de inmediato en la lista, y ya queda disponible para elegirla al crear o editar un producto.
+3. Escribe el nombre, **elige el departamento** (ver abajo) y dale clic a **"Agregar"** — aparece de inmediato en la lista, y ya queda disponible para elegirla al crear o editar un producto.
 4. Para eliminar una, dale clic a **"Eliminar"** junto a ella.
 
 **Si una categoría o marca ya tiene productos asignados**, el sistema no te va a dejar eliminarla (para no dejar productos huérfanos) — primero tendrías que cambiar esos productos a otra categoría/marca.
+
+### Los dos departamentos
+
+La tienda está partida en dos mundos, como dice el nombre — **VITA** de vitaminas y suplementos, **TECH** de tecnología:
+
+- **Tecnología** — laptops, celulares, audio, accesorios.
+- **Salud y Bienestar** — suplementos, vitaminas, proteínas.
+
+**Cada categoría pertenece a un departamento, y eso decide en qué mitad de la tienda aparecen sus productos.** Un cliente que entra a "Salud y Bienestar" no ve laptops de por medio: ni en el listado, ni en los filtros de marca, ni al buscar.
+
+Las marcas **no** tienen departamento a propósito: una misma marca podría venderte de todo.
+
+> **Para agregar más categorías de suplementos** (Vitaminas, Proteínas, Colágeno, lo que sea): escribe el nombre, elige **Salud y Bienestar** en el desplegable, y listo. Aparece sola en el menú de la tienda en cuanto le subas el primer producto.
+
+> Un departamento **sin productos no se muestra** en la tienda. Es a propósito: mejor que no exista a que el cliente entre y encuentre una sección vacía. En cuanto subas el primer suplemento, "Salud y Bienestar" aparece solo en el menú y en la portada.
 
 ---
 
