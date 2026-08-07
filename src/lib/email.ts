@@ -73,6 +73,83 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   });
 }
 
+/**
+ * Confirmación de compra para quien pagó SIN crear cuenta.
+ *
+ * Un cliente con cuenta ve su pedido en "Mi cuenta"; un invitado no tiene
+ * dónde — este correo es su único comprobante aparte del recibo que manda
+ * Recurrente. Por eso se envía solo para pedidos de invitado (lo decide quien
+ * llama a esta función, viendo si `order.userId` es null), no para todos.
+ */
+export async function sendGuestOrderConfirmationEmail(
+  to: string,
+  order: { id: string; total: number; items: { name: string; quantity: number; unitPrice: number }[] }
+) {
+  if (!isEmailEnabled()) {
+    console.error(
+      "[email] Envío de correo deshabilitado (falta RESEND_API_KEY); confirmación no enviada a",
+      to
+    );
+    return;
+  }
+
+  const filas = order.items
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e7e5e4;">
+            ${it.name}${it.quantity > 1 ? ` <span style="color: #78716c;">× ${it.quantity}</span>` : ""}
+          </td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e7e5e4; text-align: right; white-space: nowrap;">
+            ${money(it.unitPrice * it.quantity)}
+          </td>
+        </tr>`
+    )
+    .join("");
+
+  await sendEmail({
+    to,
+    subject: "Tu pedido de VITATECH está confirmado",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #ffffff; color: #1a2e05;">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <img
+            src="${SITE_URL}/vito-mascota.png"
+            alt="Vito, la mascota de Vitatech"
+            width="96"
+            height="96"
+            style="display: inline-block; border-radius: 50%;"
+          />
+        </div>
+        <h1 style="font-size: 20px; text-align: center;">¡Gracias por tu compra!</h1>
+        <p>
+          Soy Vito. Ya recibimos tu pago y estamos preparando tu pedido
+          <span style="font-weight: bold;">#${order.id.slice(-8)}</span>.
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          ${filas}
+          <tr>
+            <td style="padding: 10px 0; font-weight: bold;">Total</td>
+            <td style="padding: 10px 0; font-weight: bold; text-align: right;">${money(order.total)}</td>
+          </tr>
+        </table>
+        <p>
+          <a
+            href="${SITE_URL}/checkout/success?order=${order.id}"
+            style="display: inline-block; background: #a3e635; color: #1a2e05; font-weight: bold; padding: 12px 24px; border-radius: 10px; text-decoration: none;"
+          >
+            Ver mi pedido
+          </a>
+        </p>
+        <p style="font-size: 13px; color: #57534e;">
+          Como compraste sin crear una cuenta, este correo es tu comprobante — guárdalo. Si tienes
+          alguna duda sobre tu pedido, escríbenos por WhatsApp al +502 5335-3561.
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendAbandonedCartEmail(
   to: string,
   cart: { name: string | null; items: { name: string; quantity: number; price: number }[]; total: number }

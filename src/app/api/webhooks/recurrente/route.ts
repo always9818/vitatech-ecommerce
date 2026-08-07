@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { verifyRecurrenteWebhookSignature } from "@/lib/recurrente";
 import { TAG_CATALOGO } from "@/lib/cache-tags";
+import { sendGuestOrderConfirmationEmail } from "@/lib/email";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -87,7 +88,14 @@ export async function POST(request: Request) {
       const order = await prisma.order.update({
         where: { id: orderId },
         data: { status: "PAID" },
-        select: { id: true, userId: true, guestId: true, items: true },
+        select: {
+          id: true,
+          userId: true,
+          guestId: true,
+          guestEmail: true,
+          total: true,
+          items: { select: { productId: true, quantity: true, unitPrice: true, product: { select: { name: true } } } },
+        },
       });
 
       for (const item of order.items) {
@@ -95,6 +103,27 @@ export async function POST(request: Request) {
           where: { id: item.productId },
           data: { stock: { decrement: item.quantity } },
         });
+      }
+
+      // Un cliente con cuenta ve su pedido en "Mi cuenta"; un invitado no
+      // tiene dónde, así que este correo es su único comprobante aparte del
+      // recibo de Recurrente. Va en su propio try/catch por la misma razón
+      // que el conteo del cupón y la caché: que el correo falle nunca debe
+      // tumbar la confirmación de un pago ya cobrado.
+      if (!order.userId && order.guestEmail) {
+        try {
+          await sendGuestOrderConfirmationEmail(order.guestEmail, {
+            id: order.id,
+            total: order.total,
+            items: order.items.map((it) => ({
+              name: it.product.name,
+              quantity: it.quantity,
+              unitPrice: it.unitPrice,
+            })),
+          });
+        } catch (err) {
+          console.error("[recurrente webhook] No se pudo enviar la confirmación al invitado: %o", err);
+        }
       }
 
       // El stock que se acaba de descontar es el que la tienda muestra como

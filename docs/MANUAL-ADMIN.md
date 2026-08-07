@@ -197,3 +197,17 @@ Hay dos, y los dos le escriben solos el mensaje al cliente:
 Ambos van al **+502 5335-3561**. Si algún día cambias de número, se cambia en un solo lugar del código y se actualiza en toda la tienda — pídemelo y lo hago.
 
 Los clics se cuentan como conversión en Google Analytics y en el Meta Pixel (aparecen como *generate_lead* y *Contact*), para que puedas ver cuánta venta te trae el chat y no solo el carrito.
+
+**¿Los clientes que compran sin cuenta reciben algún comprobante?**
+Sí, desde agosto de 2026. En cuanto Recurrente confirma el pago, le llega un correo de confirmación con Vito, el resumen de lo que compró y el total — es su único comprobante nuestro, aparte del recibo que manda Recurrente, porque no tiene "Mi cuenta" donde ver su historial. A un cliente que sí tiene cuenta no le llega este correo porque ya ve su pedido ahí.
+
+Si un cliente dice que no le llegó, revisa spam primero; si de verdad falló el envío, queda registrado en los logs del servidor (`wrangler tail`), avísame y lo reviso.
+
+**¿Por qué el catálogo ahora tiene números de página abajo?**
+Desde agosto de 2026 el catálogo se reparte en tandas de 24 productos. Con lo que tienes hoy no se nota (caben todos en una sola página), pero cuando subas más productos, esos números aparecerán solos — no hay nada que configurar.
+
+**¿Qué es "También te puede interesar" en la ficha de producto?**
+Muestra hasta 4 productos de la misma categoría, para que el cliente siga viendo cosas después de leer una ficha. Se arma solo a partir de las categorías que ya tienes — no hay que elegir nada a mano.
+
+**¿Y la barra que dice "Te faltan Q X para envío gratis" en el carrito?**
+Usa el mismo monto de envío gratis que ya manejabas (Q 299). Si algún día cambias ese monto, avísame y lo actualizo — se usa en un solo lugar del código, así que se actualiza en toda la tienda a la vez.
