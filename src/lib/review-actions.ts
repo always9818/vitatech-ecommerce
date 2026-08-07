@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { TAG_RESENAS } from "@/lib/cache-tags";
 
 export type ReviewFormState = { error?: string; success?: boolean };
 
@@ -56,43 +57,17 @@ export async function createReview(
     return { error: "No se pudo guardar tu reseña en este momento. Intenta más tarde." };
   }
 
+  // Editar una reseña ya aprobada la devuelve a PENDING (el `upsert` de arriba
+  // fija `status: "PENDING"` también al actualizar), así que esto sí cambia la
+  // lista pública: hay que descartar la caché de reseñas.
+  updateTag(TAG_RESENAS);
   revalidatePath(`/producto/${productId}`);
   return { success: true };
 }
 
-export async function getApprovedReviews(productId: string) {
-  return prisma.review
-    .findMany({
-      where: { productId, status: "APPROVED" },
-      include: { user: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
-    })
-    .catch(onReviewQueryError("getApprovedReviews", [] as never[]));
-}
-
-/**
- * Antes caía en `product.rating`/`product.reviews` cuando no había reseñas
- * aprobadas reales — esos campos eran datos de ejemplo (ej. "5.0 · 4
- * reseñas" en un producto que nunca recibió una reseña real), y se publicaban
- * tal cual en los datos estructurados que lee Google. Ahora, sin reseñas
- * reales, es 0 sin relleno: es lo honesto, y evita el riesgo de que Google
- * marque el sitio por reseñas falsas.
- */
-export async function getProductRatingStats(productId: string) {
-  const approved = await prisma.review
-    .aggregate({
-      where: { productId, status: "APPROVED" },
-      _avg: { rating: true },
-      _count: { _all: true },
-    })
-    .catch(onReviewQueryError("getProductRatingStats", null));
-
-  if (!approved || approved._count._all === 0) {
-    return { rating: 0, reviews: 0 };
-  }
-
-  return { rating: approved._avg.rating ?? 0, reviews: approved._count._all };
-}
+// Las lecturas públicas (reseñas aprobadas y promedio de estrellas) se mudaron
+// a `src/lib/reviews.ts`, donde están cacheadas: aquí quedarían expuestas como
+// Server Actions sin necesidad, y este archivo es solo para lo que escribe.
 
 export async function getMyReviewForProduct(productId: string) {
   const session = await auth();

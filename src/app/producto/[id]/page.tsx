@@ -5,7 +5,7 @@ import { money, discountPct } from "@/lib/money";
 import { ProductDetailActions } from "@/components/ProductDetailActions";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveProductIcon } from "@/lib/product-icon";
-import { getProductRatingStats } from "@/lib/review-actions";
+import { getProductRatingStats } from "@/lib/reviews";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { pageMetadata, SITE_URL } from "@/lib/site";
 import { WhatsAppProducto } from "@/components/WhatsAppButton";
@@ -45,7 +45,13 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await getProductById(id);
+  // En paralelo: antes se esperaba el producto y solo después las estrellas,
+  // pagando dos viajes seguidos. Pedir las estadísticas de un producto que no
+  // existe es inofensivo — devuelve 0 reseñas.
+  const [product, ratingStats] = await Promise.all([
+    getProductById(id),
+    getProductRatingStats(id),
+  ]);
   if (!product) notFound();
 
   const off = discountPct(product.price, product.oldPrice);
@@ -58,7 +64,6 @@ export default async function ProductDetailPage({
     "Desde " + money(Math.round(product.price / MAX_INSTALLMENTS)) + `/mes en hasta ${MAX_INSTALLMENTS} cuotas sin intereses`;
   const fallbackIcon = resolveProductIcon(product.icon, product.category.name);
   const photos = product.images;
-  const ratingStats = await getProductRatingStats(product.id);
   const rating = Math.round(ratingStats.rating);
   const hasReviews = ratingStats.reviews > 0;
 

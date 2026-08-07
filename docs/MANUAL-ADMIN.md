@@ -183,3 +183,15 @@ El sistema rechaza archivos de más de 5 MB con un mensaje de error — no se su
 
 **¿Los cambios se ven de inmediato en la tienda?**
 Sí — en cuanto guardas, la home y el catálogo se actualizan al instante para cualquier visitante nuevo.
+
+Desde agosto de 2026 la tienda guarda una copia lista del catálogo para no consultar la base de datos en cada visita (por eso ahora carga mucho más rápido). Esa copia se descarta sola en el momento en que guardas algo en el panel, así que no cambia nada para ti: sigue siendo guardar y listo.
+
+**¿Dónde está el botón de WhatsApp?**
+Hay dos, y los dos le escriben solos el mensaje al cliente:
+
+- El **botón flotante**, abajo a la derecha en todas las páginas. Te llega un "quisiera información sobre sus productos".
+- El de **"Preguntar por WhatsApp"** en la ficha de cada producto, debajo de "Agregar al carrito". Ese te llega con el nombre del producto, el precio y el enlace ya escritos, así no tienes que adivinar de qué te están hablando.
+
+Ambos van al **+502 5335-3561**. Si algún día cambias de número, se cambia en un solo lugar del código y se actualiza en toda la tienda — pídemelo y lo hago.
+
+Los clics se cuentan como conversión en Google Analytics y en el Meta Pixel (aparecen como *generate_lead* y *Contact*), para que puedas ver cuánta venta te trae el chat y no solo el carrito.

@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
-import { createReview, getApprovedReviews, getMyReviewForProduct } from "@/lib/review-actions";
+import { createReview, getMyReviewForProduct } from "@/lib/review-actions";
+import { getApprovedReviews } from "@/lib/reviews";
 import { Icon } from "@/components/Icon";
 import { ReviewForm } from "@/components/ReviewForm";
 
@@ -31,7 +32,7 @@ export async function ReviewsSection({ productId }: { productId: string }) {
         {reviews.map((r) => (
           <div key={r.id} className="rounded-2xl border border-white/10 p-4">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[13.5px] font-semibold text-vt-fg">{r.user.name ?? "Cliente"}</span>
+              <span className="text-[13.5px] font-semibold text-vt-fg">{r.autor}</span>
               <span className="flex items-center gap-0.5 text-vt-accent">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Icon
@@ -44,9 +45,10 @@ export async function ReviewsSection({ productId }: { productId: string }) {
               </span>
             </div>
             <p className="mt-2 text-[13.5px] leading-relaxed text-vt-muted-1">{r.comment}</p>
-            <p className="mt-2 text-[11px] text-vt-muted-3">
-              {r.createdAt.toLocaleDateString("es-GT", { year: "numeric", month: "long", day: "numeric" })}
-            </p>
+            {/* Ya viene formateada desde `reviews.ts`: al pasar por la caché,
+                un `Date` volvería como texto y `toLocaleDateString` reventaría
+                la ficha entera. */}
+            <p className="mt-2 text-[11px] text-vt-muted-3">{r.fechaTexto}</p>
           </div>
         ))}
       </div>

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 import { uploadProductImage } from "@/lib/r2";
-import { TAG_CATALOGO, TAG_PORTADA } from "@/lib/cache-tags";
+import { TAG_CATALOGO, TAG_PORTADA, TAG_RESENAS } from "@/lib/cache-tags";
 
 export type ProductFormValues = {
   name: string;
@@ -383,6 +383,9 @@ export async function resetHeroContent() {
 }
 
 async function revalidateReviewPaths(productId: string) {
+  // Aprobar, rechazar o borrar cambia lo que ve el público en la ficha, así que
+  // la caché de reseñas se descarta aquí.
+  updateTag(TAG_RESENAS);
   revalidatePath("/admin/resenas");
   revalidatePath(`/producto/${productId}`);
 }

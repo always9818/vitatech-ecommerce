@@ -20,6 +20,9 @@ export const TAG_CATALOGO = "catalogo";
 /** Textos y diapositivas de la portada (lo editable desde /admin/portada). */
 export const TAG_PORTADA = "portada";
 
+/** Reseñas aprobadas y el promedio de estrellas que se muestra en la ficha. */
+export const TAG_RESENAS = "resenas";
+
 /**
  * Red de seguridad: aunque una invalidación por etiqueta fallara, ninguna caché
  * vive más de 5 minutos. Es corto a propósito — lo que se cachea incluye el
