@@ -25,6 +25,17 @@ const PATHS = {
   mouse: <><rect x="6" y="2" width="12" height="20" rx="6" /><path d="M12 7v3" /></>,
   tablet: <><rect x="4" y="2" width="16" height="20" rx="2.5" /><path d="M11 18.5h2" /></>,
   package: <><path d="M21 8 12 3 3 8v8l9 5 9-5Z" /><path d="m3 8 9 5 9-5" /><path d="M12 13v8" /></>,
+
+  /* --- Departamento Salud y Bienestar --- */
+  // Cápsula en diagonal, con la línea que divide sus dos mitades.
+  pill: <><rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)" /><path d="m9.5 9.5 5 5" /></>,
+  // Bote de suplemento: tapa, cuerpo y etiqueta.
+  supplement: <><path d="M9 2h6v3H9z" /><path d="M7.5 5h9a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" /><path d="M9 12h6" /><path d="M12 9v6" /></>,
+  // Mancuerna, para lo deportivo.
+  dumbbell: <><path d="M6.5 6.5v11" /><path d="M17.5 6.5v11" /><path d="M3.5 9.5v5" /><path d="M20.5 9.5v5" /><path d="M6.5 12h11" /></>,
+  // Hoja, para lo natural.
+  leaf: <><path d="M4 20c0-8 5-13 16-14 1 10-4 15-12 15H4Z" /><path d="M9.5 14.5 4 20" /></>,
+  heart: <><path d="M12 20s-7-4.5-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5c0 5-7 9.5-7 9.5Z" /></>,
   image: <><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-4.5-4.5L6 21" /></>,
   check: <><path d="M20 6 9 17l-5-5" /></>,
   checkCircle: <><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>,

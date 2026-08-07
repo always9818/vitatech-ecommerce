@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getCategoriesWithStock, getFeaturedProducts } from "@/lib/catalog";
+import { getCategoriesWithStock, getFeaturedProducts, getDepartmentCounts } from "@/lib/catalog";
+import { DEPARTMENTS, DEPARTMENT_ORDER } from "@/lib/departments";
 import { ProductCard } from "@/components/ProductCard";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveCategoryIcon } from "@/lib/product-icon";
@@ -19,12 +20,26 @@ const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
 ];
 
 export default async function HomePage() {
-  const [categories, featured, settings, slides] = await Promise.all([
+  const [categories, settings, slides, departmentCounts] = await Promise.all([
     getCategoriesWithStock(),
-    getFeaturedProducts(4),
     getSiteSettings(),
     getHeroSlides(),
+    getDepartmentCounts(),
   ]);
+
+  // Una fila de destacados por departamento. Se piden en paralelo y se
+  // descartan los que no tienen nada que mostrar: mientras Angel no suba
+  // ningún suplemento, "Salud y Bienestar" no aparece en la portada en vez de
+  // dejar una sección vacía.
+  const destacadosPorDepartamento = (
+    await Promise.all(
+      DEPARTMENT_ORDER.map(async (department) => ({
+        department,
+        productos: departmentCounts[department] > 0 ? await getFeaturedProducts(4, department) : [],
+      }))
+    )
+  ).filter((d) => d.productos.length > 0);
+
   const heroImage = settings?.heroImageUrl;
   const hero = resolveHeroContent(settings);
 
@@ -109,19 +124,54 @@ export default async function HomePage() {
           <h2 className="font-heading text-[22px] font-bold text-white min-[720px]:text-[26px]">
             Hola, soy <span className="text-vt-accent">Vito</span>
           </h2>
+          {/* El nombre VITATECH siempre fue literal: VITA por vitaminas y
+              suplementos, TECH por tecnología. Este párrafo decía solo lo
+              segundo. */}
           <p className="mt-2 max-w-[560px] text-[14.5px] leading-relaxed text-vt-muted-1">
-            Te acompaño en Importadora Vitatech. Traemos tecnología original de las mejores marcas,
-            con garantía real, servicio técnico propio y envío a todo Guatemala.
+            Te acompaño en Importadora Vitatech. Nuestro nombre lo dice todo:{" "}
+            <span className="font-semibold text-vt-fg">VITA</span> por los suplementos y vitaminas
+            que cuidan tu salud, y <span className="font-semibold text-vt-fg">TECH</span> por la
+            tecnología original de las mejores marcas. Todo con envío a todo Guatemala.
           </p>
         </div>
       </section>
+
+      {/* Los dos departamentos, como puerta de entrada grande. Es lo primero
+          que le dice al visitante que aquí hay dos mundos y no solo uno. */}
+      {destacadosPorDepartamento.length > 1 && (
+        <section className="mt-10 grid grid-cols-1 gap-4 min-[640px]:grid-cols-2">
+          {DEPARTMENT_ORDER.filter((d) => departmentCounts[d] > 0).map((d) => {
+            const info = DEPARTMENTS[d];
+            return (
+              <Link
+                key={d}
+                href={`/catalogo?dept=${info.slug}`}
+                className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.03] p-5 transition-colors hover:border-vt-accent/50"
+              >
+                <span className="grid h-12 w-12 flex-none place-items-center rounded-xl bg-vt-accent/[.12] text-vt-accent">
+                  <Icon name={info.icon} className="h-6 w-6" />
+                </span>
+                <span className="min-w-0">
+                  <span className="font-heading block text-[17px] font-bold text-white">
+                    {info.label}
+                  </span>
+                  <span className="block text-[12.5px] text-vt-muted-2">{info.tagline}</span>
+                </span>
+                <span className="ml-auto flex-none text-vt-muted-3 group-hover:text-vt-accent">
+                  <Icon name="chevronRight" className="h-5 w-5" />
+                </span>
+              </Link>
+            );
+          })}
+        </section>
+      )}
 
       {/* Category chips */}
       <section className="mt-10 flex flex-wrap gap-3">
         {categories.map((c) => (
           <Link
             key={c.id}
-            href={`/catalogo?cat=${encodeURIComponent(c.name)}`}
+            href={`/catalogo?dept=${DEPARTMENTS[c.department].slug}&cat=${encodeURIComponent(c.name)}`}
             className="group flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[.03] px-4 py-2.5 hover:border-vt-accent/50"
           >
             <span className="text-vt-muted-1 group-hover:text-vt-accent">
@@ -132,22 +182,38 @@ export default async function HomePage() {
         ))}
       </section>
 
-      {/* Featured */}
-      <section className="mt-14">
-        <div className="flex items-end justify-between">
-          <div className="font-heading text-[28px] font-bold text-white">
-            Destacados<span className="text-vt-accent">.</span>
-          </div>
-          <Link href="/catalogo" className="text-[13px] font-bold text-vt-accent">
-            Ver catálogo ›
-          </Link>
-        </div>
-        <div className="mt-6 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-4">
-          {featured.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))}
-        </div>
-      </section>
+      {/* Una fila de destacados por departamento. Con un solo departamento con
+          productos, el título vuelve a ser simplemente "Destacados". */}
+      {destacadosPorDepartamento.map(({ department, productos }) => {
+        const info = DEPARTMENTS[department];
+        const unicoDepartamento = destacadosPorDepartamento.length === 1;
+        return (
+          <section key={department} className="mt-14">
+            <div className="flex items-end justify-between gap-4">
+              <div className="font-heading flex items-center gap-2.5 text-[28px] font-bold text-white">
+                {!unicoDepartamento && (
+                  <span className="text-vt-accent">
+                    <Icon name={info.icon} className="h-6 w-6" />
+                  </span>
+                )}
+                {unicoDepartamento ? "Destacados" : info.label}
+                <span className="text-vt-accent">.</span>
+              </div>
+              <Link
+                href={`/catalogo?dept=${info.slug}`}
+                className="flex-none text-[13px] font-bold text-vt-accent"
+              >
+                Ver todo ›
+              </Link>
+            </div>
+            <div className="mt-6 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-4">
+              {productos.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

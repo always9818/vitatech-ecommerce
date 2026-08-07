@@ -69,10 +69,24 @@ model PasswordResetToken {
   @@index([userId])
 }
 
+/// Los dos mundos de la tienda. El nombre VITATECH es literal: "VITA" por
+/// vitaminas y suplementos, "TECH" por tecnología. Hasta 2026-08-07 el sitio
+/// solo vendía tecnología, así que TECNOLOGIA es el valor por defecto y las
+/// categorías que ya existían se quedaron ahí sin tocarlas.
+enum Department {
+  TECNOLOGIA
+  SALUD
+}
+
 model Category {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  products Product[]
+  id         String     @id @default(cuid())
+  name       String     @unique
+  /// A qué departamento pertenece. Es lo que evita que una proteína aparezca
+  /// junto a una laptop: el catálogo, el menú y la portada filtran por esto.
+  department Department @default(TECNOLOGIA)
+  products   Product[]
+
+  @@index([department])
 }
 
 model Brand {

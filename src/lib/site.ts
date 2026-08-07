@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 /** Constantes de marca reutilizadas por metadata, sitemap, robots y JSON-LD. */
 export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 export const SITE_NAME = "VITATECH";
-export const SITE_TITLE = "VITATECH_ · Importadora de tecnología";
+// El nombre siempre fue literal: VITA por vitaminas y suplementos, TECH por
+// tecnología. Hasta el 2026-08-07 el sitio solo anunciaba lo segundo.
+export const SITE_TITLE = "VITATECH_ · Tecnología y suplementos";
 export const SITE_DESCRIPTION =
-  "Potencia tu setup al mejor precio. Accesorios, celulares, monitores, audio y más, con envío a todo Guatemala.";
+  "Tecnología original y suplementos de marcas confiables, con envío a todo Guatemala y garantía real.";
 export const SUPPORT_PHONE_E164 = "+50253353561";
 export const SUPPORT_EMAIL = "info@importacionesvitatech.com";
 

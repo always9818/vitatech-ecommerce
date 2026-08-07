@@ -6,17 +6,29 @@ import { SearchBar } from "@/components/SearchBar";
 import { CartBadge } from "@/components/CartBadge";
 import { Icon } from "@/components/Icon";
 import { VitatechLetterV } from "@/components/Logo";
+import { DepartmentNav, type DepartmentNavItem } from "@/components/DepartmentNav";
+import { DEPARTMENT_ORDER, DEPARTMENTS } from "@/lib/departments";
 
-// Máximo de categorías en el menú, no una lista fija: antes "Monitores"
-// quedó ahí con 0 productos (el cliente hacía clic y caía en "Sin
+// Máximo de categorías por departamento en el menú, no una lista fija: antes
+// "Monitores" quedó ahí con 0 productos (el cliente hacía clic y caía en "Sin
 // resultados") porque nadie se acuerda de tocar este archivo cuando cambia
 // el inventario. Ahora se arma solo con lo que hay stock, de mayor a menor.
-const HEADER_CATEGORY_LIMIT = 4;
+const HEADER_CATEGORY_LIMIT = 6;
 
 export async function Header() {
   const [session, items, categories] = await Promise.all([auth(), getCart(), getCategoriesWithStock()]);
-  const headerCategories = categories.slice(0, HEADER_CATEGORY_LIMIT);
   const cartCount = items.reduce((a, it) => a + it.quantity, 0);
+
+  // Un departamento sin nada que vender no se anuncia: mientras no haya
+  // suplementos cargados, "Salud y Bienestar" simplemente no aparece, en vez
+  // de mandar al cliente a una sección vacía.
+  const departamentos: DepartmentNavItem[] = DEPARTMENT_ORDER.map((department) => ({
+    department,
+    categories: categories
+      .filter((c) => c.department === department)
+      .slice(0, HEADER_CATEGORY_LIMIT)
+      .map((c) => ({ id: c.id, name: c.name })),
+  })).filter((d) => d.categories.length > 0);
 
   return (
     <header className="sticky top-0 z-40 border-b border-vt-accent/[.14] bg-[rgba(13,20,5,.92)] backdrop-blur-[10px]">
@@ -34,16 +46,8 @@ export async function Header() {
           <SearchBar />
         </div>
 
-        <nav className="hidden min-[881px]:flex items-center gap-1 text-[13.5px] font-semibold text-vt-fg">
-          {headerCategories.map((c) => (
-            <Link
-              key={c.id}
-              href={`/catalogo?cat=${encodeURIComponent(c.name)}`}
-              className="rounded-lg px-3 py-2 hover:text-vt-accent"
-            >
-              {c.name}
-            </Link>
-          ))}
+        <nav className="hidden min-[881px]:block">
+          <DepartmentNav items={departamentos} />
         </nav>
 
         <div className="flex flex-none items-center gap-2 min-[520px]:gap-3">
@@ -64,6 +68,30 @@ export async function Header() {
           </Link>
         </div>
       </div>
+
+      {/* En móvil el menú de arriba no cabe y queda oculto. Sin esta fila, un
+          departamento entero sería inalcanzable desde el celular — que es por
+          donde entra la mayoría de los clientes. Son enlaces directos al
+          catálogo de cada departamento, sin desplegable. */}
+      {departamentos.length > 1 && (
+        <nav className="min-[881px]:hidden border-t border-white/[.07]">
+          <div className="mx-auto flex max-w-[1180px] items-stretch px-3.5 min-[520px]:px-6">
+            {departamentos.map(({ department }) => {
+              const info = DEPARTMENTS[department];
+              return (
+                <Link
+                  key={department}
+                  href={`/catalogo?dept=${info.slug}`}
+                  className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[12.5px] font-bold text-vt-fg"
+                >
+                  <Icon name={info.icon} className="h-4 w-4 text-vt-accent" />
+                  {info.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

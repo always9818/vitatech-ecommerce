@@ -8,10 +8,15 @@
  * después se corre `npx prisma generate`.
  *
  * Uso:
- *   node scripts/aplicar-migracion.mjs docs/migracion-checkout-invitado.sql
+ *   node scripts/aplicar-migracion.mjs docs/migracion-departamentos.sql
+ *   node scripts/aplicar-migracion.mjs docs/mi.sql Category   # inspecciona esa tabla
  *
- * Imprime las columnas afectadas antes y después para poder verificar que hizo
- * lo que debía, y no toca ninguna fila: los .sql de este proyecto son solo DDL.
+ * Si se le pasa un nombre de tabla como segundo argumento, imprime sus columnas
+ * antes y después para poder verificar a simple vista que la migración hizo lo
+ * que debía.
+ *
+ * Todo va dentro de una transacción: si una sentencia falla, no queda la base a
+ * medio migrar.
  */
 import pg from "pg";
 import fs from "node:fs";
@@ -20,6 +25,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const archivo = process.argv[2];
+const tabla = process.argv[3];
+
 if (!archivo) {
   console.error("Falta el archivo .sql. Ejemplo: node scripts/aplicar-migracion.mjs docs/mi-migracion.sql");
   process.exit(1);
@@ -28,24 +35,38 @@ if (!archivo) {
 const sql = fs.readFileSync(archivo, "utf8");
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
 
-/** Columnas que toca esta migración, para poder mirarlas antes y después. */
-async function estado(etiqueta) {
+async function columnas(etiqueta) {
+  if (!tabla) return;
   const { rows } = await client.query(
-    `SELECT column_name, is_nullable
+    `SELECT column_name, data_type, is_nullable, column_default
        FROM information_schema.columns
-      WHERE table_name = 'Order'
-        AND column_name IN ('userId', 'guestEmail', 'guestId')
-      ORDER BY column_name`
+      WHERE table_name = $1
+      ORDER BY ordinal_position`,
+    [tabla]
   );
-  console.log(etiqueta, JSON.stringify(rows));
+  console.log(`${etiqueta} ${tabla}:`);
+  for (const r of rows) {
+    console.log(
+      `   ${r.column_name} · ${r.data_type}${r.is_nullable === "YES" ? " · opcional" : ""}` +
+        (r.column_default ? ` · default ${r.column_default}` : "")
+    );
+  }
 }
 
 await client.connect();
-await estado("ANTES:  ");
-await client.query(sql);
-await estado("DESPUES:");
+await columnas("ANTES  ");
 
-const { rows } = await client.query('SELECT count(*)::int AS n FROM "Order"');
-console.log("Pedidos existentes:", rows[0].n);
+try {
+  await client.query("BEGIN");
+  await client.query(sql);
+  await client.query("COMMIT");
+  console.log(`\nAplicado: ${archivo}\n`);
+} catch (err) {
+  await client.query("ROLLBACK");
+  console.error("FALLÓ, se revirtió todo:", err.message);
+  await client.end();
+  process.exit(1);
+}
 
+await columnas("DESPUES");
 await client.end();

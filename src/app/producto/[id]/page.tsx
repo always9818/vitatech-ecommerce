@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductById, getRelatedProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
@@ -11,17 +12,30 @@ import { ReviewsSection } from "@/components/ReviewsSection";
 import { pageMetadata, SITE_URL } from "@/lib/site";
 import { WhatsAppProducto } from "@/components/WhatsAppButton";
 import { mensajeProducto, whatsappUrl } from "@/lib/whatsapp";
+import { DEPARTMENTS, type Department } from "@/lib/departments";
 import { AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
 import { ViewContentTracker } from "@/components/tracking/ViewContentTracker";
 
 const MAX_INSTALLMENTS = Math.max(...AVAILABLE_INSTALLMENTS);
 
-const BENEFITS: { icon: IconName; label: string }[] = [
-  { icon: "truck", label: "Envío gratis desde Q 299" },
-  { icon: "chat", label: "Soporte por WhatsApp" },
-  { icon: "shield", label: "Garantía real" },
-  { icon: "returns", label: "Cambios por desperfecto de fábrica" },
-];
+/**
+ * Los beneficios cambian según el departamento: "servicio técnico" no aplica a
+ * un bote de proteína, y "producto sellado" no aplica a una laptop.
+ */
+const BENEFITS: Record<Department, { icon: IconName; label: string }[]> = {
+  TECNOLOGIA: [
+    { icon: "truck", label: "Envío gratis desde Q 299" },
+    { icon: "chat", label: "Soporte por WhatsApp" },
+    { icon: "shield", label: "Garantía real" },
+    { icon: "returns", label: "Cambios por desperfecto de fábrica" },
+  ],
+  SALUD: [
+    { icon: "truck", label: "Envío gratis desde Q 299" },
+    { icon: "chat", label: "Soporte por WhatsApp" },
+    { icon: "shield", label: "Producto original y sellado" },
+    { icon: "leaf", label: "Marcas confiables" },
+  ],
+};
 
 export async function generateMetadata({
   params,
@@ -64,6 +78,7 @@ export default async function ProductDetailPage({
     categoryId: product.category.id,
   });
 
+  const departamento = product.category.department;
   const off = discountPct(product.price, product.oldPrice);
   const stockLabel =
     product.stock === 0 ? "Agotado" : product.stock <= 5 ? `Últimas ${product.stock} unidades` : "En stock";
@@ -145,8 +160,16 @@ export default async function ProductDetailPage({
         </div>
 
         <div>
+          {/* La categoría lleva al catálogo de su departamento, para que el
+              cliente pueda seguir viendo cosas del mismo mundo. */}
           <div className="text-[12px] font-bold tracking-[.06em] text-vt-accent uppercase">
-            {product.category.name} · {product.brand.name} · SKU {product.sku}
+            <Link
+              href={`/catalogo?dept=${DEPARTMENTS[departamento].slug}&cat=${encodeURIComponent(product.category.name)}`}
+              className="hover:underline"
+            >
+              {product.category.name}
+            </Link>{" "}
+            · {product.brand.name} · SKU {product.sku}
           </div>
           <h1 className="font-heading mt-2 mb-3 text-[30px] leading-[1.15] font-bold text-white">
             {product.name}
@@ -216,7 +239,7 @@ export default async function ProductDetailPage({
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-3">
-            {BENEFITS.map((b) => (
+            {BENEFITS[departamento].map((b) => (
               <div key={b.label} className="flex items-center gap-2.5 text-[12.5px] text-vt-muted-1">
                 <span className="flex-none text-vt-accent">
                   <Icon name={b.icon} className="h-[18px] w-[18px]" />
@@ -225,6 +248,19 @@ export default async function ProductDetailPage({
               </div>
             ))}
           </div>
+
+          {/* Aviso obligado en cualquier tienda que venda suplementos: no son
+              medicamentos y la tienda no debe insinuar que curan nada. Va
+              automático en todo el departamento de Salud para que no dependa
+              de que alguien se acuerde de escribirlo producto por producto. */}
+          {departamento === "SALUD" && (
+            <p className="mt-6 rounded-xl border border-white/10 bg-white/[.03] px-4 py-3 text-[11.5px] leading-relaxed text-vt-muted-2">
+              Este producto es un suplemento alimenticio: no es un medicamento y no está destinado a
+              diagnosticar, tratar ni curar ninguna enfermedad. Consulta a tu médico antes de
+              tomarlo, sobre todo si estás embarazada, lactando, tomas medicamento o tienes alguna
+              condición de salud. Mantener fuera del alcance de los niños.
+            </p>
+          )}
 
           <div className="mt-8 divide-y divide-white/10 rounded-2xl border border-white/10">
             {specs.map((s) => (

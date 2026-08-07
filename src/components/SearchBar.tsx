@@ -26,7 +26,12 @@ export function SearchBar() {
         onChange={(e) => {
           const next = e.target.value;
           setValue(next);
+          // Se conserva el departamento y se descartan los demás filtros: quien
+          // busca desde dentro de "Salud y Bienestar" espera resultados de ahí,
+          // no que la búsqueda lo saque de vuelta a todo el catálogo.
           const params = new URLSearchParams();
+          const dept = searchParams.get("dept");
+          if (dept) params.set("dept", dept);
           if (next.trim()) params.set("search", next);
           router.push(`/catalogo${params.toString() ? `?${params.toString()}` : ""}`);
         }}

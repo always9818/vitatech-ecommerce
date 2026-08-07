@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createCategory, createBrand, deleteCategory, deleteBrand } from "@/lib/admin-actions";
 import { TaxonomySection } from "@/components/admin/TaxonomySection";
+import { DEPARTMENTS, DEPARTMENT_ORDER } from "@/lib/departments";
 
 export default async function AdminTaxonomyPage({
   searchParams,
@@ -37,10 +38,18 @@ export default async function AdminTaxonomyPage({
       <div className="mt-6 grid grid-cols-1 gap-6 min-[880px]:grid-cols-2">
         <TaxonomySection
           title="Categorías"
-          items={categories.map((c) => ({ id: c.id, name: c.name, productCount: c._count.products }))}
+          items={categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            productCount: c._count.products,
+            groupLabel: DEPARTMENTS[c.department].label,
+          }))}
           createAction={createCategory}
           deleteAction={deleteCategory}
-          placeholder="Ej. Tablets"
+          placeholder="Ej. Vitaminas"
+          groupOptions={DEPARTMENT_ORDER.map((d) => ({ value: d, label: DEPARTMENTS[d].label }))}
+          groupLabel="¿A qué departamento pertenece?"
+          groupHelp="Define en qué parte de la tienda aparece: junto a la tecnología o junto a los suplementos."
         />
         <TaxonomySection
           title="Marcas"

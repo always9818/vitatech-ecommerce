@@ -1,9 +1,9 @@
-import { getCategories, getBrands } from "@/lib/catalog";
+import { getCategoryOptions, getBrands } from "@/lib/catalog";
 import { createProduct } from "@/lib/admin-actions";
 import { ProductForm } from "@/components/admin/ProductForm";
 
 export default async function NewProductPage() {
-  const [categories, brands] = await Promise.all([getCategories(), getBrands()]);
+  const [categories, brands] = await Promise.all([getCategoryOptions(), getBrands()]);
 
   return (
     <div>

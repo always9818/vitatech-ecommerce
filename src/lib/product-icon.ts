@@ -11,11 +11,20 @@ export const PRODUCT_ICON_OPTIONS: { value: IconName; label: string }[] = [
   { value: "keyboard", label: "Teclado" },
   { value: "mouse", label: "Mouse" },
   { value: "printer", label: "Impresora" },
+  // Salud y Bienestar
+  { value: "supplement", label: "Bote de suplemento" },
+  { value: "pill", label: "Cápsulas o tabletas" },
+  { value: "dumbbell", label: "Deportivo" },
+  { value: "leaf", label: "Natural" },
+  { value: "heart", label: "Bienestar" },
   { value: "package", label: "Genérico" },
 ];
 
 const VALID_ICONS = new Set<string>(PRODUCT_ICON_OPTIONS.map((o) => o.value));
 
+// Respaldo por si el producto no tiene icono propio. Las claves son nombres de
+// categoría, que Angel puede renombrar desde el panel — por eso esto es solo
+// una ayuda, nunca la única fuente: lo que no calce cae en "package".
 const BY_CATEGORY: Record<string, IconName> = {
   Laptops: "laptop",
   Celulares: "smartphone",
@@ -24,6 +33,11 @@ const BY_CATEGORY: Record<string, IconName> = {
   Audio: "headphones",
   Accesorios: "keyboard",
   Impresoras: "printer",
+  "Suplementos deportivos": "dumbbell",
+  Vitaminas: "pill",
+  "Vitaminas y minerales": "pill",
+  Proteínas: "supplement",
+  "Bienestar y belleza": "heart",
 };
 
 /**

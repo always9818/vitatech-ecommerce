@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCategories, getBrands } from "@/lib/catalog";
+import { getCategoryOptions, getBrands } from "@/lib/catalog";
 import { updateProduct } from "@/lib/admin-actions";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { resolveProductIcon } from "@/lib/product-icon";
@@ -10,7 +10,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
   const [product, categories, brands] = await Promise.all([
     prisma.product.findUnique({ where: { id }, include: { category: true } }),
-    getCategories(),
+    getCategoryOptions(),
     getBrands(),
   ]);
 

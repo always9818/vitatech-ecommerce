@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { CACHE_SEGUNDOS, TAG_CATALOGO } from "@/lib/cache-tags";
+import { DEPARTMENTS, DEPARTMENT_ORDER, type Department } from "@/lib/departments";
 
 export type SortOption = "relevancia" | "menor" | "mayor" | "descuento";
 
@@ -40,7 +41,7 @@ const CAMPOS_TARJETA = {
   stock: true,
   icon: true,
   images: true,
-  category: { select: { id: true, name: true } },
+  category: { select: { id: true, name: true, department: true } },
   brand: { select: { id: true, name: true } },
 } as const;
 
@@ -60,7 +61,7 @@ type ProductoTarjeta = {
   stock: number;
   icon: string;
   images: string[];
-  category: { id: string; name: string };
+  category: { id: string; name: string; department: Department };
   brand: { id: string; name: string };
 };
 
@@ -110,20 +111,47 @@ export async function getCategories() {
   return prisma.category.findMany({ orderBy: { name: "asc" } });
 }
 
+/**
+ * Categorías listas para el `<select>` del formulario de productos, ordenadas
+ * por departamento y con su etiqueta para agruparlas en `<optgroup>`.
+ *
+ * La categoría es lo que decide en qué mitad de la tienda aparece un producto,
+ * así que conviene que eso se vea al elegirla y no se descubra después.
+ */
+export async function getCategoryOptions() {
+  const categories = await getCategories();
+  return categories
+    .sort(
+      (a, b) =>
+        DEPARTMENT_ORDER.indexOf(a.department) - DEPARTMENT_ORDER.indexOf(b.department) ||
+        a.name.localeCompare(b.name)
+    )
+    .map((c) => ({ id: c.id, name: c.name, departmentLabel: DEPARTMENTS[c.department].label }));
+}
+
 export const getBrands = unstable_cache(
   async () => prisma.brand.findMany({ orderBy: { name: "asc" } }),
   ["marcas"],
   { tags: [TAG_CATALOGO], revalidate: CACHE_SEGUNDOS },
 );
 
-export async function getFeaturedProducts(take = 4) {
+/**
+ * Destacados, opcionalmente de un solo departamento (la portada muestra una
+ * fila por cada uno). Prioriza lo que sí se puede comprar hoy y solo completa
+ * con agotados si no alcanzan, para que la portada nunca quede con huecos.
+ */
+export async function getFeaturedProducts(take = 4, department?: Department) {
   const todos = await leerCatalogoVisible();
-  const disponibles = todos.filter((p) => p.stock > 0).slice(0, take);
+  const delDepartamento = department
+    ? todos.filter((p) => p.category.department === department)
+    : todos;
+
+  const disponibles = delDepartamento.filter((p) => p.stock > 0).slice(0, take);
   if (disponibles.length >= take) return disponibles;
 
-  // Solo cuando no alcanzan los que sí se pueden comprar se completa con
-  // agotados: la portada nunca debe quedar con huecos.
-  const agotados = todos.filter((p) => p.stock <= 0).slice(0, take - disponibles.length);
+  const agotados = delDepartamento
+    .filter((p) => p.stock <= 0)
+    .slice(0, take - disponibles.length);
   return [...disponibles, ...agotados];
 }
 
@@ -172,17 +200,21 @@ function contiene(texto: string, busqueda: string) {
 }
 
 export async function getFilteredProducts(opts: {
+  department?: Department | null;
   category?: string;
   brands?: string[];
   search?: string;
   sort?: SortOption;
 }) {
-  const { category, brands, search, sort = "relevancia" } = opts;
+  const { department, category, brands, search, sort = "relevancia" } = opts;
 
   const todos = await leerCatalogoVisible();
   const busqueda = search?.trim().toLowerCase();
 
   const products = todos.filter((p) => {
+    // El departamento manda sobre todo lo demás: dentro de Salud y Bienestar
+    // no debe colarse una laptop ni aunque la búsqueda calce con su marca.
+    if (department && p.category.department !== department) return false;
     if (category && category !== "Todas" && p.category.name !== category) return false;
     if (brands && brands.length && !brands.includes(p.brand.name)) return false;
     if (busqueda) {
@@ -233,7 +265,12 @@ export const getCategoryCounts = unstable_cache(
     prisma.category.findMany({
       // El conteo también excluye los ocultos: si no, una categoría anunciaría
       // "3 productos" y al entrar el cliente vería solo 2.
-      select: { id: true, name: true, _count: { select: { products: { where: SOLO_VISIBLES } } } },
+      select: {
+        id: true,
+        name: true,
+        department: true,
+        _count: { select: { products: { where: SOLO_VISIBLES } } },
+      },
     }),
   ["conteo-categorias"],
   { tags: [TAG_CATALOGO], revalidate: CACHE_SEGUNDOS },
@@ -246,9 +283,25 @@ export const getCategoryCounts = unstable_cache(
  * debe listarlas todas en el panel de administración (ahí hace falta ver una
  * categoría sin productos para poder agregarle el primero).
  */
-export async function getCategoriesWithStock() {
+export async function getCategoriesWithStock(department?: Department) {
   const categories = await getCategoryCounts();
   return categories
     .filter((c) => c._count.products > 0)
+    .filter((c) => !department || c.department === department)
     .sort((a, b) => b._count.products - a._count.products || a.name.localeCompare(b.name));
+}
+
+/**
+ * Cuántos productos visibles tiene cada departamento. El menú lo usa para NO
+ * anunciar un departamento vacío: mientras Angel no suba ningún suplemento,
+ * "Salud y Bienestar" no aparece y el cliente no se topa con una sección
+ * hueca — el mismo criterio que ya se usaba con las categorías sin stock.
+ */
+export async function getDepartmentCounts(): Promise<Record<Department, number>> {
+  const categories = await getCategoryCounts();
+  const counts = { TECNOLOGIA: 0, SALUD: 0 } as Record<Department, number>;
+  for (const c of categories) {
+    counts[c.department] += c._count.products;
+  }
+  return counts;
 }

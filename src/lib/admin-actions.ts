@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 import { uploadProductImage } from "@/lib/r2";
 import { TAG_CATALOGO, TAG_PORTADA, TAG_RESENAS } from "@/lib/cache-tags";
+import { Department, DEPARTMENT_ORDER } from "@/lib/departments";
 
 export type ProductFormValues = {
   name: string;
@@ -235,8 +236,16 @@ export async function createCategory(
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "El nombre de la categoría no puede estar vacío." };
 
+  // Se valida contra el enum en vez de confiar en lo que llegue del formulario:
+  // un valor inventado reventaría el INSERT con un error de Postgres que no le
+  // dice nada a quien está administrando la tienda.
+  const departmentRaw = String(formData.get("department") ?? "");
+  const department = DEPARTMENT_ORDER.includes(departmentRaw as Department)
+    ? (departmentRaw as Department)
+    : Department.TECNOLOGIA;
+
   try {
-    await prisma.category.create({ data: { name } });
+    await prisma.category.create({ data: { name, department } });
   } catch {
     return { error: `Ya existe una categoría llamada "${name}".` };
   }

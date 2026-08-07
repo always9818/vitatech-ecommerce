@@ -5,10 +5,12 @@ import type { ProductFormState } from "@/lib/admin-actions";
 import { PRODUCT_ICON_OPTIONS } from "@/lib/product-icon";
 
 type Option = { id: string; name: string };
+/** Las categorías vienen agrupadas por departamento para el <optgroup>. */
+type CategoryOption = Option & { departmentLabel: string };
 
 type ProductFormProps = {
   action: (state: ProductFormState, formData: FormData) => Promise<ProductFormState>;
-  categories: Option[];
+  categories: CategoryOption[];
   brands: Option[];
   submitLabel: string;
   defaultValues?: {
@@ -30,12 +32,45 @@ const inputClass =
   "w-full rounded-[10px] border border-white/10 bg-white/[.05] px-4 py-2.5 text-sm text-vt-fg placeholder:text-vt-muted-2 focus:border-vt-accent/50 focus:outline-none";
 const labelClass = "mb-1.5 block text-[13px] font-semibold text-vt-fg";
 
+/**
+ * Plantillas de especificaciones, una por tipo de producto.
+ *
+ * Un suplemento no se describe con procesador y memoria RAM: lo que el cliente
+ * necesita saber es la presentación, cuánto trae y cuánto dura. Esto solo
+ * rellena el cuadro de texto — Angel puede cambiar lo que quiera después.
+ *
+ * Ojo: NO se incluye ningún campo de "beneficios" ni "para qué sirve". Un
+ * suplemento no es un medicamento y atribuirle propiedades curativas es
+ * justamente lo que mete en problemas a una tienda; la descripción libre
+ * queda para lo que diga la etiqueta del fabricante.
+ */
+const PLANTILLAS_SPECS = [
+  {
+    label: "Tecnología",
+    texto: "Procesador: \nMemoria RAM: \nAlmacenamiento: \nPantalla: \nGarantía: ",
+  },
+  {
+    label: "Suplemento",
+    texto:
+      "Presentación: 60 cápsulas\nContenido neto: \nPorción: 1 cápsula\nPorciones por envase: 60\nSabor: \nRegistro sanitario: ",
+  },
+  {
+    label: "Proteína en polvo",
+    texto:
+      "Presentación: Bote de 2 lb\nContenido neto: 907 g\nPorción: 1 scoop (30 g)\nPorciones por envase: 30\nProteína por porción: 24 g\nSabor: \nRegistro sanitario: ",
+  },
+];
+
 export function ProductForm({ action, categories, brands, submitLabel, defaultValues }: ProductFormProps) {
   const [state, setState] = useState<ProductFormState>({});
   const [isPending, startTransition] = useTransition();
   const [removeImage, setRemoveImage] = useState(false);
 
   const v = defaultValues;
+
+  // Este sí es controlado (a diferencia del resto de campos) porque los botones
+  // de plantilla necesitan poder escribir en él.
+  const [specsText, setSpecsText] = useState(v?.specsText ?? "");
 
   return (
     <form
@@ -74,10 +109,22 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
           <option value="" disabled>
             Selecciona una categoría
           </option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
+          {/* Agrupadas por departamento: la categoría es lo que decide si el
+              producto sale entre la tecnología o entre los suplementos, así que
+              conviene verlo al elegirla y no descubrirlo después en la tienda. */}
+          {Object.entries(
+            categories.reduce<Record<string, CategoryOption[]>>((grupos, c) => {
+              (grupos[c.departmentLabel] ??= []).push(c);
+              return grupos;
+            }, {})
+          ).map(([departamento, opciones]) => (
+            <optgroup key={departamento} label={departamento}>
+              {opciones.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>
@@ -173,17 +220,36 @@ export function ProductForm({ action, categories, brands, submitLabel, defaultVa
       </div>
 
       <div className="min-[880px]:col-span-2">
-        <label className={labelClass}>Especificaciones técnicas</label>
+        <label className={labelClass}>Especificaciones</label>
         <textarea
           name="specs"
           rows={5}
-          defaultValue={v?.specsText}
+          value={specsText}
+          onChange={(e) => setSpecsText(e.target.value)}
           placeholder={"Procesador: AMD Ryzen 5\nMemoria RAM: 16GB\nAlmacenamiento: 512GB SSD"}
           className={inputClass}
         />
         <p className="mt-1 text-[11.5px] text-vt-muted-2">
           Una especificación por línea, formato &quot;Nombre: Valor&quot;.
         </p>
+
+        {/* Los suplementos se describen con datos distintos a los de una
+            laptop. Estos botones solo rellenan el cuadro de arriba con la
+            plantilla correspondiente para que Angel no tenga que acordarse de
+            qué poner; puede borrar o cambiar lo que quiera después. */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <span className="text-[11.5px] text-vt-muted-2">Plantillas:</span>
+          {PLANTILLAS_SPECS.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => setSpecsText(p.texto)}
+              className="rounded-lg border border-white/15 px-2.5 py-1 text-[11.5px] font-semibold text-vt-fg hover:border-vt-accent/50 hover:text-vt-accent"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="min-[880px]:col-span-2">
