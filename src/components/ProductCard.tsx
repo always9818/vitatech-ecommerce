@@ -34,6 +34,11 @@ export function ProductCard({ product, index = 0 }: { product: CardProduct; inde
               src={photo}
               alt={product.name}
               className="absolute inset-0 h-full w-full object-contain p-3"
+              // Solo las primeras tarjetas (las que se ven sin hacer scroll) se
+              // cargan de inmediato; el resto espera a acercarse a la vista. En
+              // un catálogo de 20+ productos, sin esto el navegador bajaba todas
+              // las fotos de una vez aunque el visitante nunca llegara a verlas.
+              loading={index < 4 ? "eager" : "lazy"}
             />
           ) : (
             <Icon name={resolveProductIcon(product.icon, product.category.name)} className="h-14 w-14" />

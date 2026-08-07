@@ -5,6 +5,17 @@ import { CACHE_SEGUNDOS, TAG_CATALOGO } from "@/lib/cache-tags";
 export type SortOption = "relevancia" | "menor" | "mayor" | "descuento";
 
 /**
+ * Cuántos productos muestra cada página del catálogo. `getFilteredProducts`
+ * trae y ordena TODO el catálogo visible en memoria (viene de una sola lista
+ * ya cacheada) — con las decenas de productos de hoy no pesa nada, pero sin
+ * paginar, un catálogo de cientos de productos mandaría una página gigante al
+ * navegador. Paginar aquí no reduce ese trabajo en memoria, solo cuánto se
+ * manda y se pinta; si el catálogo crece mucho más, ahí sí convendría filtrar
+ * y paginar directamente en SQL.
+ */
+export const CATALOG_PAGE_SIZE = 24;
+
+/**
  * Los productos ocultos no existen para el cliente. Se aplica en TODO lo que
  * mira la tienda (destacados, catálogo, búsqueda, conteos y la ficha), no solo
  * en el listado: si no, un producto oculto seguiría siendo alcanzable por su
@@ -134,6 +145,25 @@ export async function getProductById(id: string) {
     ["producto", id],
     { tags: [TAG_CATALOGO], revalidate: CACHE_SEGUNDOS },
   )();
+}
+
+/**
+ * "También te puede interesar": productos de la misma categoría, sin
+ * repetir el que se está viendo. Se arma sobre la misma lista completa que ya
+ * cachea `leerCatalogoVisible` — no es una consulta nueva a la base — así que
+ * usa el mismo criterio que el resto del catálogo: los agotados se muestran
+ * solo si no alcanzan productos disponibles para completar `take`.
+ */
+export async function getRelatedProducts(opts: { productId: string; categoryId: string; take?: number }) {
+  const { productId, categoryId, take = 4 } = opts;
+  const todos = await leerCatalogoVisible();
+  const mismaCategoria = todos.filter((p) => p.id !== productId && p.category.id === categoryId);
+
+  const disponibles = mismaCategoria.filter((p) => p.stock > 0).slice(0, take);
+  if (disponibles.length >= take) return disponibles;
+
+  const agotados = mismaCategoria.filter((p) => p.stock <= 0).slice(0, take - disponibles.length);
+  return [...disponibles, ...agotados];
 }
 
 /** Mismo criterio que usaba Postgres con `mode: "insensitive"`. */

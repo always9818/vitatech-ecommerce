@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductById } from "@/lib/catalog";
+import { getProductById, getRelatedProducts } from "@/lib/catalog";
+import { ProductCard } from "@/components/ProductCard";
 import { money, discountPct } from "@/lib/money";
 import { ProductDetailActions } from "@/components/ProductDetailActions";
 import { Icon, type IconName } from "@/components/Icon";
@@ -53,6 +54,15 @@ export default async function ProductDetailPage({
     getProductRatingStats(id),
   ]);
   if (!product) notFound();
+
+  // Depende del `categoryId` del producto, así que no puede ir en el mismo
+  // Promise.all de arriba: ese todavía no sabe qué producto es. En la
+  // práctica es barato — se resuelve sobre la misma lista completa que ya
+  // cachea `leerCatalogoVisible`, no dispara una consulta nueva a la base.
+  const relacionados = await getRelatedProducts({
+    productId: product.id,
+    categoryId: product.category.id,
+  });
 
   const off = discountPct(product.price, product.oldPrice);
   const stockLabel =
@@ -108,6 +118,10 @@ export default async function ProductDetailPage({
                 src={photos[0]}
                 alt={product.name}
                 className="absolute inset-0 h-full w-full object-contain p-6"
+                // Es la foto principal de la página: se carga de inmediato, no
+                // en diferido, porque casi siempre es lo primero que el
+                // visitante ve al entrar.
+                loading="eager"
               />
             ) : (
               <Icon name={fallbackIcon} className="h-28 w-28" />
@@ -122,6 +136,7 @@ export default async function ProductDetailPage({
                     src={src}
                     alt={product.name}
                     className="absolute inset-0 h-full w-full object-contain p-1.5"
+                    loading="lazy"
                   />
                 </div>
               ))}
@@ -223,6 +238,19 @@ export default async function ProductDetailPage({
       </div>
 
       <ReviewsSection productId={product.id} />
+
+      {relacionados.length > 0 && (
+        <section className="mt-14">
+          <div className="font-heading text-[22px] font-bold text-white">
+            También te puede interesar<span className="text-vt-accent">.</span>
+          </div>
+          <div className="mt-6 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-4">
+            {relacionados.map((p, i) => (
+              <ProductCard key={p.id} product={p} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

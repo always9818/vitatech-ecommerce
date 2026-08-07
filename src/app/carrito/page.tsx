@@ -8,6 +8,7 @@ import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
 import { VitoMascot } from "@/components/Logo";
 import { shippingCostFor } from "@/lib/shipping";
+import { FreeShippingBar } from "@/components/FreeShippingBar";
 
 export default async function CartPage() {
   const items = await getCart();
@@ -45,19 +46,22 @@ export default async function CartPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-8 min-[880px]:grid-cols-[1fr_340px]">
-          <div className="rounded-2xl border border-white/10 px-5">
-            {items.map((it) => (
-              <CartLine
-                key={it.id}
-                productId={it.productId}
-                name={it.product.name}
-                category={it.product.category.name}
-                icon={it.product.icon}
-                photo={it.product.images[0]}
-                price={it.product.price}
-                quantity={it.quantity}
-              />
-            ))}
+          <div className="flex flex-col gap-5">
+            <FreeShippingBar subtotal={subtotal} />
+            <div className="rounded-2xl border border-white/10 px-5">
+              {items.map((it) => (
+                <CartLine
+                  key={it.id}
+                  productId={it.productId}
+                  name={it.product.name}
+                  category={it.product.category.name}
+                  icon={it.product.icon}
+                  photo={it.product.images[0]}
+                  price={it.product.price}
+                  quantity={it.quantity}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="h-fit rounded-2xl border border-white/10 p-6 min-[880px]:sticky min-[880px]:top-24">

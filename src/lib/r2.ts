@@ -10,7 +10,7 @@ type ProductImagesBucket = {
   put: (
     key: string,
     value: ArrayBuffer,
-    options?: { httpMetadata?: { contentType?: string } }
+    options?: { httpMetadata?: { contentType?: string; cacheControl?: string } }
   ) => Promise<unknown>;
 };
 
@@ -30,11 +30,17 @@ async function uploadImage(file: File, folder: string): Promise<string> {
     );
   }
 
+  // El nombre lleva un UUID nuevo en cada subida, así que dos imágenes nunca
+  // comparten key: reemplazar la foto de un producto sube un archivo distinto,
+  // nunca pisa el anterior. Por eso es seguro cachearla "para siempre" — el
+  // navegador nunca tiene que volver a pedirla, ni siquiera si el producto se
+  // edita después. Antes no se mandaba ningún `Cache-Control`, así que el
+  // navegador repetía la descarga en cada visita a una página con esa foto.
   const extension = file.type.split("/")[1] ?? "jpg";
   const key = `${folder}/${crypto.randomUUID()}.${extension}`;
 
   await bucket.put(key, await file.arrayBuffer(), {
-    httpMetadata: { contentType: file.type },
+    httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" },
   });
 
   const publicUrl = process.env.R2_PUBLIC_URL;

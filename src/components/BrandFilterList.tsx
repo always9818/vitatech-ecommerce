@@ -15,6 +15,10 @@ export function BrandFilterList({ brands }: { brands: { id: string; name: string
     const params = new URLSearchParams(searchParams.toString());
     if (next.size) params.set("brand", Array.from(next).join(","));
     else params.delete("brand");
+    // Sin esto, cambiar de marca estando en la página 3 dejaba `page=3` en la
+    // URL: si el nuevo filtro tenía menos páginas, el catálogo caía en la
+    // última válida en vez de mostrar los resultados desde el principio.
+    params.delete("page");
     router.push(`/catalogo?${params.toString()}`);
   };
 

@@ -30,7 +30,12 @@ export function CartLine({
       <div className="relative grid h-[88px] w-[88px] flex-none place-items-center overflow-hidden rounded-xl bg-white/[.05] text-vt-muted-3">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt={name} className="absolute inset-0 h-full w-full object-contain p-2" />
+          <img
+            src={photo}
+            alt={name}
+            className="absolute inset-0 h-full w-full object-contain p-2"
+            loading="lazy"
+          />
         ) : (
           <Icon name={resolveProductIcon(icon, category)} className="h-9 w-9" />
         )}

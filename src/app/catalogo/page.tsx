@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getFilteredProducts, getCategoryCounts, getBrands, type SortOption } from "@/lib/catalog";
+import {
+  getFilteredProducts,
+  getCategoryCounts,
+  getBrands,
+  CATALOG_PAGE_SIZE,
+  type SortOption,
+} from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
 import { BrandFilterList } from "@/components/BrandFilterList";
+import { Pagination } from "@/components/Pagination";
 import { VitoMascot } from "@/components/Logo";
 import { pageMetadata } from "@/lib/site";
 
-type CatalogSearchParams = { cat?: string; brand?: string; search?: string; sort?: string };
+type CatalogSearchParams = { cat?: string; brand?: string; search?: string; sort?: string; page?: string };
 
 export async function generateMetadata({
   searchParams,
@@ -39,14 +46,21 @@ export default async function CatalogPage({
   const search = params.search ?? "";
   const sort = (params.sort as SortOption) ?? "relevancia";
 
-  const [products, categoryCounts, brandList] = await Promise.all([
+  const [allProducts, categoryCounts, brandList] = await Promise.all([
     getFilteredProducts({ category, brands, search, sort }),
     getCategoryCounts(),
     getBrands(),
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(allProducts.length / CATALOG_PAGE_SIZE));
+  // Una página fuera de rango (link viejo compartido, o el filtro cambió y ya
+  // no hay tantas páginas) cae a la última válida en vez de mostrar "Sin
+  // resultados" sobre un catálogo que sí tiene productos.
+  const page = Math.min(Math.max(1, Number(params.page) || 1), totalPages);
+  const products = allProducts.slice((page - 1) * CATALOG_PAGE_SIZE, page * CATALOG_PAGE_SIZE);
+
   const totalCount = categoryCounts.reduce((a, c) => a + c._count.products, 0);
-  const resultLabel = `${products.length} ${products.length === 1 ? "resultado" : "resultados"}`;
+  const resultLabel = `${allProducts.length} ${allProducts.length === 1 ? "resultado" : "resultados"}`;
   // El total de arriba sí cuenta todo; la lista de abajo solo muestra
   // categorías con al menos un producto, para no ofrecer un filtro que lleve
   // a "Sin resultados" (ej. Monitores o Impresoras cuando están sin stock).
@@ -113,11 +127,18 @@ export default async function CatalogPage({
 
         <div>
           {products.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-3">
-              {products.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-3">
+                {products.map((p, i) => (
+                  <ProductCard key={p.id} product={p} index={i} />
+                ))}
+              </div>
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                searchParams={{ cat: params.cat, brand: params.brand, search: params.search, sort: params.sort }}
+              />
+            </>
           ) : (
             <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 py-20 text-center">
               <VitoMascot className="h-24 w-24" />
