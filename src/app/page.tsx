@@ -40,6 +40,11 @@ export default async function HomePage() {
     )
   ).filter((d) => d.productos.length > 0);
 
+  const categoriasPorDepartamento = DEPARTMENT_ORDER.map((department) => ({
+    department,
+    items: categories.filter((c) => c.department === department),
+  })).filter((d) => d.items.length > 0);
+
   const heroImage = settings?.heroImageUrl;
   const hero = resolveHeroContent(settings);
 
@@ -166,21 +171,36 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Category chips */}
-      <section className="mt-10 flex flex-wrap gap-3">
-        {categories.map((c) => (
-          <Link
-            key={c.id}
-            href={`/catalogo?dept=${DEPARTMENTS[c.department].slug}&cat=${encodeURIComponent(c.name)}`}
-            className="group flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[.03] px-4 py-2.5 hover:border-vt-accent/50"
-          >
-            <span className="text-vt-muted-1 group-hover:text-vt-accent">
-              <Icon name={resolveCategoryIcon(c.name)} className="h-[18px] w-[18px]" />
-            </span>
-            <span className="text-[13.5px] font-bold text-vt-fg">{c.name}</span>
-          </Link>
-        ))}
-      </section>
+      {/* Category chips, agrupados por departamento. Con los dos departamentos
+          activos, antes salían todos en una sola fila —una vitamina justo al
+          lado de una laptop—, que es exactamente lo revuelto que Angel quiso
+          evitar al partir la tienda en dos. Con uno solo activo (el otro
+          todavía sin productos), se ve igual que antes: una fila simple, sin
+          etiqueta de más. */}
+      {categoriasPorDepartamento.map(({ department, items }) => (
+        <section key={department} className="mt-10">
+          {categoriasPorDepartamento.length > 1 && (
+            <div className="mb-3 flex items-center gap-2 text-[12px] font-bold tracking-[.06em] text-vt-muted-2 uppercase">
+              <Icon name={DEPARTMENTS[department].icon} className="h-3.5 w-3.5" />
+              {DEPARTMENTS[department].label}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-3">
+            {items.map((c) => (
+              <Link
+                key={c.id}
+                href={`/catalogo?dept=${DEPARTMENTS[department].slug}&cat=${encodeURIComponent(c.name)}`}
+                className="group flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[.03] px-4 py-2.5 hover:border-vt-accent/50"
+              >
+                <span className="text-vt-muted-1 group-hover:text-vt-accent">
+                  <Icon name={resolveCategoryIcon(c.name)} className="h-[18px] w-[18px]" />
+                </span>
+                <span className="text-[13.5px] font-bold text-vt-fg">{c.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
 
       {/* Una fila de destacados por departamento. Con un solo departamento con
           productos, el título vuelve a ser simplemente "Destacados". */}
