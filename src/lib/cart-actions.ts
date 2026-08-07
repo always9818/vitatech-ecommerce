@@ -3,9 +3,18 @@
 import { cookies } from "next/headers";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { GUEST_COOKIE } from "@/lib/cart-constants";
+
+// La sesión es un JWT firmado que sobrevive a que se borre la cuenta que lo
+// firmó (ej. un admin elimina un usuario de prueba a mano en la base). Si esa
+// sesión vieja intenta crear un carrito, Postgres rechaza el INSERT porque
+// `userId` ya no existe en `User` — Prisma lo reporta como P2003.
+function isMissingUserError(err: unknown): boolean {
+  return err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2003";
+}
 
 // Solo debe llamarse desde Server Actions reales (los exports mutantes de abajo):
 // escribe la cookie de invitado, lo cual Next.js prohíbe durante el render de un
@@ -21,13 +30,24 @@ async function getOrCreateCart() {
   const userId = session?.user?.id;
 
   if (userId) {
-    const cart = await prisma.cart.upsert({
-      where: { userId },
-      update: {},
-      create: { userId },
-      select: CART_ID_ONLY,
-    });
-    return cart;
+    try {
+      const cart = await prisma.cart.upsert({
+        where: { userId },
+        update: {},
+        create: { userId },
+        select: CART_ID_ONLY,
+      });
+      return cart;
+    } catch (err) {
+      if (!isMissingUserError(err)) throw err;
+      // No hay carrito válido que crear para una cuenta que ya no existe.
+      // Parchar el carrito (ej. caer al flujo de invitado) dejaría el
+      // producto guardado en un carrito que el cliente nunca vería — peor
+      // que el error. Lo correcto es cerrar esa sesión vieja: `signOut`
+      // redirige, así que esto nunca vuelve (lanza internamente).
+      await signOut({ redirectTo: "/login?error=session-expired" });
+      throw err;
+    }
   }
 
   const cookieStore = await cookies();

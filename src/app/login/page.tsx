@@ -10,5 +10,5 @@ export default async function LoginPage({
 
   // Se lee aquí (en el servidor, dentro del request) y no en el cliente: en
   // Cloudflare Workers las variables de entorno solo existen durante un request.
-  return <LoginForm googleEnabled={isGoogleEnabled()} oauthError={error} />;
+  return <LoginForm googleEnabled={isGoogleEnabled()} authError={error} />;
 }

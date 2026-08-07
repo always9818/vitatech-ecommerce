@@ -8,8 +8,12 @@ import { VitatechMark } from "@/components/Logo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Traduce los códigos de error que devuelve Auth.js en la URL. */
-function describeOauthError(code: string): string {
+/**
+ * Traduce los códigos de error que llegan por la URL: los que devuelve
+ * Auth.js para OAuth, más "session-expired", que mandamos nosotros desde
+ * cart-actions.ts cuando una sesión sobrevive a una cuenta ya borrada.
+ */
+function describeAuthError(code: string): string {
   switch (code) {
     case "AccessDenied":
       return "No pudimos continuar con esa cuenta de Google. Asegúrate de que su correo esté verificado.";
@@ -17,6 +21,8 @@ function describeOauthError(code: string): string {
       return "Ese correo ya tiene una cuenta creada con contraseña. Inicia sesión con tu contraseña.";
     case "Configuration":
       return "El inicio de sesión con Google no está configurado correctamente.";
+    case "session-expired":
+      return "Tu sesión ya no es válida. Inicia sesión de nuevo.";
     default:
       return "No se pudo iniciar sesión con Google. Intenta de nuevo.";
   }
@@ -24,10 +30,10 @@ function describeOauthError(code: string): string {
 
 export function LoginForm({
   googleEnabled,
-  oauthError,
+  authError,
 }: {
   googleEnabled: boolean;
-  oauthError?: string;
+  authError?: string;
 }) {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
@@ -35,7 +41,7 @@ export function LoginForm({
   const [pass, setPass] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [formError, setFormError] = useState<string | null>(
-    oauthError ? describeOauthError(oauthError) : null
+    authError ? describeAuthError(authError) : null
   );
   const [loginOk, setLoginOk] = useState(false);
   const [isPending, startTransition] = useTransition();
