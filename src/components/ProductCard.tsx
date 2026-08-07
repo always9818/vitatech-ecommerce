@@ -33,7 +33,18 @@ export function ProductCard({ product, index = 0 }: { product: CardProduct; inde
             <img
               src={photo}
               alt={product.name}
-              className="absolute inset-0 h-full w-full object-contain p-3"
+              // `overflow-hidden` en el contenedor padre recorta el acercamiento:
+              // la imagen crece pero nunca se sale de la tarjeta ni empuja el
+              // resto del layout.
+              //
+              // OJO: sin `scale-100` a propósito. Tailwind v4 traduce tanto
+              // `scale-100` como `group-hover:scale-110` a la misma propiedad
+              // CSS `scale`, con especificidad casi idéntica — puestos juntos,
+              // cuál gana depende del orden en que Tailwind los generó, y en la
+              // práctica `scale-100` terminaba ganando SIEMPRE, incluso en
+              // hover. `scale: none` (sin escalar) ya es el valor inicial, así
+              // que no hace falta declararlo.
+              className="absolute inset-0 h-full w-full object-contain p-3 transition-transform duration-300 ease-out group-hover:scale-110"
               // Solo las primeras tarjetas (las que se ven sin hacer scroll) se
               // cargan de inmediato; el resto espera a acercarse a la vista. En
               // un catálogo de 20+ productos, sin esto el navegador bajaba todas

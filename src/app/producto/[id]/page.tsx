@@ -15,6 +15,7 @@ import { mensajeProducto, whatsappUrl } from "@/lib/whatsapp";
 import { DEPARTMENTS, type Department } from "@/lib/departments";
 import { AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
 import { ViewContentTracker } from "@/components/tracking/ViewContentTracker";
+import { ZoomableImage } from "@/components/ZoomableImage";
 
 const MAX_INSTALLMENTS = Math.max(...AVAILABLE_INSTALLMENTS);
 
@@ -128,15 +129,11 @@ export default async function ProductDetailPage({
         <div>
           <div className="relative grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
             {photos[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <ZoomableImage
                 src={photos[0]}
                 alt={product.name}
-                className="absolute inset-0 h-full w-full object-contain p-6"
-                // Es la foto principal de la página: se carga de inmediato, no
-                // en diferido, porque casi siempre es lo primero que el
-                // visitante ve al entrar.
-                loading="eager"
+                containerClassName="absolute inset-0 h-full w-full cursor-zoom-in overflow-hidden"
+                className="h-full w-full object-contain p-6"
               />
             ) : (
               <Icon name={fallbackIcon} className="h-28 w-28" />
