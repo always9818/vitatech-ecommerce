@@ -12,8 +12,12 @@ import { InitiateCheckoutTracker } from "@/components/tracking/InitiateCheckoutT
 export const metadata = { title: "Datos de envío · VITATECH_" };
 
 export default async function CheckoutPage() {
+  // Ya NO se redirige a /login. Obligar a crear cuenta antes de pagar era la
+  // principal fuga de ventas: el visitante nuevo tenía que registrarse y
+  // esperar los ~5s de bcrypt solo para poder pagar. Ahora el invitado compra
+  // dejando su correo, y se le ofrece iniciar sesión solo como atajo.
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  const esInvitado = !session?.user;
 
   const items = await getCart();
   if (items.length === 0) redirect("/carrito");
@@ -48,11 +52,26 @@ export default async function CheckoutPage() {
       <h1 className="font-heading mt-2 text-[28px] font-bold text-white">Datos de envío</h1>
       <p className="mt-1 text-[13.5px] text-vt-muted-1">
         Dinos a dónde llevamos tu pedido. Después pasas al pago.
+        {esInvitado && " No necesitas crear una cuenta."}
       </p>
+
+      {esInvitado && (
+        <p className="mt-3 text-[13px] text-vt-muted-2">
+          ¿Ya tienes cuenta?{" "}
+          <Link href="/login?next=/checkout" className="font-semibold text-vt-accent hover:underline">
+            Inicia sesión
+          </Link>{" "}
+          y se llenan solos tus datos de envío.
+        </p>
+      )}
 
       <div className="mt-8 grid grid-cols-1 gap-10 min-[900px]:grid-cols-[1fr_320px]">
         <div className="rounded-2xl border border-white/10 p-6">
-          <CheckoutForm defaults={profile ?? undefined} hasSavedProfile={Boolean(profile)} />
+          <CheckoutForm
+            defaults={profile ?? undefined}
+            hasSavedProfile={Boolean(profile)}
+            esInvitado={esInvitado}
+          />
         </div>
 
         <aside className="h-fit rounded-2xl border border-white/10 p-6">

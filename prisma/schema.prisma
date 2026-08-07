@@ -178,8 +178,21 @@ model CartItem {
 
 model Order {
   id                 String      @id @default(cuid())
-  userId             String
-  user               User        @relation(fields: [userId], references: [id])
+
+  /// Opcional desde el 2026-08-06: se puede comprar SIN crear cuenta. Obligar a
+  /// registrarse antes de pagar era la principal fuga de ventas — el visitante
+  /// nuevo tenía que crear cuenta y esperar los ~5s de bcrypt solo para poder
+  /// pagar. Cuando es null, el comprador es un invitado.
+  userId             String?
+  user               User?       @relation(fields: [userId], references: [id])
+
+  /// Correo del comprador invitado: el único modo de contactarlo sobre su
+  /// pedido, así que el formulario lo exige cuando no hay sesión.
+  guestEmail         String?
+
+  /// El `vt_guest_id` de su cookie, para poder vaciarle el carrito cuando el
+  /// webhook confirme el pago (sin sesión no hay `userId` con qué buscarlo).
+  guestId            String?
   items              OrderItem[]
   subtotal           Int
   shipping           Int

@@ -12,7 +12,10 @@ const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
   { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
   { icon: "chat", title: "Soporte por WhatsApp", sub: "Lun a sáb, 9am–6pm" },
   { icon: "shield", title: "Garantía real", sub: "Servicio técnico propio" },
-  { icon: "card", title: "Pago seguro", sub: "Tarjeta o contra entrega" },
+  // Solo lo que Recurrente procesa de verdad. Decía "Tarjeta o contra entrega"
+  // y contra entrega nunca existió en el checkout: prometerlo era invitar a un
+  // reclamo.
+  { icon: "card", title: "Pago seguro", sub: "Tarjeta, hasta 12 cuotas" },
 ];
 
 export default async function HomePage() {

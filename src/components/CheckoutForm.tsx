@@ -8,9 +8,11 @@ import { ShippingFields, type ShippingDefaults } from "@/components/ShippingFiel
 export function CheckoutForm({
   defaults,
   hasSavedProfile,
+  esInvitado,
 }: {
   defaults?: ShippingDefaults;
   hasSavedProfile: boolean;
+  esInvitado: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -37,17 +39,44 @@ export function CheckoutForm({
       }}
       className="flex flex-col gap-6"
     >
+      {/* Sin cuenta, el correo es el único hilo con el cliente: por ahí se le
+          avisa de su pedido. Va primero y aparte, para que se entienda que es
+          para eso y no un registro encubierto. */}
+      {esInvitado && (
+        <div className="flex flex-col gap-2">
+          <label htmlFor="email" className="text-[13px] font-semibold text-vt-fg">
+            Tu correo electrónico
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            inputMode="email"
+            placeholder="tucorreo@ejemplo.com"
+            className="rounded-[10px] border border-white/15 bg-white/[.04] px-4 py-3 text-[14px] text-vt-fg outline-none focus:border-vt-accent"
+          />
+          <p className="text-[12px] text-vt-muted-2">
+            Ahí te avisamos sobre tu pedido. No creamos ninguna cuenta ni te mandamos publicidad.
+          </p>
+        </div>
+      )}
+
       <ShippingFields defaults={defaults} />
 
-      <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-vt-muted-1">
-        <input
-          type="checkbox"
-          name="saveProfile"
-          defaultChecked={!hasSavedProfile}
-          className="h-4 w-4 accent-vt-accent"
-        />
-        Guardar esta dirección para mis próximas compras
-      </label>
+      {/* Un invitado no tiene perfil donde guardar la dirección. */}
+      {!esInvitado && (
+        <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-vt-muted-1">
+          <input
+            type="checkbox"
+            name="saveProfile"
+            defaultChecked={!hasSavedProfile}
+            className="h-4 w-4 accent-vt-accent"
+          />
+          Guardar esta dirección para mis próximas compras
+        </label>
+      )}
 
       {error && (
         <div className="rounded-lg border border-vt-error/30 bg-vt-error/10 px-4 py-3 text-[13px] text-vt-error">

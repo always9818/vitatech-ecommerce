@@ -31,9 +31,13 @@ function describeAuthError(code: string): string {
 export function LoginForm({
   googleEnabled,
   authError,
+  // Ya viene validado como ruta interna desde page.tsx. Sirve para que quien
+  // llega desde el checkout vuelva ahí y no a la portada, perdiendo su compra.
+  next = "/",
 }: {
   googleEnabled: boolean;
   authError?: string;
+  next?: string;
 }) {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
@@ -90,7 +94,7 @@ export function LoginForm({
       // cuenta seguía apuntando a /login y parecía que la sesión no había
       // funcionado. Recargar de verdad hace que el servidor vuelva a renderizar
       // todo con la sesión ya puesta.
-      window.location.href = "/";
+      window.location.href = next;
     });
   };
 
@@ -116,7 +120,10 @@ export function LoginForm({
           <ul className="mt-6 flex flex-col gap-3 text-[14px] text-vt-muted-1">
             <li>✓ Envío a todo el país</li>
             <li>✓ Garantía real con servicio técnico propio</li>
-            <li>✓ Pago seguro con tarjeta o contra entrega</li>
+            {/* Se ofrece SOLO lo que Recurrente procesa. Antes decía "o contra
+                entrega", que no existe en el checkout: prometerlo era invitar a
+                un reclamo. */}
+            <li>✓ Pago seguro con tarjeta, hasta 12 cuotas</li>
           </ul>
           <div className="mt-10 text-[12px] text-vt-muted-3">
             © {new Date().getFullYear()} Importadora Vitatech.
@@ -244,7 +251,7 @@ export function LoginForm({
                 disabled={googlePending}
                 onClick={() => {
                   setGooglePending(true);
-                  void signIn("google", { callbackUrl: "/" });
+                  void signIn("google", { callbackUrl: next });
                 }}
                 className="vt-btn flex items-center justify-center gap-2.5 rounded-[10px] border border-white/[.14] py-2.5 text-[13.5px] font-semibold text-vt-fg hover:border-vt-accent disabled:opacity-60"
               >

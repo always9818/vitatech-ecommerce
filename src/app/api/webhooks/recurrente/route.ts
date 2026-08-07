@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       const order = await prisma.order.update({
         where: { id: orderId },
         data: { status: "PAID" },
-        select: { id: true, userId: true, items: true },
+        select: { id: true, userId: true, guestId: true, items: true },
       });
 
       for (const item of order.items) {
@@ -134,10 +134,15 @@ export async function POST(request: Request) {
         console.error("[recurrente webhook] No se pudo contabilizar el cupón: %o", err);
       }
 
-      const cart = await prisma.cart.findUnique({
-        where: { userId: order.userId },
-        select: { id: true },
-      });
+      // El carrito se busca por quien compró: con cuenta, por `userId`; sin
+      // cuenta, por el `guestId` de su cookie que se guardó al crear el pedido.
+      // Antes esto era `where: { userId: order.userId }` a secas, y con un
+      // pedido de invitado (`userId` en null) Prisma habría reventado.
+      const cart = order.userId
+        ? await prisma.cart.findUnique({ where: { userId: order.userId }, select: { id: true } })
+        : order.guestId
+          ? await prisma.cart.findUnique({ where: { guestId: order.guestId }, select: { id: true } })
+          : null;
       if (cart) {
         await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
         await prisma.cart

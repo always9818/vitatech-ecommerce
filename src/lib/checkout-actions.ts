@@ -1,8 +1,11 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getCart } from "@/lib/cart-actions";
+import { GUEST_COOKIE } from "@/lib/cart-constants";
 import { createRecurrenteCheckout, AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
 import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
@@ -39,20 +42,49 @@ function applyDiscountToLineItems(
   return scaled;
 }
 
-export async function startCheckout(formData: FormData): Promise<{ url?: string; error?: string }> {
+/**
+ * Identifica a quien compra. Con sesión es su `userId`; sin sesión, el correo
+ * que escribió más el `vt_guest_id` de su cookie.
+ *
+ * El correo se exige solo a los invitados y NO es un capricho: sin cuenta, es
+ * el único modo de contactarlos sobre su pedido.
+ */
+async function identificarComprador(
+  formData: FormData
+): Promise<{ userId: string | null; guestEmail: string | null; guestId: string | null } | { error: string }> {
   const session = await auth();
-  if (!session?.user) {
-    return { error: "Debes iniciar sesión para finalizar tu compra." };
+  if (session?.user) {
+    return { userId: session.user.id, guestEmail: null, guestId: null };
   }
+
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const parsed = z.string().email().safeParse(email);
+  if (!parsed.success) {
+    return { error: "Escribe un correo válido: es a donde te avisamos sobre tu pedido." };
+  }
+
+  // Puede no existir si el carrito se armó antes de que la cookie se escribiera;
+  // no es motivo para bloquear una venta, solo significa que el webhook no
+  // podrá vaciarle el carrito solo.
+  const cookieStore = await cookies();
+  const guestId = cookieStore.get(GUEST_COOKIE)?.value ?? null;
+
+  return { userId: null, guestEmail: parsed.data, guestId };
+}
+
+export async function startCheckout(formData: FormData): Promise<{ url?: string; error?: string }> {
+  const comprador = await identificarComprador(formData);
+  if ("error" in comprador) return { error: comprador.error };
 
   const shipping_ = readShippingInput(formData);
   const shippingError = validateShipping(shipping_);
   if (shippingError) return { error: shippingError };
 
   // Guardar la dirección es secundario: si falla, la compra debe continuar.
-  if (formData.get("saveProfile") === "on") {
+  // Solo aplica a quien tiene cuenta — un invitado no tiene dónde guardarla.
+  if (comprador.userId && formData.get("saveProfile") === "on") {
     try {
-      await persistShippingProfile(session.user.id, shipping_);
+      await persistShippingProfile(comprador.userId, shipping_);
     } catch {
       /* no bloquea el checkout */
     }
@@ -79,7 +111,9 @@ export async function startCheckout(formData: FormData): Promise<{ url?: string;
 
   const order = await prisma.order.create({
     data: {
-      userId: session.user.id,
+      userId: comprador.userId,
+      guestEmail: comprador.guestEmail,
+      guestId: comprador.guestId,
       subtotal,
       shipping,
       discount,

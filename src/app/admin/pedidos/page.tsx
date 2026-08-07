@@ -57,10 +57,21 @@ export default async function AdminOrdersPage() {
               <li key={order.id} className="rounded-2xl border border-white/10 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <div className="text-[14.5px] font-bold text-vt-fg">
-                      {order.user.name ?? "Sin nombre"}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[14.5px] font-bold text-vt-fg">
+                        {/* Un pedido de invitado no tiene `user`: el nombre sale
+                            de quien recibe el envío. */}
+                        {order.user?.name ?? order.shipRecipientName ?? "Sin nombre"}
+                      </span>
+                      {!order.userId && (
+                        <span className="rounded-full border border-white/20 px-2 py-0.5 text-[10.5px] font-bold tracking-wide text-vt-muted-2 uppercase">
+                          Invitado
+                        </span>
+                      )}
                     </div>
-                    <div className="text-[12.5px] text-vt-muted-2">{order.user.email}</div>
+                    <div className="text-[12.5px] text-vt-muted-2">
+                      {order.user?.email ?? order.guestEmail ?? "Sin correo"}
+                    </div>
                   </div>
                   <div className="flex flex-col items-end gap-1.5">
                     <span

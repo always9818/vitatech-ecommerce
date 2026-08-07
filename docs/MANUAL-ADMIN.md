@@ -42,7 +42,7 @@ Es la primera pestaña del panel: **Pedidos**. Ahí ves todo lo que te han compr
 
 De cada pedido ves:
 
-- **Quién compró** (nombre y correo, por si necesitas contactarlo).
+- **Quién compró** (nombre y correo, por si necesitas contactarlo). Si el pedido lleva la etiqueta **INVITADO**, esa persona compró **sin crear cuenta**: el nombre es el de quien recibe el envío y el correo es el que dejó en el formulario. Para ti funciona igual — le escribes a ese correo y listo.
 - **Estado**: *Pendiente de pago* (todavía no paga), *Pagado* (ya puedes despachar), *Cancelado* o *Fallido*.
 - **Productos** con cantidades y precios.
 - **Entregar a**: nombre de quien recibe, teléfono, dirección completa con zona, municipio, departamento y el punto de referencia.
@@ -52,6 +52,8 @@ Arriba tienes el resumen: cuántos pedidos van, cuántos están pagados y cuánt
 > **Despacha solo los que digan "Pagado".** Un pedido "Pendiente de pago" significa que el cliente llegó hasta la pantalla de pago pero no la completó.
 
 > Los pedidos hechos **antes** de que existiera esta función no tienen dirección guardada. En esos casos verás un aviso y tendrás que escribirle al cliente por correo para confirmar a dónde enviarlo.
+
+> **Desde agosto de 2026 se puede comprar sin crear cuenta.** Antes el cliente tenía que registrarse antes de pagar, y esa es la razón #1 por la que la gente abandona un carrito. Ahora solo deja su correo. Los clientes que sí tienen cuenta siguen viendo su historial en "Mi cuenta"; un invitado no, porque no hay cuenta donde guardarlo — por eso su correo es importante.
 
 ---
 
