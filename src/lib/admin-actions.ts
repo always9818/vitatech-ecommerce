@@ -73,13 +73,18 @@ function parseSpecs(raw: string): { k: string; v: string }[] {
   return specs;
 }
 
-async function resolveImageUrls(formData: FormData, existing: string[]): Promise<string[]> {
-  const file = formData.get("image");
-  if (file instanceof File && file.size > 0) {
-    const url = await uploadProductImage(file);
-    return [url];
-  }
-  return existing;
+/**
+ * Arma la lista final de fotos: las que ya existían y el admin decidió
+ * conservar (`keepImages`, una por cada una que no marcó "Quitar" en el
+ * formulario) más las que se acaban de subir (`images`, campo con `multiple`).
+ * El orden que llega en `keepImages` es el que el formulario ya mostraba, así
+ * que las fotos no reordenan solas al guardar; las nuevas van al final.
+ */
+async function resolveImageUrls(formData: FormData): Promise<string[]> {
+  const conservadas = formData.getAll("keepImages").map(String);
+  const nuevos = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
+  const subidas = await Promise.all(nuevos.map((file) => uploadProductImage(file)));
+  return [...conservadas, ...subidas];
 }
 
 function readProductFields(formData: FormData) {
@@ -121,7 +126,9 @@ export async function createProduct(_prevState: ProductFormState, formData: Form
 
   try {
     const fields = readProductFields(formData);
-    const images = await resolveImageUrls(formData, []);
+    // Un producto nuevo no tiene fotos previas que conservar: todo lo que
+    // llega en `images` es nuevo.
+    const images = await resolveImageUrls(formData);
 
     await prisma.product.create({
       data: { ...fields, images },
@@ -148,11 +155,11 @@ export async function updateProduct(
   await requireAdmin();
 
   try {
-    const existing = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
     const fields = readProductFields(formData);
-    const removeImage = formData.get("removeImage") === "true";
-    const baseImages = removeImage ? [] : existing.images;
-    const images = await resolveImageUrls(formData, baseImages);
+    // `keepImages` ya trae exactamente cuáles fotos existentes el admin dejó
+    // (el formulario manda una por cada una que NO marcó "Quitar"), así que no
+    // hace falta volver a leer el producto de la base para saberlo.
+    const images = await resolveImageUrls(formData);
 
     await prisma.product.update({
       where: { id: productId },

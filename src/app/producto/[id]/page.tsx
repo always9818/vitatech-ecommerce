@@ -15,7 +15,7 @@ import { mensajeProducto, whatsappUrl } from "@/lib/whatsapp";
 import { DEPARTMENTS, type Department } from "@/lib/departments";
 import { AVAILABLE_INSTALLMENTS } from "@/lib/recurrente";
 import { ViewContentTracker } from "@/components/tracking/ViewContentTracker";
-import { ZoomableImage } from "@/components/ZoomableImage";
+import { ProductGallery } from "@/components/ProductGallery";
 
 const MAX_INSTALLMENTS = Math.max(...AVAILABLE_INSTALLMENTS);
 
@@ -127,31 +127,11 @@ export default async function ProductDetailPage({
       />
       <div className="grid grid-cols-1 gap-10 min-[880px]:grid-cols-[1.05fr_.95fr]">
         <div>
-          <div className="relative grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
-            {photos[0] ? (
-              <ZoomableImage
-                src={photos[0]}
-                alt={product.name}
-                containerClassName="absolute inset-0 h-full w-full cursor-zoom-in overflow-hidden"
-                className="h-full w-full object-contain p-6"
-              />
-            ) : (
+          {photos.length > 0 ? (
+            <ProductGallery photos={photos} alt={product.name} />
+          ) : (
+            <div className="relative grid h-[400px] place-items-center overflow-hidden rounded-2xl bg-white/[.05] text-vt-muted-3">
               <Icon name={fallbackIcon} className="h-28 w-28" />
-            )}
-          </div>
-          {photos.length > 1 && (
-            <div className="mt-3 grid grid-cols-4 gap-3">
-              {photos.slice(0, 4).map((src) => (
-                <div className="relative grid h-20 place-items-center overflow-hidden rounded-xl bg-white/[.05]" key={src}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={product.name}
-                    className="absolute inset-0 h-full w-full object-contain p-1.5"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
             </div>
           )}
         </div>

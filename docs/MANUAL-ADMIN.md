@@ -83,7 +83,7 @@ Al entrar al panel ves la lista completa de productos: nombre, SKU, categoría, 
 | Ícono de respaldo | Se elige de una lista. Para tecnología: Laptop, Celular, Monitor, Audífonos, Impresora… Para suplementos: **Bote de suplemento, Cápsulas o tabletas, Deportivo, Natural, Bienestar**. Es el dibujo de línea que se muestra mientras el producto todavía no tiene foto |
 | Descripción | Texto que se ve en la ficha del producto |
 | Especificaciones | Una línea por especificación, formato `Nombre: Valor`. Debajo del cuadro hay **botones de plantilla** (Tecnología, Suplemento, Proteína en polvo) que te lo dejan casi listo — solo llenas los valores |
-| Foto de producto | Sube una imagen (JPG, PNG, WEBP o GIF, máximo 5 MB) |
+| Fotos del producto | Puedes seleccionar **varias a la vez** (JPG, PNG, WEBP o GIF, máximo 5 MB cada una). La primera que subas es la que se ve en el catálogo y en las tarjetas; el cliente puede ver las demás haciendo clic en las miniaturas de la ficha |
 
 3. Dale clic a **"Crear producto"**.
 4. Te regresa automáticamente a la lista, con el producto ya creado arriba de todo.
@@ -105,11 +105,13 @@ Es igual que cualquier producto, con tres cosas propias:
 1. En la lista, dale clic a **"Editar"** junto al producto que quieras cambiar.
 2. El formulario aparece con todos los datos actuales ya llenos.
 3. Cambia lo que necesites (precio, stock, descripción, etc.).
-4. Si quieres **reemplazar la foto**: sube una nueva en el campo "Foto de producto" — la anterior se reemplaza automáticamente.
-5. Si quieres **quitar la foto** sin subir una nueva: dale clic a "Quitar foto" (aparece debajo de la foto actual), y el producto volverá a mostrar solo el ícono de respaldo.
-6. Dale clic a **"Guardar cambios"**.
+4. Vas a ver las fotos que ya tiene el producto, cada una con una **X** para quitarla. La que dice "Principal" es la que se ve en el catálogo.
+5. Para **agregar fotos nuevas** (sin perder las que ya tiene), selecciónalas en el campo de abajo — puedes elegir varias a la vez, o repetir el paso para ir agregando de a poco.
+6. Para **quitar una foto**, dale clic a la X en su esquina. Se quita de la vista al instante; no se borra de verdad hasta que le des a "Guardar cambios".
+7. Si quitas todas las fotos, el producto vuelve a mostrar solo el ícono de respaldo.
+8. Dale clic a **"Guardar cambios"**.
 
-> Las fotos que subas ahora sí se muestran en la tienda: en la tarjeta del catálogo, en la ficha del producto y en el carrito. Mientras un producto no tenga foto, se ve el ícono de línea que hayas elegido.
+> Las fotos que subas ahora sí se muestran en la tienda: en la tarjeta del catálogo, en la ficha del producto y en el carrito. Si subes más de una, el cliente puede pasar entre ellas haciendo clic en las miniaturas debajo de la foto grande de la ficha. Mientras un producto no tenga ninguna foto, se ve el ícono de línea que hayas elegido.
 
 ---
 

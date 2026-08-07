@@ -39,7 +39,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           oldPrice: product.oldPrice,
           stock: product.stock,
           specsText,
-          existingImage: product.images[0],
+          existingImages: product.images,
         }}
       />
     </div>
