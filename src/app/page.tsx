@@ -12,7 +12,7 @@ import { VitoMascot } from "@/components/Logo";
 const BENEFITS: { icon: IconName; title: string; sub: string }[] = [
   { icon: "truck", title: "Envío a todo el país", sub: "Gratis desde Q 299" },
   { icon: "chat", title: "Soporte por WhatsApp", sub: "Lun a sáb, 9am–6pm" },
-  { icon: "shield", title: "Garantía real", sub: "Servicio técnico propio" },
+  { icon: "shield", title: "Garantía real", sub: "Por desperfectos de fábrica" },
   // Solo lo que Recurrente procesa de verdad. Decía "Tarjeta o contra entrega"
   // y contra entrega nunca existió en el checkout: prometerlo era invitar a un
   // reclamo.

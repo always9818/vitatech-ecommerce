@@ -119,7 +119,7 @@ export function LoginForm({
           </h2>
           <ul className="mt-6 flex flex-col gap-3 text-[14px] text-vt-muted-1">
             <li>✓ Envío a todo el país</li>
-            <li>✓ Garantía real con servicio técnico propio</li>
+            <li>✓ Garantía real por desperfectos de fábrica</li>
             {/* Se ofrece SOLO lo que Recurrente procesa. Antes decía "o contra
                 entrega", que no existe en el checkout: prometerlo era invitar a
                 un reclamo. */}
