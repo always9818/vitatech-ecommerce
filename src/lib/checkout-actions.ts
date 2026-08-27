@@ -10,7 +10,7 @@ import { createRecurrenteCheckout, AVAILABLE_INSTALLMENTS } from "@/lib/recurren
 import { getCartCoupon } from "@/lib/coupon-actions";
 import { computeCouponDiscount } from "@/lib/coupon-utils";
 import { readShippingInput, validateShipping, shippingCostFor } from "@/lib/shipping";
-import { persistShippingProfile } from "@/lib/shipping-actions";
+import { persistShippingProfile } from "@/lib/shipping-store";
 
 
 // Recurrente factura por línea de producto (amount_in_cents, sin soporte de
@@ -96,6 +96,13 @@ export async function startCheckout(formData: FormData): Promise<{ url?: string;
   }
 
   for (const item of items) {
+    // El piso (`< 1`) es el segundo candado contra las cantidades negativas.
+    // El primero está en `addToCart`, pero conviene tenerlo también aquí: es
+    // el último punto antes de fijar el precio que se le cobra al cliente, y
+    // una línea negativa restaba del subtotal sin que nada la detuviera.
+    if (item.quantity < 1) {
+      return { error: "Tu carrito tiene una cantidad inválida. Vacíalo y vuelve a agregar los productos." };
+    }
     if (item.quantity > item.product.stock) {
       return { error: `"${item.product.name}" ya no tiene stock suficiente.` };
     }

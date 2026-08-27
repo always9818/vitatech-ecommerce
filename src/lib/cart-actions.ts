@@ -101,6 +101,15 @@ export async function getCart() {
 }
 
 export async function addToCart(productId: string, quantity = 1) {
+  // `quantity` llega del cliente y esta función es un endpoint público: todo
+  // export de un archivo "use server" lo es. Sin este piso, un `quantity`
+  // negativo atravesaba el `Math.min` de abajo y se guardaba tal cual, y una
+  // línea con cantidad negativa RESTA del subtotal. El checkout tampoco lo
+  // frenaba: su única comprobación era `quantity > stock`, que un número
+  // negativo cumple. Se podía armar un pedido por menos de lo que vale.
+  const piezas = Math.trunc(Number(quantity));
+  if (!Number.isFinite(piezas) || piezas < 1) return;
+
   const cart = await getOrCreateCart();
   const product = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
 
@@ -108,7 +117,7 @@ export async function addToCart(productId: string, quantity = 1) {
     where: { cartId_productId: { cartId: cart.id, productId } },
   });
 
-  const nextQty = Math.min(product.stock, (existing?.quantity ?? 0) + quantity);
+  const nextQty = Math.max(1, Math.min(product.stock, (existing?.quantity ?? 0) + piezas));
 
   await prisma.cartItem.upsert({
     where: { cartId_productId: { cartId: cart.id, productId } },
@@ -120,6 +129,12 @@ export async function addToCart(productId: string, quantity = 1) {
 }
 
 export async function changeCartQty(productId: string, delta: number) {
+  // Mismo motivo que en addToCart: `delta` es entrada del cliente. Aquí un
+  // valor absurdo no abarata nada (el resultado se acota igual y un total <= 0
+  // borra la línea), pero se normaliza para no escribir basura en la base.
+  const paso = Math.trunc(Number(delta));
+  if (!Number.isFinite(paso) || paso === 0) return;
+
   const cart = await getOrCreateCart();
   const existing = await prisma.cartItem.findUnique({
     where: { cartId_productId: { cartId: cart.id, productId } },
@@ -127,7 +142,7 @@ export async function changeCartQty(productId: string, delta: number) {
   if (!existing) return;
 
   const product = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
-  const nextQty = Math.min(product.stock, existing.quantity + delta);
+  const nextQty = Math.min(product.stock, existing.quantity + paso);
 
   if (nextQty <= 0) {
     await prisma.cartItem.delete({ where: { id: existing.id } });
