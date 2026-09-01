@@ -66,11 +66,23 @@
     { "pattern": "importadoravitatech.com/*", "zone_name": "importadoravitatech.com" },
     { "pattern": "www.importadoravitatech.com/*", "zone_name": "importadoravitatech.com" }
   ],
-  // Cada hora, en punto: revisa carritos abandonados y manda el recordatorio
-  // a los que ya llevan quietos el tiempo suficiente (ver custom-worker.ts y
-  // src/lib/abandoned-cart.ts).
+  // Dos disparadores, y custom-worker.ts decide qué hacer según cuál entró
+  // (Cloudflare pasa la expresión en `event.cron`):
+  //
+  //   "0 * * * *"    cada hora en punto: revisa carritos abandonados y manda
+  //                  el recordatorio a los que llevan quietos el tiempo
+  //                  suficiente (ver src/lib/abandoned-cart.ts).
+  //   "*/5 * * * *"  cada 5 minutos: solo un SELECT 1 para que Prisma
+  //                  Postgres no se suspenda por inactividad. Sin esto, el
+  //                  primer visitante tras el sueño se come 21 segundos y un
+  //                  error 1101 (medido en producción).
+  //
+  // A las en punto coinciden los dos y Cloudflare invoca el handler dos
+  // veces, una por expresión. No es un problema: el barrido de carritos es
+  // idempotente (compara abandonedEmailSentAt con updatedAt) y el ping no
+  // escribe nada.
   "triggers": {
-    "crons": ["0 * * * *"]
+    "crons": ["0 * * * *", "*/5 * * * *"]
   },
   "observability": {
     "enabled": true
