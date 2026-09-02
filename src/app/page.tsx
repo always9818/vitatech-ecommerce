@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCategoriesWithStock, getFeaturedProducts, getDepartmentCounts } from "@/lib/catalog";
 import { DEPARTMENTS, DEPARTMENT_ORDER } from "@/lib/departments";
 import { ProductCard } from "@/components/ProductCard";
+import { foto, fotoSrcSet, ANCHOS_BANNER } from "@/lib/imagen";
 import { Icon, type IconName } from "@/components/Icon";
 import { resolveCategoryIcon } from "@/lib/product-icon";
 import { getSiteSettings, resolveHeroContent } from "@/lib/site-settings";
@@ -46,6 +47,15 @@ export default async function HomePage() {
   })).filter((d) => d.items.length > 0);
 
   const heroImage = settings?.heroImageUrl;
+
+  // El banner es la imagen mas grande de la portada y la primera que se ve
+  // (1600x700 reales para dibujarse a 727x409, medido el 2026-08-27). Se
+  // calcula aqui, en el servidor, porque HeroCarousel es "use client".
+  const slidesConFoto = slides.map((slide) => ({
+    ...slide,
+    src: foto(slide.imageUrl, 960),
+    srcSet: fotoSrcSet(slide.imageUrl, ANCHOS_BANNER),
+  }));
   const hero = resolveHeroContent(settings);
 
   return (
@@ -55,13 +65,19 @@ export default async function HomePage() {
           secciones sueltas una debajo de la otra. */}
       <div className="grid grid-cols-1 gap-5 min-[980px]:grid-cols-[1.9fr_1fr]">
         {slides.length > 0 ? (
-          <HeroCarousel slides={slides} />
+          <HeroCarousel slides={slidesConFoto} />
         ) : (
           <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[.04]">
             <div className="relative aspect-[4/3] w-full min-[560px]:aspect-[16/9]">
               {heroImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-contain" />
+                <img
+                  src={foto(heroImage, 960)}
+                  srcSet={fotoSrcSet(heroImage, ANCHOS_BANNER)}
+                  sizes="(max-width: 980px) 96vw, 62vw"
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
               ) : (
                 <div className="absolute inset-0 grid place-items-center text-vt-muted-3">
                   <Icon name="image" className="h-16 w-16" />
@@ -204,9 +220,19 @@ export default async function HomePage() {
 
       {/* Una fila de destacados por departamento. Con un solo departamento con
           productos, el título vuelve a ser simplemente "Destacados". */}
-      {destacadosPorDepartamento.map(({ department, productos }) => {
+      {destacadosPorDepartamento.map(({ department, productos }, seccion) => {
         const info = DEPARTMENTS[department];
         const unicoDepartamento = destacadosPorDepartamento.length === 1;
+        // El `index` de ProductCard decide dos cosas: qué fotos se bajan de
+        // inmediato (las 4 primeras) y el escalonado de la animación. Tiene
+        // que ser CONTINUO entre secciones. Con `i` reiniciándose en cada
+        // departamento, las 8 tarjetas de la portada salían con index 0-3 y
+        // el navegador se bajaba las 8 fotos de golpe al abrir la página —
+        // justo lo que el `loading="lazy"` estaba para evitar. Verificado en
+        // vivo el 2026-08-27: las 8 con loading="eager".
+        const yaMostrados = destacadosPorDepartamento
+          .slice(0, seccion)
+          .reduce((total, s) => total + s.productos.length, 0);
         return (
           <section key={department} className="mt-14">
             <div className="flex items-end justify-between gap-4">
@@ -228,7 +254,7 @@ export default async function HomePage() {
             </div>
             <div className="mt-6 grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 min-[880px]:grid-cols-4">
               {productos.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} />
+                <ProductCard key={p.id} product={p} index={yaMostrados + i} />
               ))}
             </div>
           </section>

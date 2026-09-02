@@ -7,7 +7,16 @@ import { Icon } from "@/components/Icon";
 
 const AUTOPLAY_MS = 6000;
 
-export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
+/**
+ * `src` y `srcSet` los calcula page.tsx (componente de servidor) con los
+ * ayudantes de `@/lib/imagen`: aqui no se puede, porque este archivo es
+ * "use client" y el interruptor IMAGENES_OPTIMIZADAS no viaja al navegador.
+ * Cuando vienen vacios se usa `imageUrl` tal cual, que es el comportamiento
+ * de siempre.
+ */
+type SlideConFoto = HeroSlideView & { src?: string; srcSet?: string };
+
+export function HeroCarousel({ slides }: { slides: SlideConFoto[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const total = slides.length;
@@ -47,7 +56,11 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
           const image = (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
-              src={slide.imageUrl}
+              src={slide.src ?? slide.imageUrl}
+              srcSet={slide.srcSet}
+              // El banner ocupa casi todo el ancho en movil y ~62% en
+              // escritorio, donde comparte fila con el panel de la derecha.
+              sizes="(max-width: 980px) 96vw, 62vw"
               alt={slide.alt ?? ""}
               className="absolute inset-0 h-full w-full object-contain"
               loading={i === 0 ? "eager" : "lazy"}

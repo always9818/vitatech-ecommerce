@@ -3,6 +3,7 @@ import { money, discountPct } from "@/lib/money";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { Icon } from "@/components/Icon";
 import { resolveProductIcon } from "@/lib/product-icon";
+import { foto, fotoSrcSet, ANCHOS_TARJETA } from "@/lib/imagen";
 
 type CardProduct = {
   id: string;
@@ -31,7 +32,16 @@ export function ProductCard({ product, index = 0 }: { product: CardProduct; inde
           {photo ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={photo}
+              // La tarjeta se dibuja a 269x170 en escritorio, pero varias
+              // fotos del catálogo son de 1200-1600 px. Con el interruptor
+              // IMAGENES_OPTIMIZADAS apagado esto devuelve la url tal cual y
+              // `srcSet` queda en undefined, o sea exactamente lo de antes.
+              src={foto(photo, 480)}
+              srcSet={fotoSrcSet(photo, ANCHOS_TARJETA)}
+              // 1 columna hasta 520px, 2 hasta 880px, 4 de ahí en adelante:
+              // hay que decírselo al navegador o asume 100vw y pide la
+              // variante más grande de todas.
+              sizes="(max-width: 520px) 92vw, (max-width: 880px) 46vw, 280px"
               alt={product.name}
               // `overflow-hidden` en el contenedor padre recorta el acercamiento:
               // la imagen crece pero nunca se sale de la tarjeta ni empuja el

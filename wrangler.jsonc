@@ -44,6 +44,13 @@
     }
   ],
   "vars": {
+    // Interruptor de las transformaciones de imagen de Cloudflare (ver
+    // src/lib/imagen.ts). En "0" la tienda sirve las fotos tal cual, como
+    // siempre. Ponerlo en "1" SOLO despues de habilitar Speed -> Optimization
+    // -> Image Transformations en el panel, incluyendo "Resize images from
+    // any origin" (las fotos viven en el bucket publico pub-*.r2.dev, que es
+    // otro origen). Sin ese paso, todas las fotos darian 404.
+    "IMAGENES_OPTIMIZADAS": "0",
     "R2_PUBLIC_URL": "https://pub-f5e3eee06ae444ed8a574cb56350cc48.r2.dev",
     "NEXT_PUBLIC_APP_URL": "https://importadoravitatech.com",
     "NEXTAUTH_URL": "https://importadoravitatech.com",
