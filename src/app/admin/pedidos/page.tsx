@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { formatOrderShipping } from "@/lib/shipping";
 import { VitoMascot } from "@/components/Logo";
 
-export const metadata = { title: "Pedidos · Panel VITATECH_" };
+export const metadata = { title: "Pedidos · Panel" };
 
 const STATUS: Record<string, { text: string; className: string }> = {
   PENDING: { text: "Pendiente de pago", className: "border-white/20 text-vt-muted-1" },

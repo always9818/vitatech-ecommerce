@@ -3,7 +3,7 @@ import { verifyResetToken } from "@/lib/password-reset-actions";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 import { Icon } from "@/components/Icon";
 
-export const metadata = { title: "Restablecer contraseña · VITATECH_" };
+export const metadata = { title: "Restablecer contraseña" };
 
 export default async function ResetPasswordPage({
   searchParams,

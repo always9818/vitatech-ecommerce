@@ -1,6 +1,6 @@
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-export const metadata = { title: "Recuperar contraseña · VITATECH_" };
+export const metadata = { title: "Recuperar contraseña" };
 
 export default function ForgotPasswordPage() {
   return (

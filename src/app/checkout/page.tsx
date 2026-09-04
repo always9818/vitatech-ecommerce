@@ -9,7 +9,7 @@ import { shippingCostFor } from "@/lib/shipping";
 import { CheckoutForm } from "@/components/CheckoutForm";
 import { InitiateCheckoutTracker } from "@/components/tracking/InitiateCheckoutTracker";
 
-export const metadata = { title: "Datos de envío · VITATECH_" };
+export const metadata = { title: "Datos de envío" };
 
 export default async function CheckoutPage() {
   // Ya NO se redirige a /login. Obligar a crear cuenta antes de pagar era la

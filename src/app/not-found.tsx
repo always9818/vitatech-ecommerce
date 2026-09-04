@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { VitoMascot } from "@/components/Logo";
 
-export const metadata = { title: "Página no encontrada · VITATECH_" };
+export const metadata = { title: "Página no encontrada" };
 
 export default function NotFound() {
   return (

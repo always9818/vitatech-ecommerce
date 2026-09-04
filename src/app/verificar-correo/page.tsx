@@ -3,7 +3,7 @@ import { estadoDelToken } from "@/lib/email-verification-actions";
 import { VerifyForm } from "./VerifyForm";
 import { Icon } from "@/components/Icon";
 
-export const metadata = { title: "Confirmar correo · VITATECH_" };
+export const metadata = { title: "Confirmar correo" };
 
 export default async function VerificarCorreoPage({
   searchParams,
