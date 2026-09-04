@@ -81,9 +81,19 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
  * Recurrente. Por eso se envía solo para pedidos de invitado (lo decide quien
  * llama a esta función, viendo si `order.userId` es null), no para todos.
  */
-export async function sendGuestOrderConfirmationEmail(
+/**
+ * Confirmacion de compra para CUALQUIER cliente, tenga cuenta o no.
+ *
+ * Hasta el 2026-09-02 solo se le mandaba a los invitados, con el razonamiento
+ * de que quien tiene cuenta ya lo ve en "Mi cuenta". Pero eso obliga al
+ * cliente a entrar a buscarlo: lo unico que le llegaba al correo era el
+ * recibo de Recurrente, con la marca de la pasarela y no la nuestra. El
+ * parrafo del cierre es lo unico que cambia entre los dos casos.
+ */
+export async function sendOrderConfirmationEmail(
   to: string,
-  order: { id: string; total: number; items: { name: string; quantity: number; unitPrice: number }[] }
+  order: { id: string; total: number; items: { name: string; quantity: number; unitPrice: number }[] },
+  opts: { tieneCuenta: boolean } = { tieneCuenta: false }
 ) {
   if (!isEmailEnabled()) {
     console.error(
@@ -142,8 +152,12 @@ export async function sendGuestOrderConfirmationEmail(
           </a>
         </p>
         <p style="font-size: 13px; color: #57534e;">
-          Como compraste sin crear una cuenta, este correo es tu comprobante — guárdalo. Si tienes
-          alguna duda sobre tu pedido, escríbenos por WhatsApp al +502 5335-3561.
+          ${
+            opts.tieneCuenta
+              ? "También puedes seguir tu pedido desde <b>Mi cuenta</b> cuando quieras."
+              : "Como compraste sin crear una cuenta, este correo es tu comprobante — guárdalo."
+          }
+          Si tienes alguna duda sobre tu pedido, escríbenos por WhatsApp al +502 5335-3561.
         </p>
       </div>
     `,
@@ -195,6 +209,101 @@ export async function sendAbandonedCartEmail(
         </p>
         <p style="font-size: 13px; color: #57534e;">
           Si ya no te interesa, puedes ignorar este correo — tu carrito no vence.
+        </p>
+      </div>
+    `,
+  });
+}
+
+
+export type PedidoParaAviso = {
+  id: string;
+  total: number;
+  items: { name: string; quantity: number; unitPrice: number }[];
+  correoCliente: string | null;
+  tieneCuenta: boolean;
+  envio: {
+    recipientName: string;
+    phone: string;
+    department: string;
+    municipality: string;
+    addressLine: string;
+    zone: string | null;
+    reference: string | null;
+  } | null;
+};
+
+/**
+ * Avisa a la tienda que entro un pedido pagado.
+ *
+ * Hasta el 2026-09-02 la unica forma de enterarse era entrar a
+ * /admin/pedidos: un pedido que caia un domingo en la noche esperaba a que
+ * alguien se acordara de revisar. Lleva la direccion completa para poder
+ * despachar sin abrir el panel.
+ *
+ * El destinatario sale de ADMIN_NOTIFY_EMAIL. Sin esa variable no se manda
+ * nada y queda el aviso en los logs: mejor eso que adivinar una direccion y
+ * que los correos reboten en silencio.
+ */
+export async function sendNewOrderAdminEmail(order: PedidoParaAviso) {
+  const to = process.env.ADMIN_NOTIFY_EMAIL;
+  if (!to) {
+    console.error("[email] Falta ADMIN_NOTIFY_EMAIL; no se avisó del pedido %s", order.id);
+    return;
+  }
+  if (!isEmailEnabled()) {
+    console.error("[email] Envío deshabilitado (falta RESEND_API_KEY); no se avisó del pedido", order.id);
+    return;
+  }
+
+  const filas = order.items
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding: 6px 0; border-bottom: 1px solid #e7e5e4;">${it.name} × ${it.quantity}</td>
+          <td style="padding: 6px 0; border-bottom: 1px solid #e7e5e4; text-align: right; white-space: nowrap;">${money(it.unitPrice * it.quantity)}</td>
+        </tr>`
+    )
+    .join("");
+
+  const e = order.envio;
+  const direccion = e
+    ? [
+        `<b>${e.recipientName}</b> — ${e.phone}`,
+        e.addressLine,
+        e.zone ? `Zona ${e.zone}` : null,
+        `${e.municipality}, ${e.department}`,
+        e.reference ? `Referencia: ${e.reference}` : null,
+      ]
+        .filter(Boolean)
+        .join("<br />")
+    : "Sin datos de envío.";
+
+  await sendEmail({
+    to,
+    subject: `Pedido nuevo ${order.id.slice(-8)} · ${money(order.total)}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; background: #ffffff; color: #1a2e05;">
+        <h1 style="font-size: 18px; margin: 0 0 4px;">Entró un pedido pagado</h1>
+        <p style="margin: 0 0 16px; color: #57534e; font-size: 13px;">
+          ${order.id} · ${order.tieneCuenta ? "cliente con cuenta" : "compra como invitado"}
+          ${order.correoCliente ? ` · ${order.correoCliente}` : ""}
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+          ${filas}
+          <tr>
+            <td style="padding: 10px 0; font-weight: bold;">Total</td>
+            <td style="padding: 10px 0; font-weight: bold; text-align: right;">${money(order.total)}</td>
+          </tr>
+        </table>
+        <div style="background: #f5f5f4; border-radius: 10px; padding: 14px; font-size: 14px; line-height: 1.6;">
+          <div style="font-weight: bold; margin-bottom: 6px;">Enviar a</div>
+          ${direccion}
+        </div>
+        <p style="margin-top: 20px;">
+          <a href="${SITE_URL}/admin/pedidos" style="display: inline-block; background: #a3e635; color: #1a2e05; font-weight: bold; padding: 10px 20px; border-radius: 10px; text-decoration: none;">
+            Abrir el panel
+          </a>
         </p>
       </div>
     `,

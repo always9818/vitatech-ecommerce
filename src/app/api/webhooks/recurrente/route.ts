@@ -3,7 +3,7 @@ import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { verifyRecurrenteWebhookSignature } from "@/lib/recurrente";
 import { TAG_CATALOGO } from "@/lib/cache-tags";
-import { sendGuestOrderConfirmationEmail } from "@/lib/email";
+import { sendOrderConfirmationEmail, sendNewOrderAdminEmail } from "@/lib/email";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -94,6 +94,19 @@ export async function POST(request: Request) {
           guestId: true,
           guestEmail: true,
           total: true,
+          // El correo del titular, para poder confirmarle la compra tambien a
+          // quien SI tiene cuenta.
+          user: { select: { email: true } },
+          // Copia congelada de la direccion: va en el aviso a la tienda para
+          // poder despachar sin abrir el panel. Todos opcionales en el
+          // esquema, porque los pedidos viejos no la tienen.
+          shipRecipientName: true,
+          shipPhone: true,
+          shipDepartment: true,
+          shipMunicipality: true,
+          shipAddressLine: true,
+          shipZone: true,
+          shipReference: true,
           items: { select: { productId: true, quantity: true, unitPrice: true, product: { select: { name: true } } } },
         },
       });
@@ -105,25 +118,68 @@ export async function POST(request: Request) {
         });
       }
 
-      // Un cliente con cuenta ve su pedido en "Mi cuenta"; un invitado no
-      // tiene dónde, así que este correo es su único comprobante aparte del
-      // recibo de Recurrente. Va en su propio try/catch por la misma razón
-      // que el conteo del cupón y la caché: que el correo falle nunca debe
-      // tumbar la confirmación de un pago ya cobrado.
-      if (!order.userId && order.guestEmail) {
+      const lineas = order.items.map((it) => ({
+        name: it.product.name,
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+      }));
+
+      // El correo de confirmación va para TODOS, no solo invitados. Antes la
+      // condición era `!order.userId && order.guestEmail`, con el argumento de
+      // que quien tiene cuenta ya lo ve en "Mi cuenta" — pero eso lo obliga a
+      // entrar a buscarlo, y lo único que le llegaba al buzón era el recibo de
+      // Recurrente, con la marca de la pasarela y no la nuestra.
+      //
+      // Todo lo que sigue va en try/catch por la misma razón que el conteo del
+      // cupón y la caché: que un correo falle nunca debe tumbar la
+      // confirmación de un pago ya cobrado.
+      const correoCliente = order.guestEmail ?? order.user?.email ?? null;
+      if (correoCliente) {
         try {
-          await sendGuestOrderConfirmationEmail(order.guestEmail, {
-            id: order.id,
-            total: order.total,
-            items: order.items.map((it) => ({
-              name: it.product.name,
-              quantity: it.quantity,
-              unitPrice: it.unitPrice,
-            })),
-          });
+          await sendOrderConfirmationEmail(
+            correoCliente,
+            { id: order.id, total: order.total, items: lineas },
+            { tieneCuenta: Boolean(order.userId) }
+          );
         } catch (err) {
-          console.error("[recurrente webhook] No se pudo enviar la confirmación al invitado: %o", err);
+          console.error("[recurrente webhook] No se pudo enviar la confirmación al cliente: %o", err);
         }
+      }
+
+      // Aviso a la tienda. Antes la única forma de enterarse de una venta era
+      // entrar a /admin/pedidos: un pedido de domingo por la noche esperaba a
+      // que alguien se acordara de revisar.
+      try {
+        // Los campos de envío son opcionales en el esquema (los pedidos
+        // anteriores a esa función no los tienen), así que solo se arma el
+        // bloque de dirección cuando están los que de verdad hacen falta.
+        const envio =
+          order.shipRecipientName &&
+          order.shipPhone &&
+          order.shipDepartment &&
+          order.shipMunicipality &&
+          order.shipAddressLine
+            ? {
+                recipientName: order.shipRecipientName,
+                phone: order.shipPhone,
+                department: order.shipDepartment,
+                municipality: order.shipMunicipality,
+                addressLine: order.shipAddressLine,
+                zone: order.shipZone,
+                reference: order.shipReference,
+              }
+            : null;
+
+        await sendNewOrderAdminEmail({
+          id: order.id,
+          total: order.total,
+          items: lineas,
+          correoCliente,
+          tieneCuenta: Boolean(order.userId),
+          envio,
+        });
+      } catch (err) {
+        console.error("[recurrente webhook] No se pudo avisar del pedido nuevo: %o", err);
       }
 
       // El stock que se acaba de descontar es el que la tienda muestra como
