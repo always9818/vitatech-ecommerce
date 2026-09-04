@@ -67,11 +67,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
             update: {
               name: user.name ?? undefined,
               image: user.image ?? undefined,
+              // Google ya comprobó que el correo es suyo (se exige
+              // `email_verified` unas líneas arriba), así que no tiene sentido
+              // mandarlo a confirmar lo mismo otra vez.
+              emailVerified: new Date(),
             },
             create: {
               email,
               name: user.name ?? null,
               image: user.image ?? null,
+              emailVerified: new Date(),
             },
           });
 

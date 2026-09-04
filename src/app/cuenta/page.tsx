@@ -7,6 +7,7 @@ import { formatOrderShipping } from "@/lib/shipping";
 import { ShippingProfileForm } from "@/components/ShippingProfileForm";
 import { VitoMascot } from "@/components/Logo";
 import { SignOutButton } from "@/components/SignOutButton";
+import { VerificarCorreoAviso } from "@/components/VerificarCorreoAviso";
 
 const STATUS_LABEL: Record<string, { text: string; className: string }> = {
   PENDING: { text: "Pendiente de pago", className: "text-vt-muted-1" },
@@ -19,13 +20,18 @@ export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const [profile, orders] = await Promise.all([
+  const [profile, orders, cuenta] = await Promise.all([
     getShippingProfile(),
     prisma.order.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
       include: { items: { include: { product: { select: { name: true } } } } },
     }),
+    // `select` explícito: si la migración de verificación todavía no se aplicó,
+    // esta consulta falla sola y no se lleva por delante la página entera.
+    prisma.user
+      .findUnique({ where: { id: session.user.id }, select: { emailVerified: true } })
+      .catch(() => null),
   ]);
 
   const q = (n: number) => `Q ${n.toLocaleString("es-GT")}`;
@@ -40,6 +46,11 @@ export default async function AccountPage() {
         <div className="mt-4 text-[13px] text-vt-muted-2">Correo</div>
         <div className="text-[15px] font-semibold text-vt-fg">{session.user.email}</div>
       </div>
+
+      {/* Solo cuando se sabe con certeza que falta confirmar. Si la consulta
+          falló (migración sin aplicar), `cuenta` es null y no se muestra
+          nada — mejor callar que alarmar sin motivo. */}
+      {cuenta && !cuenta.emailVerified && <VerificarCorreoAviso />}
 
       <section className="mt-8">
         <h2 className="font-heading text-[19px] font-bold text-white">Dirección de envío</h2>

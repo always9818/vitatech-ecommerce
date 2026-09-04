@@ -83,8 +83,8 @@ export async function resetPassword(
   const rawToken = String(formData.get("token") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  if (password.length < 6) {
-    return { error: "La contraseña debe tener al menos 6 caracteres." };
+  if (password.length < 8) {
+    return { error: "La contraseña debe tener al menos 8 caracteres." };
   }
 
   const token = await prisma.passwordResetToken.findUnique({

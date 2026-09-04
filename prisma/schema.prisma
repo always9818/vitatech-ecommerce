@@ -44,6 +44,13 @@ model User {
   // Foto de perfil que devuelve Google al iniciar sesión.
   image         String?
   role          UserRole  @default(CUSTOMER)
+  /// Fecha en que el cliente confirmó que el correo es suyo. Nulo = sin
+  /// confirmar, que es el estado de todas las cuentas anteriores a esta
+  /// función. NO bloquea el inicio de sesión a propósito: hacerlo dejaría
+  /// fuera a los clientes que ya existen. Sirve para dos cosas — saber que se
+  /// le puede escribir de verdad, y poder enlazarle los pedidos que hizo como
+  /// invitado con ese mismo correo.
+  emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -52,11 +59,26 @@ model User {
   reviews             Review[]
   shippingProfile     ShippingProfile?
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 }
 
 /// Enlace de un solo uso para restablecer la contraseña. Se guarda el hash del
 /// token, no el token en sí: si alguien llegara a leer la base de datos, no
 /// podría fabricar un enlace válido con esos datos.
+/// Calcado de PasswordResetToken: se guarda el HASH del token, no el token, de
+/// modo que ni con la base en la mano se puede confirmar el correo de nadie.
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
 model PasswordResetToken {
   id        String    @id @default(cuid())
   userId    String

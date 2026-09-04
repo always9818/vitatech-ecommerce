@@ -324,3 +324,43 @@ export async function sendNewOrderAdminEmail(order: PedidoParaAviso) {
     `,
   });
 }
+
+
+/**
+ * Pide al cliente recien registrado que confirme que el correo es suyo.
+ *
+ * Mismo molde que sendPasswordResetEmail: el enlace lleva el token en claro
+ * (de la base solo sale su hash), vence, y sirve una sola vez.
+ */
+export async function sendEmailVerificationEmail(to: string, verifyUrl: string) {
+  if (!isEmailEnabled()) {
+    console.error("[email] Envío deshabilitado (falta RESEND_API_KEY); enlace de verificación no enviado:", verifyUrl);
+    return;
+  }
+
+  await sendEmail({
+    to,
+    subject: "Confirma tu correo en VITATECH",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #ffffff; color: #1a2e05;">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <img src="${SITE_URL}/vito-mascota.png" alt="Vito, la mascota de Vitatech" width="96" height="96" style="display: inline-block; border-radius: 50%;" />
+        </div>
+        <h1 style="font-size: 20px; text-align: center;">¡Bienvenido a VITATECH!</h1>
+        <p>Soy Vito. Solo falta un paso: confirmá que este correo es tuyo.</p>
+        <p>
+          <a href="${verifyUrl}" style="display: inline-block; background: #a3e635; color: #1a2e05; font-weight: bold; padding: 12px 24px; border-radius: 10px; text-decoration: none;">
+            Confirmar mi correo
+          </a>
+        </p>
+        <p style="font-size: 13px; color: #57534e;">
+          El enlace vence en 24 horas. Podés seguir comprando mientras tanto — confirmarlo solo
+          nos sirve para estar seguros de que te llegan los avisos de tus pedidos.
+        </p>
+        <p style="font-size: 13px; color: #57534e;">
+          Si no creaste esta cuenta, ignorá este correo: sin confirmar no pasa nada.
+        </p>
+      </div>
+    `,
+  });
+}

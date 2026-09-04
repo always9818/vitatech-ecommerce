@@ -1,42 +1,41 @@
 import Link from "next/link";
-import { verifyResetToken } from "@/lib/password-reset-actions";
-import { ResetPasswordForm } from "./ResetPasswordForm";
+import { estadoDelToken } from "@/lib/email-verification-actions";
+import { VerifyForm } from "./VerifyForm";
 import { Icon } from "@/components/Icon";
 
-export const metadata = { title: "Restablecer contraseña · VITATECH_" };
+export const metadata = { title: "Confirmar correo · VITATECH_" };
 
-export default async function ResetPasswordPage({
+export default async function VerificarCorreoPage({
   searchParams,
 }: {
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  const result = await verifyResetToken(token ?? "");
+  const estado = await estadoDelToken(token ?? "");
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-260px)] max-w-[420px] flex-col justify-center px-6 py-16">
-      {result.valid ? (
+      {estado.valido ? (
         <>
-          <h1 className="font-heading text-[24px] font-bold text-white">
-            Crea una contraseña nueva
-          </h1>
+          <h1 className="font-heading text-[24px] font-bold text-white">Confirma tu correo</h1>
           <p className="mt-2 mb-8 text-[14px] text-vt-muted-1">
-            Elige una contraseña de al menos 8 caracteres.
+            Un clic y listo. Así sabemos que te llegan los avisos de tus pedidos.
           </p>
-          <ResetPasswordForm token={token ?? ""} />
+          <VerifyForm token={token ?? ""} />
         </>
       ) : (
         <div className="flex flex-col items-center gap-3 text-center">
           <Icon name="xCircle" className="h-10 w-10 text-vt-error" />
-          <h1 className="font-heading text-[20px] font-bold text-white">{result.reason}</h1>
+          <h1 className="font-heading text-[20px] font-bold text-white">{estado.motivo}</h1>
           <p className="text-[14px] text-vt-muted-1">
-            Pide un enlace nuevo — los enlaces solo funcionan una vez y vencen después de una hora.
+            Los enlaces solo funcionan una vez y vencen a las 24 horas. Puedes pedir uno nuevo desde
+            Mi cuenta.
           </p>
           <Link
-            href="/olvide-contrasena"
+            href="/cuenta"
             className="vt-btn vt-btn-accent mt-2 rounded-[10px] bg-vt-accent px-6 py-3 text-sm font-extrabold text-vt-accent-fg"
           >
-            Pedir un enlace nuevo
+            Ir a Mi cuenta
           </Link>
         </div>
       )}
