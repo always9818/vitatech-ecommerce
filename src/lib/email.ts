@@ -231,6 +231,12 @@ export type PedidoParaAviso = {
     zone: string | null;
     reference: string | null;
   } | null;
+  /**
+   * Productos que ya no tenian existencia cuando llego el pago. Va aqui y no
+   * solo a los logs porque de un console.error nadie se entera: esto es
+   * justamente lo que hay que ver antes de que el cliente reclame.
+   */
+  sobreventa?: string[];
 };
 
 /**
@@ -281,10 +287,19 @@ export async function sendNewOrderAdminEmail(order: PedidoParaAviso) {
 
   await sendEmail({
     to,
-    subject: `Pedido nuevo ${order.id.slice(-8)} · ${money(order.total)}`,
+    subject: `${order.sobreventa?.length ? "⚠ SOBREVENTA · " : ""}Pedido nuevo ${order.id.slice(-8)} · ${money(order.total)}`,
     html: `
       <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; background: #ffffff; color: #1a2e05;">
         <h1 style="font-size: 18px; margin: 0 0 4px;">Entró un pedido pagado</h1>
+        ${
+          order.sobreventa?.length
+            ? `<div style="background: #fee2e2; border-left: 4px solid #c1342a; border-radius: 6px; padding: 12px 14px; margin: 12px 0; font-size: 14px; line-height: 1.6;">
+                 <b>Se vendió más de lo que había en existencia.</b><br />
+                 ${order.sobreventa.join("<br />")}<br />
+                 El cobro ya se hizo. Conviene llamar al cliente antes de que reclame.
+               </div>`
+            : ""
+        }
         <p style="margin: 0 0 16px; color: #57534e; font-size: 13px;">
           ${order.id} · ${order.tieneCuenta ? "cliente con cuenta" : "compra como invitado"}
           ${order.correoCliente ? ` · ${order.correoCliente}` : ""}

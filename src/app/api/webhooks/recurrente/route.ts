@@ -111,11 +111,34 @@ export async function POST(request: Request) {
         },
       });
 
+      // La condición del stock va DENTRO del where, no en un if aparte: así la
+      // comprobación y la resta ocurren en la misma operación y no hay ventana
+      // entre una y otra. `update` a secas restaba a ciegas y podía dejar el
+      // stock en negativo.
+      //
+      // Esto puede pasar de verdad: entre que se crea el pedido en PENDING y
+      // llega este webhook pasan los minutos que el cliente tarda en
+      // Recurrente, y en esa ventana nada aparta el inventario para él. Con
+      // varios productos en "Últimas 1", dos personas pueden pagar la misma
+      // unidad.
+      const sobreventa: string[] = [];
       for (const item of order.items) {
-        await prisma.product.update({
-          where: { id: item.productId },
+        const bajado = await prisma.product.updateMany({
+          where: { id: item.productId, stock: { gte: item.quantity } },
           data: { stock: { decrement: item.quantity } },
         });
+
+        if (bajado.count === 0) {
+          // El cobro ya ocurrió y no se revierte desde aquí. Lo que importa es
+          // enterarse YA, mientras todavía se le puede llamar al cliente y
+          // ofrecerle otra cosa, en vez de descubrirlo cuando reclame.
+          sobreventa.push(`${item.product.name} ×${item.quantity}`);
+          console.error(
+            "[recurrente webhook] SOBREVENTA en el pedido %s: %s sin existencia suficiente",
+            order.id,
+            item.product.name
+          );
+        }
       }
 
       const lineas = order.items.map((it) => ({
@@ -177,6 +200,7 @@ export async function POST(request: Request) {
           correoCliente,
           tieneCuenta: Boolean(order.userId),
           envio,
+          sobreventa,
         });
       } catch (err) {
         console.error("[recurrente webhook] No se pudo avisar del pedido nuevo: %o", err);
@@ -210,10 +234,45 @@ export async function POST(request: Request) {
           select: { couponId: true },
         });
         if (withCoupon?.couponId) {
-          await prisma.coupon.update({
+          // Mismo principio que el stock: la comprobación del límite va en el
+          // where, no antes. `applyCoupon` valida al APLICARLO al carrito, y
+          // el contador solo sube aquí, minutos después — en esa ventana un
+          // cupón de un solo uso lo pueden aplicar y pagar varias personas, y
+          // el `increment` a ciegas de antes las dejaba pasar a todas.
+          //
+          // El límite se lee antes y se compara contra un número literal, en vez
+          // de usar una referencia de campo (`prisma.coupon.fields.usageLimit`).
+          // Sigue siendo atómico, que es lo que importa: la condición viaja en
+          // el WHERE y el motor la evalúa en el mismo UPDATE. Y se puede
+          // razonar sin depender de una función de Prisma que aquí no hay forma
+          // de probar en local — el cliente está generado para `workerd` y no
+          // arranca bajo Node.
+          //
+          // Leer `usageLimit` por separado no abre ninguna carrera: es un
+          // ajuste que solo cambia desde el panel, no algo que se mueva mientras
+          // los clientes pagan.
+          const limite = await prisma.coupon.findUnique({
             where: { id: withCoupon.couponId },
+            select: { usageLimit: true },
+          });
+
+          const aplicado = await prisma.coupon.updateMany({
+            where:
+              limite?.usageLimit == null
+                ? { id: withCoupon.couponId }
+                : { id: withCoupon.couponId, usageCount: { lt: limite.usageLimit } },
             data: { usageCount: { increment: 1 } },
           });
+
+          if (aplicado.count === 0) {
+            // El pedido ya se cobró con el descuento aplicado; esto no lo
+            // revierte, solo deja rastro para poder revisarlo en /admin/pedidos.
+            console.error(
+              "[recurrente webhook] El cupón %s se usó pasado su límite en el pedido %s",
+              withCoupon.couponId,
+              order.id
+            );
+          }
         }
       } catch (err) {
         console.error("[recurrente webhook] No se pudo contabilizar el cupón: %o", err);
