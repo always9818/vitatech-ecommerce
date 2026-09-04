@@ -347,18 +347,18 @@ export async function sendEmailVerificationEmail(to: string, verifyUrl: string) 
           <img src="${SITE_URL}/vito-mascota.png" alt="Vito, la mascota de Vitatech" width="96" height="96" style="display: inline-block; border-radius: 50%;" />
         </div>
         <h1 style="font-size: 20px; text-align: center;">¡Bienvenido a VITATECH!</h1>
-        <p>Soy Vito. Solo falta un paso: confirmá que este correo es tuyo.</p>
+        <p>Soy Vito. Solo falta un paso: confirma que este correo es tuyo.</p>
         <p>
           <a href="${verifyUrl}" style="display: inline-block; background: #a3e635; color: #1a2e05; font-weight: bold; padding: 12px 24px; border-radius: 10px; text-decoration: none;">
             Confirmar mi correo
           </a>
         </p>
         <p style="font-size: 13px; color: #57534e;">
-          El enlace vence en 24 horas. Podés seguir comprando mientras tanto — confirmarlo solo
+          El enlace vence en 24 horas. Puedes seguir comprando mientras tanto — confirmarlo solo
           nos sirve para estar seguros de que te llegan los avisos de tus pedidos.
         </p>
         <p style="font-size: 13px; color: #57534e;">
-          Si no creaste esta cuenta, ignorá este correo: sin confirmar no pasa nada.
+          Si no creaste esta cuenta, ignora este correo: sin confirmar no pasa nada.
         </p>
       </div>
     `,
