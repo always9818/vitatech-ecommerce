@@ -1,5 +1,5 @@
 import { Icon } from "@/components/Icon";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, SUPPORT_EMAIL } from "@/lib/site";
 
 export const metadata = pageMetadata({
   title: "Términos y condiciones",
@@ -93,7 +93,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: "13. Contacto",
     paragraphs: [
-      "Para cualquier duda, aclaración o reclamo relacionado con estos Términos, puede escribirnos por WhatsApp al +502 5335-3561 o al correo info@importacionesvitatech.com, en nuestro horario de atención: lunes a sábado, de 9:00 a. m. a 6:00 p. m.",
+      `Para cualquier duda, aclaración o reclamo relacionado con estos Términos, puede escribirnos por WhatsApp al +502 5335-3561 o al correo ${SUPPORT_EMAIL}, en nuestro horario de atención: lunes a sábado, de 9:00 a. m. a 6:00 p. m.`,
     ],
   },
 ];

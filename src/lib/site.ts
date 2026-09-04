@@ -9,7 +9,7 @@ export const SITE_TITLE = "VITATECH_ · Tecnología y suplementos";
 export const SITE_DESCRIPTION =
   "Tecnología original y suplementos de marcas confiables, con envío a todo Guatemala y garantía real.";
 export const SUPPORT_PHONE_E164 = "+50253353561";
-export const SUPPORT_EMAIL = "info@importacionesvitatech.com";
+export const SUPPORT_EMAIL = "info@importadoravitatech.com";
 
 /**
  * `openGraph.title`/`description` NO heredan el `title`/`description` de la

@@ -1,5 +1,5 @@
 import { StaticInfoPage } from "@/components/StaticInfoPage";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, SUPPORT_EMAIL } from "@/lib/site";
 
 export const metadata = pageMetadata({
   title: "Soporte",
@@ -15,7 +15,7 @@ export default function SoportePage() {
       subtitle="¿Necesitas ayuda? Estamos para servirte."
       paragraphs={[
         "WhatsApp: +502 5335-3561.",
-        "Correo electrónico: info@importacionesvitatech.com.",
+        `Correo electrónico: ${SUPPORT_EMAIL}.`,
         "Horario de atención: lunes a sábado, de 9:00 a. m. a 6:00 p. m.",
         "Todos nuestros envíos se realizan a través de GUATEX.",
       ]}

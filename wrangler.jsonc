@@ -51,6 +51,10 @@
     // any origin" (las fotos viven en el bucket publico pub-*.r2.dev, que es
     // otro origen). Sin ese paso, todas las fotos darian 404.
     "IMAGENES_OPTIMIZADAS": "0",
+    // A donde llegan los avisos de pedido nuevo (ver sendNewOrderAdminEmail).
+    // Es el correo oficial de la tienda, el mismo que ve el cliente en
+    // /soporte y /terminos.
+    "ADMIN_NOTIFY_EMAIL": "info@importadoravitatech.com",
     "R2_PUBLIC_URL": "https://pub-f5e3eee06ae444ed8a574cb56350cc48.r2.dev",
     "NEXT_PUBLIC_APP_URL": "https://importadoravitatech.com",
     "NEXTAUTH_URL": "https://importadoravitatech.com",
