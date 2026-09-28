@@ -13,14 +13,20 @@ function isEmailEnabled() {
   return Boolean(process.env.RESEND_API_KEY);
 }
 
-async function sendEmail(params: { to: string; subject: string; html: string }) {
+/**
+ * Devuelve si Resend aceptó el correo. Los avisos de siempre lo ignoran (un
+ * correo que falla no debe tumbar un pago), pero el formulario de contacto lo
+ * necesita: si no se envió, el cliente tiene que saberlo y no quedarse
+ * esperando una respuesta que nunca llegará.
+ */
+async function sendEmail(params: { to: string; subject: string; html: string; replyTo?: string }): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     // No se lanza al que hizo la solicitud: quien pide restablecer su
     // contraseña no debe enterarse de un detalle de configuración interna.
     // Sí queda visible en `wrangler tail` para diagnosticar.
     console.error("[email] RESEND_API_KEY no configurada; no se envió el correo a", params.to);
-    return;
+    return false;
   }
 
   // Mientras no se verifique importadoravitatech.com en Resend, se envía desde
@@ -38,13 +44,21 @@ async function sendEmail(params: { to: string; subject: string; html: string }) 
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({ from, to: params.to, subject: params.subject, html: params.html }),
+    body: JSON.stringify({
+      from,
+      to: params.to,
+      subject: params.subject,
+      html: params.html,
+      ...(params.replyTo ? { reply_to: params.replyTo } : {}),
+    }),
   });
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     console.error(`[email] Resend respondió ${res.status} al enviar a ${params.to}: ${body}`);
+    return false;
   }
+  return true;
 }
 
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
@@ -360,6 +374,66 @@ export async function sendEmailVerificationEmail(to: string, verifyUrl: string) 
         <p style="font-size: 13px; color: #57534e;">
           Si no creaste esta cuenta, ignora este correo: sin confirmar no pasa nada.
         </p>
+      </div>
+    `,
+  });
+}
+
+/** Escapa lo que escribió el cliente antes de meterlo en el HTML del correo. */
+function escaparHtml(texto: string) {
+  return texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export type MensajeContacto = {
+  nombre: string;
+  correo: string;
+  telefono: string;
+  motivo: string;
+  mensaje: string;
+};
+
+/**
+ * Mensaje del formulario de /contacto, a la bandeja de la tienda.
+ *
+ * Llega a ADMIN_NOTIFY_EMAIL con `reply_to` = el correo del cliente: Angel
+ * contesta con "Responder" como a cualquier correo, sin copiar direcciones.
+ * A propósito NO se le manda copia al cliente: el formulario no verifica que
+ * el correo sea suyo, y una copia automática convertiría el sitio en una
+ * herramienta para mandar correos con la marca VITATECH a quien sea.
+ */
+export async function sendContactMessageEmail(m: MensajeContacto): Promise<boolean> {
+  const to = process.env.ADMIN_NOTIFY_EMAIL;
+  if (!to) {
+    console.error("[email] Falta ADMIN_NOTIFY_EMAIL; no se entregó el mensaje de contacto de %s", m.correo);
+    return false;
+  }
+
+  const fila = (etiqueta: string, valor: string) => `
+    <tr>
+      <td style="padding: 6px 12px 6px 0; color: #57534e; font-size: 13px; white-space: nowrap; vertical-align: top;">${etiqueta}</td>
+      <td style="padding: 6px 0; color: #1a2e05; font-size: 14px;">${valor}</td>
+    </tr>`;
+
+  return sendEmail({
+    to,
+    replyTo: m.correo,
+    subject: `Contacto web · ${m.motivo} · ${m.nombre}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; color: #1a2e05; background: #ffffff; padding: 24px;">
+        <p style="margin: 0 0 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #4d7c0f; font-weight: bold;">Nuevo mensaje desde la tienda</p>
+        <h2 style="margin: 0 0 16px; font-size: 20px;">${escaparHtml(m.motivo)}</h2>
+        <table style="border-collapse: collapse; margin-bottom: 16px;">
+          ${fila("Nombre", escaparHtml(m.nombre))}
+          ${fila("Correo", `<a href="mailto:${escaparHtml(m.correo)}" style="color: #4d7c0f;">${escaparHtml(m.correo)}</a>`)}
+          ${m.telefono ? fila("Teléfono", escaparHtml(m.telefono)) : ""}
+        </table>
+        <div style="border-left: 3px solid #a3e635; background: #f7fee7; padding: 12px 16px; font-size: 14px; line-height: 1.55; white-space: pre-wrap;">${escaparHtml(m.mensaje)}</div>
+        <p style="margin-top: 20px; font-size: 12px; color: #78716c;">Responde a este correo y le llegará directo a ${escaparHtml(m.nombre)}.</p>
       </div>
     `,
   });

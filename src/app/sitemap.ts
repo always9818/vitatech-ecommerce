@@ -16,6 +16,7 @@ const STATIC_ROUTES: { path: string; changeFrequency: "daily" | "weekly" | "mont
   { path: "/envios", changeFrequency: "monthly", priority: 0.4 },
   { path: "/garantias", changeFrequency: "monthly", priority: 0.4 },
   { path: "/soporte", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/contacto", changeFrequency: "monthly", priority: 0.5 },
   { path: "/terminos", changeFrequency: "monthly", priority: 0.3 },
 ];
 

@@ -75,15 +75,21 @@ export function WhatsAppProducto({ href }: { href: string }) {
 }
 
 /**
- * Botón de la página 404. Es el último recurso de quien no encontró lo que
+ * Botón de ayuda de la página 404 y de /contacto. Es el último recurso de quien no encontró lo que
  * buscaba: si el enlace venía de un anuncio viejo, preguntar por WhatsApp
  * rescata la venta en vez de perder al cliente.
  */
-export function WhatsAppAyuda({ href }: { href: string }) {
+export function WhatsAppAyuda({
+  href,
+  origen = "pagina-404",
+}: {
+  href: string;
+  origen?: Extract<OrigenWhatsApp, "pagina-404" | "contacto">;
+}) {
   return (
     <EnlaceWhatsApp
       href={href}
-      origen="pagina-404"
+      origen={origen}
       className="vt-btn vt-btn-accent inline-flex flex-none items-center justify-center gap-2.5 rounded-[10px] bg-vt-accent px-6 py-3.5 text-sm font-bold text-vt-accent-fg"
     >
       <Icon name="whatsapp" className="h-[18px] w-[18px]" />

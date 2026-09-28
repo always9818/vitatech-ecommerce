@@ -127,7 +127,12 @@ export default function NotFound() {
               Escríbenos y te decimos si lo tenemos o si lo podemos importar para ti.
             </p>
           </div>
-          <WhatsAppAyuda href={whatsappUrl(MENSAJE_NO_ENCONTRADO)} />
+          <div className="flex flex-none flex-col items-center gap-2">
+            <WhatsAppAyuda href={whatsappUrl(MENSAJE_NO_ENCONTRADO)} />
+            <Link href="/contacto" className="text-[12.5px] font-semibold text-vt-muted-1 hover:text-vt-accent">
+              o escríbenos por correo
+            </Link>
+          </div>
         </section>
       </div>
     </div>

@@ -99,7 +99,7 @@ export function trackInitiateCheckout(items: TrackedItem[], value: number) {
  * el botón flotante del de la ficha de producto, para saber cuál trae gente.
  */
 /** Desde dónde se abrió WhatsApp: separa en GA4 qué botón trae más contactos. */
-export type OrigenWhatsApp = "flotante" | "ficha-producto" | "pagina-404";
+export type OrigenWhatsApp = "flotante" | "ficha-producto" | "pagina-404" | "contacto";
 
 export function trackWhatsAppContact(origen: OrigenWhatsApp) {
   fbq("track", "Contact", { content_name: origen });

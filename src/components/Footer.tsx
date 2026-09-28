@@ -22,6 +22,9 @@ export function Footer() {
           <Link href="/soporte" className="hover:text-vt-accent">
             Soporte
           </Link>
+          <Link href="/contacto" className="hover:text-vt-accent">
+            Contacto
+          </Link>
           <Link href="/terminos" className="hover:text-vt-accent">
             Términos
           </Link>
