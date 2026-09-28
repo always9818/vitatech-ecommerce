@@ -10,6 +10,10 @@ import { VitoMascot } from "@/components/Logo";
 import { shippingCostFor } from "@/lib/shipping";
 import { FreeShippingBar } from "@/components/FreeShippingBar";
 
+// Página personal, sin nada que buscar en Google: fuera del índice. Antes
+// heredaba la descripción de la portada y competía con ella en los resultados.
+export const metadata = { title: "Mi carrito", robots: { index: false, follow: true } };
+
 export default async function CartPage() {
   const items = await getCart();
   const count = items.reduce((a, it) => a + it.quantity, 0);

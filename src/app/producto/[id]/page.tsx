@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { productMetaDescription } from "@/lib/product-meta";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductById, getRelatedProducts } from "@/lib/catalog";
@@ -49,7 +50,7 @@ export async function generateMetadata({
 
   return pageMetadata({
     title: product.name,
-    description: product.description.slice(0, 155),
+    description: productMetaDescription(product),
     path: `/producto/${id}`,
     image: product.images[0],
   });

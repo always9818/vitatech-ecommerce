@@ -1,6 +1,10 @@
 import { isGoogleEnabled } from "@/auth";
 import { LoginForm } from "./LoginForm";
 
+// Página personal, sin nada que buscar en Google: fuera del índice. Antes
+// heredaba la descripción de la portada y competía con ella en los resultados.
+export const metadata = { title: "Iniciar sesión", robots: { index: false, follow: true } };
+
 /**
  * A dónde mandar al cliente después de entrar.
  *
