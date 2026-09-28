@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { VitoMascot } from "@/components/Logo";
 import { Icon } from "@/components/Icon";
 import { ProductCard } from "@/components/ProductCard";
@@ -34,10 +35,14 @@ async function sugerencias() {
 const GRADIENTE_DIGITO =
   "bg-gradient-to-b from-vt-accent-hover via-vt-accent to-[#16B5A0] bg-clip-text text-transparent drop-shadow-[0_10px_30px_rgba(163,230,53,.18)]";
 
-export default async function NotFound() {
-  const { categorias, conteos, destacados } = await sugerencias();
-  const departamentos = conteos ? DEPARTMENT_ORDER.filter((d) => conteos[d] > 0) : [];
-
+/*
+ * La página es síncrona a propósito y lo que consulta la base va aparte, en
+ * <Sugerencias> dentro de un <Suspense>. Con la página entera async, al
+ * hidratar Next reemplazaba el título "Página no encontrada" por el de la
+ * portada (verificado en producción el 2026-09-28). Además así Vito y el
+ * buscador se ven al instante aunque la base esté despertando.
+ */
+export default function NotFound() {
   return (
     <div className="animate-vt-fade relative overflow-hidden">
       {/* Fondo: retícula de circuito + halo lima detrás de Vito. */}
@@ -107,90 +112,9 @@ export default async function NotFound() {
           </nav>
         </section>
 
-        {/* ── Departamentos ────────────────────────────────────────── */}
-        {departamentos.length > 0 && (
-          <section className="mt-16">
-            <TituloSeccion>Explora por departamento</TituloSeccion>
-            <div className={`grid gap-4 ${departamentos.length > 1 ? "min-[720px]:grid-cols-2" : ""}`}>
-              {departamentos.map((d, i) => {
-                const info = DEPARTMENTS[d];
-                const total = conteos![d];
-                return (
-                  <Link
-                    key={d}
-                    href={`/catalogo?dept=${info.slug}`}
-                    className="animate-vt-stagger group relative flex items-center gap-5 overflow-hidden rounded-3xl border border-white/10 bg-white/[.03] p-6 transition-colors hover:border-vt-accent/50 hover:bg-white/[.05]"
-                    style={{ animationDelay: `${0.1 + i * 0.08}s` }}
-                  >
-                    <div
-                      aria-hidden
-                      className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                      style={{ background: "radial-gradient(circle, rgba(163,230,53,.18), transparent 65%)" }}
-                    />
-                    <span className="grid h-14 w-14 flex-none place-items-center rounded-2xl border border-vt-accent/25 bg-vt-accent/[.1] text-vt-accent transition-transform duration-300 group-hover:scale-105">
-                      <Icon name={info.icon} className="h-7 w-7" />
-                    </span>
-                    <div className="relative min-w-0 flex-1">
-                      <div className="font-heading text-[19px] font-bold text-white">{info.label}</div>
-                      <div className="mt-0.5 text-[13px] text-vt-muted-1">{info.tagline}</div>
-                      <div className="mt-2 text-[12px] font-semibold text-vt-muted-2">
-                        {total} {total === 1 ? "producto" : "productos"}
-                      </div>
-                    </div>
-                    <Icon
-                      name="chevronRight"
-                      className="relative h-5 w-5 flex-none text-vt-muted-2 transition-all duration-300 group-hover:translate-x-1 group-hover:text-vt-accent"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ── Categorías populares ─────────────────────────────────── */}
-        {categorias.length > 0 && (
-          <section className="mt-10">
-            <TituloSeccion>Categorías populares</TituloSeccion>
-            <div className="flex flex-wrap gap-2.5">
-              {categorias.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/catalogo?dept=${DEPARTMENTS[c.department].slug}&cat=${encodeURIComponent(c.name)}`}
-                  className="vt-btn inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.03] py-2 pr-2.5 pl-3 text-[13px] font-semibold text-vt-fg hover:border-vt-accent/50 hover:text-vt-accent"
-                >
-                  <Icon name={resolveCategoryIcon(c.name)} className="h-4 w-4 text-vt-accent" />
-                  {c.name}
-                  <span className="rounded-full bg-white/[.07] px-1.5 py-px text-[11px] text-vt-muted-2">
-                    {c._count.products}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Destacados ───────────────────────────────────────────── */}
-        {destacados.length > 0 && (
-          <section className="mt-14">
-            <div className="mb-5 flex items-end justify-between gap-4">
-              <TituloSeccion className="mb-0">Quizá te interese</TituloSeccion>
-              <Link
-                href="/catalogo"
-                className="inline-flex flex-none items-center gap-1 text-[13px] font-semibold text-vt-accent hover:underline"
-              >
-                Ver todo <Icon name="chevronRight" className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4 min-[880px]:grid-cols-4">
-              {/* index desde 4: están debajo del pliegue, sus fotos pueden
-                  esperar (ProductCard carga "eager" solo las 4 primeras). */}
-              {destacados.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i + 4} />
-              ))}
-            </div>
-          </section>
-        )}
+        <Suspense fallback={null}>
+          <Sugerencias />
+        </Suspense>
 
         {/* ── Ayuda por WhatsApp ───────────────────────────────────── */}
         <section className="mt-14 flex flex-col items-center gap-5 rounded-3xl border border-vt-accent/20 bg-gradient-to-br from-vt-accent/[.09] via-white/[.02] to-transparent p-7 text-center min-[720px]:flex-row min-[720px]:p-8 min-[720px]:text-left">
@@ -207,6 +131,100 @@ export default async function NotFound() {
         </section>
       </div>
     </div>
+  );
+}
+
+async function Sugerencias() {
+  const { categorias, conteos, destacados } = await sugerencias();
+  const departamentos = conteos ? DEPARTMENT_ORDER.filter((d) => conteos[d] > 0) : [];
+
+  return (
+    <>
+          {/* ── Departamentos ────────────────────────────────────────── */}
+          {departamentos.length > 0 && (
+            <section className="mt-16">
+              <TituloSeccion>Explora por departamento</TituloSeccion>
+              <div className={`grid gap-4 ${departamentos.length > 1 ? "min-[720px]:grid-cols-2" : ""}`}>
+                {departamentos.map((d, i) => {
+                  const info = DEPARTMENTS[d];
+                  const total = conteos![d];
+                  return (
+                    <Link
+                      key={d}
+                      href={`/catalogo?dept=${info.slug}`}
+                      className="animate-vt-stagger group relative flex items-center gap-5 overflow-hidden rounded-3xl border border-white/10 bg-white/[.03] p-6 transition-colors hover:border-vt-accent/50 hover:bg-white/[.05]"
+                      style={{ animationDelay: `${0.1 + i * 0.08}s` }}
+                    >
+                      <div
+                        aria-hidden
+                        className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        style={{ background: "radial-gradient(circle, rgba(163,230,53,.18), transparent 65%)" }}
+                      />
+                      <span className="grid h-14 w-14 flex-none place-items-center rounded-2xl border border-vt-accent/25 bg-vt-accent/[.1] text-vt-accent transition-transform duration-300 group-hover:scale-105">
+                        <Icon name={info.icon} className="h-7 w-7" />
+                      </span>
+                      <div className="relative min-w-0 flex-1">
+                        <div className="font-heading text-[19px] font-bold text-white">{info.label}</div>
+                        <div className="mt-0.5 text-[13px] text-vt-muted-1">{info.tagline}</div>
+                        <div className="mt-2 text-[12px] font-semibold text-vt-muted-2">
+                          {total} {total === 1 ? "producto" : "productos"}
+                        </div>
+                      </div>
+                      <Icon
+                        name="chevronRight"
+                        className="relative h-5 w-5 flex-none text-vt-muted-2 transition-all duration-300 group-hover:translate-x-1 group-hover:text-vt-accent"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* ── Categorías populares ─────────────────────────────────── */}
+          {categorias.length > 0 && (
+            <section className="mt-10">
+              <TituloSeccion>Categorías populares</TituloSeccion>
+              <div className="flex flex-wrap gap-2.5">
+                {categorias.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/catalogo?dept=${DEPARTMENTS[c.department].slug}&cat=${encodeURIComponent(c.name)}`}
+                    className="vt-btn inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.03] py-2 pr-2.5 pl-3 text-[13px] font-semibold text-vt-fg hover:border-vt-accent/50 hover:text-vt-accent"
+                  >
+                    <Icon name={resolveCategoryIcon(c.name)} className="h-4 w-4 text-vt-accent" />
+                    {c.name}
+                    <span className="rounded-full bg-white/[.07] px-1.5 py-px text-[11px] text-vt-muted-2">
+                      {c._count.products}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Destacados ───────────────────────────────────────────── */}
+          {destacados.length > 0 && (
+            <section className="mt-14">
+              <div className="mb-5 flex items-end justify-between gap-4">
+                <TituloSeccion className="mb-0">Quizá te interese</TituloSeccion>
+                <Link
+                  href="/catalogo"
+                  className="inline-flex flex-none items-center gap-1 text-[13px] font-semibold text-vt-accent hover:underline"
+                >
+                  Ver todo <Icon name="chevronRight" className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-4 min-[880px]:grid-cols-4">
+                {/* index desde 4: están debajo del pliegue, sus fotos pueden
+                    esperar (ProductCard carga "eager" solo las 4 primeras). */}
+                {destacados.map((p, i) => (
+                  <ProductCard key={p.id} product={p} index={i + 4} />
+                ))}
+              </div>
+            </section>
+          )}
+    </>
   );
 }
 
