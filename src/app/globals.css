@@ -226,3 +226,71 @@ select optgroup {
     animation: none;
   }
 }
+
+/* ── Página 404 ────────────────────────────────────────────────────────
+   Vito flota en el lugar del "0" mientras un radar lo rodea: está buscando
+   la página. La sombra de abajo se encoge cuando él sube, para que se lea
+   como un objeto en el aire y no como un dibujo que se desliza. */
+
+@keyframes vt-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes vt-float-shadow {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scaleX(0.72);
+    opacity: 0.3;
+  }
+}
+
+@keyframes vt-radar {
+  from {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+.animate-vt-float {
+  animation: vt-float 4.2s ease-in-out infinite;
+}
+.animate-vt-float-shadow {
+  animation: vt-float-shadow 4.2s ease-in-out infinite;
+}
+.animate-vt-radar {
+  animation: vt-radar 3s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+}
+
+/* Retícula tipo placa de circuito, desvanecida hacia los bordes. */
+.vt-grid-bg {
+  background-image:
+    linear-gradient(rgba(163, 230, 53, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163, 230, 53, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 20%, transparent 75%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-vt-float,
+  .animate-vt-float-shadow,
+  .animate-vt-radar {
+    animation: none;
+  }
+  .animate-vt-radar {
+    opacity: 0;
+  }
+}

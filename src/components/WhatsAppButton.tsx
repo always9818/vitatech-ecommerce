@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/Icon";
-import { trackWhatsAppContact } from "@/lib/tracking";
+import { trackWhatsAppContact, type OrigenWhatsApp } from "@/lib/tracking";
 
 /**
  * Enlace a WhatsApp con el mensaje ya escrito.
@@ -19,7 +19,7 @@ function EnlaceWhatsApp({
   ...rest
 }: {
   href: string;
-  origen: "flotante" | "ficha-producto";
+  origen: OrigenWhatsApp;
   className?: string;
   children: React.ReactNode;
 } & Omit<React.ComponentPropsWithoutRef<"a">, "href" | "className" | "children" | "onClick">) {
@@ -70,6 +70,24 @@ export function WhatsAppProducto({ href }: { href: string }) {
     >
       <Icon name="whatsapp" className="h-[18px] w-[18px]" />
       Preguntar por WhatsApp
+    </EnlaceWhatsApp>
+  );
+}
+
+/**
+ * Botón de la página 404. Es el último recurso de quien no encontró lo que
+ * buscaba: si el enlace venía de un anuncio viejo, preguntar por WhatsApp
+ * rescata la venta en vez de perder al cliente.
+ */
+export function WhatsAppAyuda({ href }: { href: string }) {
+  return (
+    <EnlaceWhatsApp
+      href={href}
+      origen="pagina-404"
+      className="vt-btn vt-btn-accent inline-flex flex-none items-center justify-center gap-2.5 rounded-[10px] bg-vt-accent px-6 py-3.5 text-sm font-bold text-vt-accent-fg"
+    >
+      <Icon name="whatsapp" className="h-[18px] w-[18px]" />
+      Escribirnos por WhatsApp
     </EnlaceWhatsApp>
   );
 }

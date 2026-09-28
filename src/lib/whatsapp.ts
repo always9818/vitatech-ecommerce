@@ -24,3 +24,7 @@ ${opts.url}
 
 ¿Está disponible?`;
 }
+
+/** El de la página 404: el cliente llegó buscando algo que no encontró. */
+export const MENSAJE_NO_ENCONTRADO =
+  "Hola VITATECH 👋 Estaba buscando un producto en su página y no lo encontré. ¿Me pueden ayudar?";
