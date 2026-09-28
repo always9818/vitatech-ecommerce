@@ -255,7 +255,12 @@ export async function getFilteredProducts(opts: {
 export async function getSitemapProducts() {
   return prisma.product.findMany({
     where: SOLO_VISIBLES,
-    select: { id: true, updatedAt: true },
+    select: {
+      id: true,
+      updatedAt: true,
+      images: true,
+      category: { select: { name: true, department: true } },
+    },
     orderBy: { updatedAt: "desc" },
   });
 }
